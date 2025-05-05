@@ -4,12 +4,12 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
+import { Folder, LayoutGrid } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
 	{
-		title: 'Dashboard',
+		title: 'Main Menu',
 		href: '/dashboard',
 		icon: LayoutGrid,
 	},
@@ -17,14 +17,9 @@ const mainNavItems: NavItem[] = [
 
 const footerNavItems: NavItem[] = [
 	{
-		title: 'Repository',
-		href: 'https://github.com/laravel/react-starter-kit',
+		title: 'Source Code',
+		href: 'https://github.com/vempr/libsim',
 		icon: Folder,
-	},
-	{
-		title: 'Documentation',
-		href: 'https://laravel.com/docs/starter-kits#react',
-		icon: BookOpen,
 	},
 ];
 
