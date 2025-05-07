@@ -13,5 +13,9 @@ class DatabaseSeeder extends Seeder {
 	 */
 	public function run(): void {
 		Work::factory(20)->recycle(User::factory(2)->create())->create();
+
+		$this->call([
+			LanguageSeeder::class,
+		]);
 	}
 }
