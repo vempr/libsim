@@ -16,8 +16,13 @@ return new class extends Migration {
 			$table->text("description")->nullable();
 			$table->string("status")->nullable();
 			$table->string("author")->nullable();
+
 			$table->string("language_original")->nullable();
+			$table->foreign('language_original')->references('code')->on('languages');
+
 			$table->string("language_translated")->nullable();
+			$table->foreign('language_translated')->references('code')->on('languages');
+
 			$table->integer("publication_year")->nullable();
 			$table->string("image")->nullable();
 			$table->timestamps();
