@@ -42,7 +42,7 @@ class WorkController extends Controller {
 	public function show(Work $work) {
 		$this->authorize('view', $work);
 
-		return Inertia::render('works/id', [
+		return Inertia::render('works/work', [
 			'work' => $work,
 		]);
 	}

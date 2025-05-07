@@ -2,7 +2,7 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 
-export default function Id() {
+export default function Work() {
 	const { work } = usePage<InertiaProps>().props;
 
 	const breadcrumbs: BreadcrumbItem[] = [
