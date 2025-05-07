@@ -12,10 +12,10 @@ class DatabaseSeeder extends Seeder {
 	 * Seed the application's database.
 	 */
 	public function run(): void {
-		Work::factory(20)->recycle(User::factory(2)->create())->create();
-
 		$this->call([
 			LanguageSeeder::class,
 		]);
+
+		Work::factory(20)->recycle(User::factory(2)->create())->create();
 	}
 }
