@@ -41,3 +41,18 @@ export interface User {
   updated_at: string;
   [key: string]: unknown; // This allows for additional properties...
 }
+
+export interface Work {
+  id: number;
+  user_id: number;
+  title: string;
+  description?: string | null;
+  status?: string | null;
+  author?: string | null;
+  language_original?: string | null;
+  language_translated?: string | null;
+  publication_year?: number | null;
+  image?: string | null;
+  created_at: string;
+  updated_at: string;
+}
