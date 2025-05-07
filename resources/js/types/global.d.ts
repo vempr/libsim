@@ -22,6 +22,6 @@ declare global {
   interface InertiaProps extends Page<PageProps> {
     work: Work;
     works: Work[];
-    [key: string]: any;
+    [key: string]: unknown;
   }
 }
