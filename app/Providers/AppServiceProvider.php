@@ -2,9 +2,15 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
+use App\Models\Work;
+use App\Policies\WorkPolicy;
+use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
-class AppServiceProvider extends ServiceProvider {
+class AuthServiceProvider extends ServiceProvider {
+	protected $policies = [
+		Work::class => WorkPolicy::class,
+	];
+
 	/**
 	 * Register any application services.
 	 */
@@ -16,6 +22,6 @@ class AppServiceProvider extends ServiceProvider {
 	 * Bootstrap any application services.
 	 */
 	public function boot(): void {
-		//
+		$this->registerPolicies();
 	}
 }

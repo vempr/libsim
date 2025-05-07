@@ -10,6 +10,7 @@ use Inertia\Inertia;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class WorkController extends Controller {
+	use AuthorizesRequests;
 	/**
 	 * Display a listing of the resource.
 	 */
@@ -39,7 +40,7 @@ class WorkController extends Controller {
 	 * Display the specified resource.
 	 */
 	public function show(Work $work) {
-		if (Auth::id() !== $work->user_id) return redirect('works/all');
+		$this->authorize('view', $work);
 
 		return Inertia::render('works/id', [
 			'work' => $work,
