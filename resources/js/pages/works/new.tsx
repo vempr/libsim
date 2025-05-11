@@ -12,7 +12,7 @@ import { type BreadcrumbItem } from '@/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const breadcrumbs: BreadcrumbItem[] = [
-	{ title: 'Import Work', href: '/works/create' },
+	{ title: 'Create Entry', href: '/works/create' },
 ];
 
 export default function New() {
@@ -26,7 +26,7 @@ export default function New() {
 
 	return (
 		<AppLayout breadcrumbs={breadcrumbs}>
-			<Head title="Import Work" />
+			<Head title="Create Entry" />
 
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">

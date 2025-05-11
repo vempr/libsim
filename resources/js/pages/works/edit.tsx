@@ -23,7 +23,7 @@ export default function New() {
 			href: `/works/${work.id}`,
 		},
 		{
-			title: 'Edit Work',
+			title: 'Edit Entry',
 			href: `/works/${work.id}/edit`,
 		},
 	];

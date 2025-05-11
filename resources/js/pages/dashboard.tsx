@@ -4,7 +4,7 @@ import { Head } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
 	{
-		title: 'Main Menu',
+		title: 'Dashboard',
 		href: '/dashboard',
 	},
 ];
@@ -12,7 +12,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function Dashboard() {
 	return (
 		<AppLayout breadcrumbs={breadcrumbs}>
-			<Head title="Main Menu" />
+			<Head title="Dashboard" />
 		</AppLayout>
 	);
 }

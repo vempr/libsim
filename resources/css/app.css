@@ -7,8 +7,26 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@font-face {
+  font-family: Oswald;
+  font-style: normal;
+  src: url('/fonts/Manrope-Regular.tff') format('ttf');
+}
+
+@font-face {
+  font-family: Oswald;
+  font-style: bold;
+  src: url('/fonts/Manrope-Bold.tff') format('ttf');
+}
+
+@font-face {
+  font-family: Oswald;
+  font-style: light;
+  src: url('/fonts/Manrope-Light.tff') format('ttf');
+}
+
 @theme {
-  --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-sans: 'Oswald', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
@@ -102,7 +120,7 @@
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
   --radius: 0.625rem;
-  --sidebar: oklch(0.96 0.0222 0);
+  --sidebar: oklch(0.99 0.0222 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
   --sidebar-primary-foreground: oklch(0.985 0 0);
