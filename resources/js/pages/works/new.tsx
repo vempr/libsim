@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { languages, status, workSchema } from '@/types/schemas/work';
+import { languages, statusPublication, statusReading, workSchema } from '@/types/schemas/work';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -10,14 +10,23 @@ import AppLayout from '@/layouts/app-layout';
 import { Head, router } from '@inertiajs/react';
 import { type BreadcrumbItem } from '@/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { InputTags } from '@/components/input-tags';
 
 const breadcrumbs: BreadcrumbItem[] = [
 	{ title: 'Create entry', href: '/works/create' },
 ];
 
+const sp = z.enum(statusPublication);
+const sr = z.enum(statusReading);
+type Publication = z.infer<typeof sp>;
+type Reading = z.infer<typeof sr>;
+
 export default function New() {
 	const form = useForm<z.infer<typeof workSchema>>({
 		resolver: zodResolver(workSchema),
+		defaultValues: {
+			status_reading: "reading",
+		},
 	});
 
 	function onSubmit(values: z.infer<typeof workSchema>) {
@@ -63,10 +72,10 @@ export default function New() {
 
 					<FormField
 						control={form.control}
-						name="status"
+						name="status_publication"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Status</FormLabel>
+								<FormLabel>Publication status</FormLabel>
 								<Select onValueChange={field.onChange}>
 									<FormControl>
 										<SelectTrigger>
@@ -74,7 +83,32 @@ export default function New() {
 										</SelectTrigger>
 									</FormControl>
 									<SelectContent>
-										{status.map((s) => (
+										{statusPublication.map((s: Publication) => (
+											<SelectItem key={s} value={s}>
+												{s.charAt(0).toUpperCase() + s.slice(1)}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+
+					<FormField
+						control={form.control}
+						name="status_reading"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Reading status</FormLabel>
+								<Select onValueChange={field.onChange} defaultValue="reading">
+									<FormControl>
+										<SelectTrigger>
+											<SelectValue placeholder="Select reading status" />
+										</SelectTrigger>
+									</FormControl>
+									<SelectContent>
+										{statusReading.map((s: Reading) => (
 											<SelectItem key={s} value={s}>
 												{s.charAt(0).toUpperCase() + s.slice(1)}
 											</SelectItem>
@@ -193,6 +227,26 @@ export default function New() {
 									})} />
 								</FormControl>
 								<FormDescription>URL for the cover image of the work, optional, up to 255 characters</FormDescription>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+
+					<FormField
+						control={form.control}
+						name="tags"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Tags</FormLabel>
+								<FormControl>
+									<InputTags
+										value={field.value}
+										{...form.register("tags", {
+											required: false,
+										})}
+									/>
+								</FormControl>
+								<FormDescription>Enter tags separated by commas/enter e.g. "romance,comedy, isekai", optional, up to 1000 characters</FormDescription>
 								<FormMessage />
 							</FormItem>
 						)}

@@ -47,7 +47,8 @@ export interface Work {
   user_id: number;
   title: string;
   description?: string | null;
-  status?: string | null;
+  status_publication?: 'unknown' | 'ongoing' | 'completed' | 'hiatus' | 'cancelled' | null;
+  status_reading: 'reading' | 'completed' | 'on hold' | 'dropped';
   author?: string | null;
   language_original?: string | null;
   language_translated?: string | null;
@@ -55,4 +56,5 @@ export interface Work {
   image?: string | null;
   created_at: string;
   updated_at: string;
+  tags: string | null;
 }
