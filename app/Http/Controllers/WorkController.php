@@ -37,7 +37,7 @@ class WorkController extends Controller {
 
 		$work = Work::create($requestWork);
 
-		return redirect()->route('work', ['work' => $work->id]);
+		return redirect('works/' . $work->id);
 	}
 
 	/**
@@ -55,14 +55,24 @@ class WorkController extends Controller {
 	 * Show the form for editing the specified resource.
 	 */
 	public function edit(Work $work) {
-		//
+		$this->authorize('view', $work);
+
+		return Inertia::render('works/edit', [
+			'work' => $work,
+		]);
 	}
 
 	/**
 	 * Update the specified resource in storage.
 	 */
 	public function update(UpdateWorkRequest $request, Work $work) {
-		//
+		$this->authorize('update', $work);
+
+		$work->update($request->validated());
+
+		return Inertia::render('works/work', [
+			'work' => $work,
+		]);
 	}
 
 	/**

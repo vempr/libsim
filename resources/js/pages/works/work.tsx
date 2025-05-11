@@ -1,6 +1,6 @@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 
 export default function Work() {
 	const { work } = usePage<InertiaProps>().props;
@@ -21,6 +21,7 @@ export default function Work() {
 			<Head title={work.title} />
 			<p>{JSON.stringify(work)}
 			</p>
+			<Link href={`/works/${work.id}/edit`}>Edit</Link>
 		</AppLayout>
 	);
 }
