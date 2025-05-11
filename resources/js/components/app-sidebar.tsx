@@ -14,7 +14,7 @@ const mainNavItems: NavItem[] = [
 		icon: LayoutGrid,
 	},
 	{
-		title: 'Saved Works',
+		title: 'Saved works',
 		href: '/works',
 		icon: LibraryBig,
 	},

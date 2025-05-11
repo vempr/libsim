@@ -15,15 +15,15 @@ export default function New() {
 	const { work } = usePage<InertiaProps>().props;
 	const breadcrumbs: BreadcrumbItem[] = [
 		{
-			title: 'Saved Works',
-			href: '/works/all',
+			title: 'Saved works',
+			href: '/works',
 		},
 		{
 			title: work.title,
 			href: `/works/${work.id}`,
 		},
 		{
-			title: 'Edit Entry',
+			title: 'Edit entry',
 			href: `/works/${work.id}/edit`,
 		},
 	];

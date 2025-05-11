@@ -7,8 +7,8 @@ export default function Work() {
 
 	const breadcrumbs: BreadcrumbItem[] = [
 		{
-			title: 'Saved Works',
-			href: '/works/all',
+			title: 'Saved works',
+			href: '/works',
 		},
 		{
 			title: work.title,
