@@ -15,7 +15,7 @@ const mainNavItems: NavItem[] = [
 	},
 	{
 		title: 'Saved Works',
-		href: '/works/all',
+		href: '/works',
 		icon: LibraryBig,
 	},
 ];
