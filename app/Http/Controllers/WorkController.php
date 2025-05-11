@@ -8,6 +8,7 @@ use App\Models\Work;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\RedirectResponse;
 
 class WorkController extends Controller {
 	use AuthorizesRequests;
@@ -15,10 +16,8 @@ class WorkController extends Controller {
 	 * Display a listing of the resource.
 	 */
 	public function index() {
-		$id = Auth::id();
-
 		return Inertia::render('works/all', [
-			'works' => Work::where('user_id', $id)->get(),
+			'works' => Auth::user()->works,
 		]);
 	}
 
@@ -26,14 +25,19 @@ class WorkController extends Controller {
 	 * Show the form for creating a new resource.
 	 */
 	public function create() {
-		//
+		return Inertia::render('works/new');
 	}
 
 	/**
 	 * Store a newly created resource in storage.
 	 */
-	public function store(StoreWorkRequest $request) {
-		//
+	public function store(StoreWorkRequest $request): RedirectResponse {
+		$requestWork = $request->validated();
+		$requestWork['user_id'] = Auth::id();
+
+		$work = Work::create($requestWork);
+
+		return redirect()->route('work', ['work' => $work->id]);
 	}
 
 	/**
