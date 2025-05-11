@@ -16,6 +16,15 @@ class DatabaseSeeder extends Seeder {
 			LanguageSeeder::class,
 		]);
 
-		Work::factory(20)->recycle(User::factory(2)->create())->create();
+		$staticUser = User::factory()->create([
+			'name' => 'Static User',
+			'email' => 'static@example.com',
+		]);
+
+		$randomUser = User::factory()->create();
+
+		Work::factory(20)
+			->recycle([$staticUser, $randomUser])
+			->create();
 	}
 }
