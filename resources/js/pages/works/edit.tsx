@@ -189,7 +189,9 @@ export default function New() {
 										{...field}
 										onChange={(e) => {
 											const val = e.target.value;
-											if (Number(val)) {
+											if (val.length === 0) {
+												field.onChange(undefined);
+											} else if (Number(val)) {
 												field.onChange(Number(val));
 											}
 										}}
