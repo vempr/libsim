@@ -32,7 +32,7 @@ class WorkPolicy {
 	 * Determine whether the user can delete the model.
 	 */
 	public function delete(User $user, Work $work): bool {
-		return false;
+		return $user->id === $work->user_id;
 	}
 
 	/**

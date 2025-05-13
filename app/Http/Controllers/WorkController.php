@@ -79,6 +79,10 @@ class WorkController extends Controller {
 	 * Remove the specified resource from storage.
 	 */
 	public function destroy(Work $work) {
-		//
+		$this->authorize('delete', $work);
+
+		$work->delete();
+
+		return redirect('works')->with('success', 'Your work "' . $work->title . '" has been deleted.');
 	}
 }

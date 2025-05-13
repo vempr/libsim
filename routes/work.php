@@ -15,4 +15,5 @@ Route::middleware(['auth', 'verified'])
 		Route::get('{work}', 'show')->name('work');
 		Route::get('{work}/edit', 'edit');
 		Route::put('{work}/edit', 'update')->name('work.update');
+		Route::delete('{work}', 'destroy')->name('work.destroy');
 	});

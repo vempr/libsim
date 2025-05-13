@@ -9,5 +9,9 @@ declare global {
     work: Work;
     works: Work[];
     [key: string]: unknown;
+    flash: {
+      success: string | undefined;
+      error: string | undefined;
+    };
   }
 }

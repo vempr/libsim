@@ -1,6 +1,8 @@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
+import { useEffect } from 'react';
+import { toast } from 'sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
 	{
@@ -10,11 +12,16 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function All() {
-	const { works } = usePage<InertiaProps>().props;
+	const { works, flash } = usePage<InertiaProps>().props;
+
+	useEffect(() => {
+		toast(flash?.success);
+	});
 
 	return (
 		<AppLayout breadcrumbs={breadcrumbs}>
 			<Head title="Saved works" />
+
 			<ul>
 				{works.map(work => <li>{JSON.stringify(work)}</li>)}
 			</ul>

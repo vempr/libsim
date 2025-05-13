@@ -30,7 +30,6 @@ export default function New() {
 	});
 
 	function onSubmit(values: z.infer<typeof workSchema>) {
-		console.log(values); return null;
 		router.post("/works/new", values);
 	}
 
