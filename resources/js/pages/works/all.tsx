@@ -15,7 +15,8 @@ export default function All() {
 	const { works, flash } = usePage<InertiaProps>().props;
 
 	useEffect(() => {
-		toast(flash?.success);
+		if (flash.success) toast(flash.success);
+		if (flash.error) toast(flash.error);
 	});
 
 	return (

@@ -128,11 +128,12 @@ export default function New() {
 							<FormItem>
 								<FormLabel>Author</FormLabel>
 								<FormControl>
-									<Input {...field} {...form.register("author", {
-										required: false,
-									})} />
+									<InputTags
+										value={field.value}
+										onChange={(e) => field.onChange(e.target.value)}
+									/>
 								</FormControl>
-								<FormDescription>Use "&&" as separator for multiple names, optional, up to 255 characters.</FormDescription>
+								<FormDescription>Use commas as separator for multiple names, optional, up to 255 characters.</FormDescription>
 								<FormMessage />
 							</FormItem>
 						)}
@@ -240,6 +241,7 @@ export default function New() {
 								<FormLabel>Tags</FormLabel>
 								<FormControl>
 									<InputTags
+										lowercase
 										value={field.value}
 										onChange={(e) => field.onChange(e.target.value)}
 									/>

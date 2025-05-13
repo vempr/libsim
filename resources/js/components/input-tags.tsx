@@ -5,24 +5,28 @@ import { XIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type InputTagsProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, "value" | "onChange"> & {
+	lowercase?: boolean;
 	value: string; // Comma-separated string of tags
 	onChange: React.ChangeEventHandler<HTMLInputElement>; // Standard form-compatible change handler
 };
 
 const InputTags = React.forwardRef<HTMLInputElement, InputTagsProps>(
-	({ className, value = "", onChange, ...props }, ref) => {
+	({ className, value = "", lowercase, onChange, ...props }, ref) => {
 		const [pendingDataPoint, setPendingDataPoint] = React.useState("");
 
 		const tags = value
 			.split(",")
-			.map((tag) => tag.trim())
+			.map((tag) => lowercase ? tag.trim().toLowerCase() : tag.trim())
 			.filter((tag) => tag !== "");
 
 		React.useEffect(() => {
 			if (pendingDataPoint.includes(",")) {
 				const newTags = new Set([
 					...tags,
-					...pendingDataPoint.split(",").map((chunk) => chunk.trim()).filter(Boolean),
+					...pendingDataPoint
+						.split(",")
+						.map((chunk) => lowercase ? chunk.trim().toLowerCase() : chunk.trim())
+						.filter(Boolean),
 				]);
 				const newValue = Array.from(newTags).join(",");
 				onChange({ target: { value: newValue } } as React.ChangeEvent<HTMLInputElement>);
@@ -32,7 +36,7 @@ const InputTags = React.forwardRef<HTMLInputElement, InputTagsProps>(
 
 		const addPendingDataPoint = () => {
 			if (pendingDataPoint.trim() !== "") {
-				const newTags = new Set([...tags, pendingDataPoint.trim()]);
+				const newTags = lowercase ? new Set([...tags, pendingDataPoint.trim().toLowerCase()]) : new Set([...tags, pendingDataPoint.trim()]);
 				const newValue = Array.from(newTags).join(",");
 				onChange({ target: { value: newValue } } as React.ChangeEvent<HTMLInputElement>);
 				setPendingDataPoint("");
