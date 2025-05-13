@@ -97,7 +97,7 @@ export default function New() {
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>Publication status</FormLabel>
-								<Select onValueChange={field.onChange}>
+								<Select onValueChange={field.onChange} defaultValue={work.status_publication ?? undefined}>
 									<FormControl>
 										<SelectTrigger>
 											<SelectValue placeholder="Select publication status" />
@@ -122,7 +122,7 @@ export default function New() {
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>Reading status</FormLabel>
-								<Select onValueChange={field.onChange}>
+								<Select onValueChange={field.onChange} defaultValue={work.status_reading}>
 									<FormControl>
 										<SelectTrigger>
 											<SelectValue placeholder="Select reading status" />
@@ -165,7 +165,7 @@ export default function New() {
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>Original Language</FormLabel>
-								<Select onValueChange={field.onChange}>
+								<Select onValueChange={field.onChange} defaultValue={work.language_original ?? undefined}>
 									<FormControl>
 										<SelectTrigger>
 											<SelectValue placeholder="Select original language" />
@@ -191,7 +191,7 @@ export default function New() {
 						render={({ field }) => (
 							<FormItem>
 								<FormLabel>Translated Language</FormLabel>
-								<Select onValueChange={field.onChange}>
+								<Select onValueChange={field.onChange} defaultValue={work.language_translated ?? undefined}>
 									<FormControl>
 										<SelectTrigger>
 											<SelectValue placeholder="Select translated language" />
@@ -221,11 +221,11 @@ export default function New() {
 									<Input
 										{...field}
 										onChange={(e) => {
-											const val = e.target.value;
-											if (val.length === 0) {
-												field.onChange(undefined);
-											} else if (Number(val)) {
-												field.onChange(Number(val));
+											const val = Number(e.target.value);
+											if (isNaN(val)) {
+												field.onChange(0);
+											} else {
+												field.onChange(val);
 											}
 										}}
 									/>
@@ -265,7 +265,7 @@ export default function New() {
 										onChange={(e) => field.onChange(e.target.value)}
 									/>
 								</FormControl>
-								<FormDescription>Enter tags separated by commas/enter e.g. "romance,comedy, isekai", optional, up to 1000 characters</FormDescription>
+								<FormDescription>Enter tags separated by commas e.g. "romance,comedy, isekai", optional, up to 1000 characters</FormDescription>
 								<FormMessage />
 							</FormItem>
 						)}

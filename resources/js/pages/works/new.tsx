@@ -200,11 +200,11 @@ export default function New() {
 									<Input
 										{...field}
 										onChange={(e) => {
-											const val = e.target.value;
-											if (val.length === 0) {
-												field.onChange(undefined);
-											} else if (Number(val)) {
-												field.onChange(Number(val));
+											const val = Number(e.target.value);
+											if (isNaN(val)) {
+												field.onChange(0);
+											} else {
+												field.onChange(val);
 											}
 										}}
 									/>
@@ -244,7 +244,7 @@ export default function New() {
 										onChange={(e) => field.onChange(e.target.value)}
 									/>
 								</FormControl>
-								<FormDescription>Enter tags separated by commas/enter e.g. "romance,comedy, isekai", optional, up to 1000 characters</FormDescription>
+								<FormDescription>Enter tags separated by commas e.g. "romance,comedy, isekai", optional, up to 1000 characters</FormDescription>
 								<FormMessage />
 							</FormItem>
 						)}

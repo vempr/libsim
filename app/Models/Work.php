@@ -13,12 +13,14 @@ class Work extends Model {
 		'user_id',
 		'title',
 		'description',
-		'status',
+		'status_publication',
+		'status_reading',
 		'author',
 		'language_original',
 		'language_translated',
 		'publication_year',
 		'image',
+		'tags',
 	];
 
 	public function user() {
