@@ -11,10 +11,14 @@ return new class extends Migration {
 	public function up(): void {
 		Schema::create('works', function (Blueprint $table) {
 			$table->id();
-			$table->foreignIdFor(\App\Models\User::class);
+			$table->foreignIdFor(\App\Models\User::class)
+				->constrained()
+				->onDelete('cascade');
+
 			$table->string("title");
 			$table->text("description")->nullable();
-			$table->string("status")->nullable();
+			$table->string("status_publication")->nullable();
+			$table->string("status_reading");
 			$table->string("author")->nullable();
 
 			$table->string("language_original")->nullable();
@@ -25,6 +29,8 @@ return new class extends Migration {
 
 			$table->integer("publication_year")->nullable();
 			$table->string("image")->nullable();
+			$table->string("tags", 1000)->nullable();
+
 			$table->timestamps();
 		});
 	}

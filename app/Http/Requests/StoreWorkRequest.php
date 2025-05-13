@@ -23,12 +23,14 @@ class StoreWorkRequest extends FormRequest {
 		return [
 			'title' => 'required|string|min:1|max:255',
 			'description' => 'nullable|string|max:2000',
-			'status' => 'nullable|in:unknown,ongoing,completed,hiatus,cancelled',
+			'status_publication' => 'nullable|in:unknown,ongoing,completed,hiatus,cancelled',
+			'status_reading' => 'required|in:reading,completed,on hold,dropped',
 			'author' => 'nullable|string|max:255',
 			'language_original' => 'nullable|string|in:' . $languages,
 			'language_translated' => 'nullable|string|in:' . $languages,
 			'publication_year' => 'nullable|integer|min:-5000|max:5000',
 			'image' => 'nullable|string|max:255',
+			'tags' => 'nullable|string|max:1000',
 		];
 	}
 }
