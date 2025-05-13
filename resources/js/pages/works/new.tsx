@@ -30,6 +30,7 @@ export default function New() {
 	});
 
 	function onSubmit(values: z.infer<typeof workSchema>) {
+		console.log(values); return null;
 		router.post("/works/new", values);
 	}
 
@@ -241,9 +242,7 @@ export default function New() {
 								<FormControl>
 									<InputTags
 										value={field.value}
-										{...form.register("tags", {
-											required: false,
-										})}
+										onChange={(e) => field.onChange(e.target.value)}
 									/>
 								</FormControl>
 								<FormDescription>Enter tags separated by commas/enter e.g. "romance,comedy, isekai", optional, up to 1000 characters</FormDescription>

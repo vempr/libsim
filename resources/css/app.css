@@ -10,19 +10,9 @@
 @font-face {
   font-family: Oswald;
   font-style: normal;
-  src: url('/fonts/Manrope-Regular.tff') format('ttf');
-}
-
-@font-face {
-  font-family: Oswald;
-  font-style: bold;
-  src: url('/fonts/Manrope-Bold.tff') format('ttf');
-}
-
-@font-face {
-  font-family: Oswald;
-  font-style: light;
-  src: url('/fonts/Manrope-Light.tff') format('ttf');
+  src:
+    url('/fonts/Manrope-Regular.ttf'),
+    url('/fonts/Manrope-Bold.ttf') format('ttf');
 }
 
 @theme {
