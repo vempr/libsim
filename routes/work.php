@@ -8,6 +8,7 @@ Route::middleware(['auth', 'verified'])
 	->prefix('works')
 	->group(function () {
 		Route::get('/', 'index')->name('work.index');
+		Route::get('/', 'search')->name('work.search');
 
 		Route::get('new', 'create');
 		Route::post('new', 'store');

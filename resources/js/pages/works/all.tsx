@@ -1,7 +1,9 @@
+import { AdvancedSearchForm } from '@/components/advanced-search';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, router, usePage } from '@inertiajs/react';
 import { useEffect, useRef } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -26,19 +28,20 @@ export default function All() {
 		defaultValues: {
 			q: query ?? '',
 		},
+		resolver: zodResolver(querySchema),
 	});
 
 	const q = watch('q');
 	const prevQRef = useRef<string | undefined>(q);
 	useEffect(() => {
 		if (prevQRef.current !== '' && q === '') {
-			router.get(route('work.index'));
+			router.get(route('work.search'));
 		}
 		prevQRef.current = q;
 	}, [q]);
 
 	const onSubmit: SubmitHandler<Query> = (data) => {
-		router.get(route('work.index'), data);
+		router.get(route('work.search'), data);
 	}
 
 	useEffect(() => {
@@ -56,6 +59,15 @@ export default function All() {
 					{...register('q')}
 				/>
 				<Button type="submit">Search</Button>
+			</form>
+
+			<Button>Advanced search</Button>
+			<AdvancedSearchForm />
+			<form onSubmit={(e) => {
+				e.preventDefault();
+				router.get(route('work.search'))
+			}}>
+				<Button type="submit">Reset settings</Button>
 			</form>
 
 			<ul>

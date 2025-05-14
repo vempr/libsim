@@ -18,20 +18,69 @@ class WorkController extends Controller {
 	/**
 	 * Display a listing of the resource.
 	 */
-	public function index(Request $request) {
-		$query = $request->input('q');
-		$user = Auth::user();
+	public function index() {
+		return Inertia::render('works/all', [
+			'works' => Auth::user()->works,
+		]);
+	}
 
-		$works = $query ? DB::table('works')
-			->where('user_id', $user->id)
-			->when($query, function ($q) use ($query) {
-				$q->where('title', 'like', "%{$query}%");
-			})
-			->get() : $user->works;
+	public function search(Request $request) {
+		$user = Auth::user();
+		$state = [
+			'q' => $request->input('q'),
+			'author' => $request->input('author'),
+			'tags' => $request->input('tags'),
+			'language_original' => $request->input('language_original'),
+			'language_translated' => $request->input('language_translated'),
+			'status_publication' => $request->input('status_publication'),
+			'status_reading' => $request->input('status_reading'),
+			'publication_year' => $request->input('publication_year'),
+		];
+
+		$query = Work::query()->where('user_id', $user->id);
+
+		if ($state['q']) {
+			$query->where('title', 'like', "%{$state['q']}%");
+		}
+
+		if ($state['author']) {
+			$authorsArray = explode(',', $state['author']);
+			foreach ($authorsArray as $author) {
+				$query->where('author', 'like', '%' . trim($author) . '%');
+			}
+		}
+
+		if ($state['tags']) {
+			$tagsArray = explode(',', $state['tags']);
+			foreach ($tagsArray as $tag) {
+				$query->where('tags', 'like', '%' . trim($tag) . '%');
+			}
+		}
+
+		if ($state['language_original']) {
+			$query->where('language_original', $state['language_original']);
+		}
+
+		if ($state['language_translated']) {
+			$query->where('language_translated', $state['language_translated']);
+		}
+
+		if ($state['status_publication']) {
+			$query->where('status_publication', $state['status_publication']);
+		}
+
+		if ($state['status_reading']) {
+			$query->where('status_reading', $state['status_reading']);
+		}
+
+		if ($state['publication_year']) {
+			$query->where('publication_year', $state['publication_year']);
+		}
 
 		return Inertia::render('works/all', [
-			'works' => $works,
-			'query' => $query,
+			'works' => $query->get(),
+			'query' => $state['q'],
+			'state' => $state,
 		]);
 	}
 
