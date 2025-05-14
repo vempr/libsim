@@ -13,5 +13,6 @@ declare global {
       success: string | undefined;
       error: string | undefined;
     };
+    query: string | null;
   }
 }

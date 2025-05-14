@@ -7,7 +7,7 @@ Route::middleware(['auth', 'verified'])
 	->controller(WorkController::class)
 	->prefix('works')
 	->group(function () {
-		Route::get('/', 'index');
+		Route::get('/', 'index')->name('work.index');
 
 		Route::get('new', 'create');
 		Route::post('new', 'store');

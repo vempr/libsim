@@ -4,20 +4,34 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreWorkRequest;
 use App\Http\Requests\UpdateWorkRequest;
+use App\Models\User;
 use App\Models\Work;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class WorkController extends Controller {
 	use AuthorizesRequests;
 	/**
 	 * Display a listing of the resource.
 	 */
-	public function index() {
+	public function index(Request $request) {
+		$query = $request->input('q');
+		$user = Auth::user();
+
+		$works = $query ? DB::table('works')
+			->where('user_id', $user->id)
+			->when($query, function ($q) use ($query) {
+				$q->where('title', 'like', "%{$query}%");
+			})
+			->get() : $user->works;
+
 		return Inertia::render('works/all', [
-			'works' => Auth::user()->works,
+			'works' => $works,
+			'query' => $query,
 		]);
 	}
 
