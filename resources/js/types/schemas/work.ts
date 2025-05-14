@@ -182,15 +182,20 @@ export const languages = {
 const languagesKeys = Object.keys(languages) as [string, ...string[]];
 
 export const statusPublication = ['unknown', 'ongoing', 'completed', 'hiatus', 'cancelled'] as const;
+const statusPublicationSchema = z.enum(statusPublication);
+export type Publication = z.infer<typeof statusPublicationSchema>;
+
 export const statusReading = ['reading', 'completed', 'on hold', 'dropped'] as const;
+const statusReadingSchema = z.enum(statusReading);
+export type Reading = z.infer<typeof statusReadingSchema>;
 
 const languageSchema = z.enum(languagesKeys);
 
 export const workSchema = z.object({
   title: z.string().min(1, 'Work must have a title').max(255, "Title can't be longer than 255 characters"),
   description: z.string().max(2000, 'Description cannot exceed 2000 characters'),
-  status_publication: z.enum(statusPublication).optional(),
-  status_reading: z.enum(statusReading),
+  status_publication: statusPublicationSchema.optional(),
+  status_reading: statusReadingSchema,
   author: z.string().max(255, "Author's name can't be longer than 255 characters"),
   language_original: languageSchema.optional(),
   language_translated: languageSchema.optional(),

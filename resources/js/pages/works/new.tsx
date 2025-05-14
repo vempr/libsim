@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { languages, statusPublication, statusReading, workSchema } from '@/types/schemas/work';
+import { languages, Publication, Reading, statusPublication, statusReading, workSchema } from '@/types/schemas/work';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -15,11 +15,6 @@ import { InputTags } from '@/components/input-tags';
 const breadcrumbs: BreadcrumbItem[] = [
 	{ title: 'Create entry', href: '/works/create' },
 ];
-
-const sp = z.enum(statusPublication);
-const sr = z.enum(statusReading);
-type Publication = z.infer<typeof sp>;
-type Reading = z.infer<typeof sr>;
 
 export default function New() {
 	const form = useForm<z.infer<typeof workSchema>>({
