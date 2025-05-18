@@ -1,14 +1,21 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { languages, Publication, Reading, statusPublication, statusReading, workSchema } from '@/types/schemas/work';
+import {
+	languages,
+	PublicationStatus,
+	publicationStatuses,
+	ReadingStatus,
+	readingStatuses,
+	workFormSchema
+} from '@/types/schemas/work';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Form, FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from '@/components/ui/form';
 import AppLayout from '@/layouts/app-layout';
 import { Head, router, usePage } from '@inertiajs/react';
-import { type BreadcrumbItem } from '@/types';
+import { type InertiaProps, type BreadcrumbItem } from '@/types/index';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { InputTags } from '@/components/input-tags';
 
@@ -29,13 +36,13 @@ export default function New() {
 		},
 	];
 
-	const form = useForm<z.infer<typeof workSchema>>({
-		resolver: zodResolver(workSchema),
+	const form = useForm<z.infer<typeof workFormSchema>>({
+		resolver: zodResolver(workFormSchema),
 		defaultValues: {
 			title: work.title,
 			description: work.description || "",
-			status_publication: work.status_publication as Publication || undefined,
-			status_reading: work.status_reading as Reading,
+			status_publication: work.status_publication as PublicationStatus || undefined,
+			status_reading: work.status_reading as ReadingStatus,
 			author: work.author || "",
 			language_original: work.language_original || undefined,
 			language_translated: work.language_translated || undefined,
@@ -45,7 +52,7 @@ export default function New() {
 		},
 	});
 
-	function onSubmit(values: z.infer<typeof workSchema>) {
+	function onSubmit(values: z.infer<typeof workFormSchema>) {
 		router.put(route('work.update', work.id), values);
 	}
 
@@ -101,7 +108,7 @@ export default function New() {
 										</SelectTrigger>
 									</FormControl>
 									<SelectContent>
-										{statusPublication.map((s: Publication) => (
+										{publicationStatuses.map((s: PublicationStatus) => (
 											<SelectItem key={s} value={s}>
 												{s.charAt(0).toUpperCase() + s.slice(1)}
 											</SelectItem>
@@ -126,7 +133,7 @@ export default function New() {
 										</SelectTrigger>
 									</FormControl>
 									<SelectContent>
-										{statusReading.map((s: Reading) => (
+										{readingStatuses.map((s: ReadingStatus) => (
 											<SelectItem key={s} value={s}>
 												{s.charAt(0).toUpperCase() + s.slice(1)}
 											</SelectItem>
@@ -147,7 +154,7 @@ export default function New() {
 								<FormLabel>Author</FormLabel>
 								<FormControl>
 									<InputTags
-										value={field.value}
+										value={field.value ?? ""}
 										onChange={(e) => field.onChange(e.target.value)}
 									/>
 								</FormControl>
@@ -254,7 +261,7 @@ export default function New() {
 								<FormControl>
 									<InputTags
 										lowercase
-										value={field.value}
+										value={field.value ?? ""}
 										onChange={(e) => field.onChange(e.target.value)}
 									/>
 								</FormControl>

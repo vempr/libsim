@@ -4,14 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreWorkRequest;
 use App\Http\Requests\UpdateWorkRequest;
-use App\Models\User;
 use App\Models\Work;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 function search(Request $request) {
 	$user = Auth::user();
@@ -68,7 +66,7 @@ function search(Request $request) {
 
 	return [
 		'works' => $query->get(),
-		'state' => $state,
+		'searchState' => $state,
 	];
 }
 

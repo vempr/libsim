@@ -5,7 +5,7 @@
 	"htmlWhitespaceSensitivity": "css",
 	"printWidth": 150,
 	"plugins": [
-		"prettier-plugin-organize-imports",
+		"@trivago/prettier-plugin-sort-imports",
 		"prettier-plugin-tailwindcss"
 	],
 	"tailwindFunctions": [
@@ -20,5 +20,13 @@
 				"tabWidth": 2
 			}
 		}
-	]
+	],
+	"importOrder": [
+		"^@core/(.*)$",
+		"<THIRD_PARTY_MODULES>",
+		"^@server/(.*)$",
+		"^@ui/(.*)$",
+		"^[./]"
+	],
+	"importOrderSeparation": true
 }
