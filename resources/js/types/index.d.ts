@@ -65,5 +65,5 @@ export interface InertiaProps extends Page<PageProps> {
     publication_year: number | null;
   };
   advanced: boolean;
-  [key: string]: any;
+  [key: string]: unknown;
 }
