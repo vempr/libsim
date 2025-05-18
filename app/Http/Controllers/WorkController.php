@@ -80,7 +80,8 @@ class WorkController extends Controller {
 	public function index(Request $request) {
 		$response = search($request);
 
-		return Inertia::render('works/all', $response);
+		return Inertia::render('works/all', $response)
+			->with('advanced', filter_var(request('advanced', false), FILTER_VALIDATE_BOOLEAN));
 	}
 
 	/**

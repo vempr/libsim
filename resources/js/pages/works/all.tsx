@@ -14,7 +14,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function All() {
-	const { works, state, flash } = usePage<InertiaProps>().props;
+	const { works, state, flash, advanced } = usePage<InertiaProps>().props;
 
 	useEffect(() => {
 		if (flash.success) toast(flash.success);
@@ -25,7 +25,7 @@ export default function All() {
 		<AppLayout breadcrumbs={breadcrumbs}>
 			<Head title="Saved works" />
 
-			<AdvancedSearchForm state={state} />
+			<AdvancedSearchForm state={state} advanced={advanced} />
 
 			<ul>
 				{works.map(work => <li>{JSON.stringify(work)}</li>)}

@@ -30,7 +30,7 @@ const searchSchema = z.object({
 
 type Search = z.infer<typeof searchSchema>;
 
-export function AdvancedSearchForm({ state }: {
+export function AdvancedSearchForm({ state, advanced }: {
 	state: {
 		q: string | null;
 		author: string | null;
@@ -41,9 +41,10 @@ export function AdvancedSearchForm({ state }: {
 		status_reading: Reading | null;
 		publication_year: number | null;
 	};
+	advanced: boolean;
 }) {
 
-	const [advanced, setAdvanced] = useState(false);
+	const [adv, setAdv] = useState(advanced);
 
 	const form = useForm<Search>({
 		resolver: zodResolver(searchSchema),
@@ -60,11 +61,11 @@ export function AdvancedSearchForm({ state }: {
 	});
 
 	const handleSearch = (values?: z.infer<typeof searchSchema>) => {
-		router.get(route('work.index'), values);
+		router.get(route('work.index'), { ...values, advanced: adv });
 	}
 
 	const onSubmit = (values: z.infer<typeof searchSchema>) => {
-		if (!advanced) {
+		if (!adv) {
 			handleSearch({ q: values.q });
 		} else {
 			delete values.q;
@@ -76,7 +77,7 @@ export function AdvancedSearchForm({ state }: {
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
 
-				<div className={advanced ? "hidden" : "block"}>
+				<div className={adv ? "hidden" : "block"}>
 					<FormField
 						control={form.control}
 						name="q"
@@ -103,7 +104,7 @@ export function AdvancedSearchForm({ state }: {
 					/>
 				</div>
 
-				<div className={advanced ? "block space-y-6" : "hidden"}>
+				<div className={adv ? "block space-y-6" : "hidden"}>
 					<FormField
 						control={form.control}
 						name="status_publication"
@@ -265,16 +266,16 @@ export function AdvancedSearchForm({ state }: {
 				</div>
 
 				<Button type="button" variant="secondary" onClick={() => {
-					setAdvanced(!advanced);
+					setAdv(!adv);
 					window.scrollTo(0, 0);
 				}}
 				>
-					{advanced ? "Simple search" : "Advanced search"}
+					{adv ? "Simple search" : "Advanced search"}
 				</Button>
 
 				<Button type="submit">Submit</Button>
 
-				<Button type="button" variant="secondary" onClick={() => handleSearch()} className={advanced ? "inline" : "hidden"}>Reset query options</Button>
+				<Button type="button" variant="secondary" onClick={() => handleSearch()} className={adv ? "inline" : "hidden"}>Reset query options</Button>
 			</form>
 		</Form>
 	);

@@ -23,5 +23,6 @@ declare global {
       status_reading: 'reading' | 'completed' | 'on hold' | 'dropped' | null;
       publication_year: number | null;
     };
+    advanced: boolean;
   }
 }
