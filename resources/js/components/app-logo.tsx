@@ -5,7 +5,7 @@ export default function AppLogo() {
 		<>
 			<AppLogoIcon />
 			<div className="ml-1 grid flex-1 text-left text-lg">
-				<span className="mb-0.5 truncate leading-none font-light italic">libsim</span>
+				<span className="mb-0.5 truncate leading-none font-brand">libsim</span>
 			</div>
 		</>
 	);

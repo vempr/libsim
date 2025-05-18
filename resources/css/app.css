@@ -8,15 +8,72 @@
 @custom-variant dark (&:is(.dark *));
 
 @font-face {
-  font-family: Oswald;
+  font-family: 'Lexend Deca';
   font-style: normal;
-  src:
-    url('/fonts/Manrope-Regular.ttf'),
-    url('/fonts/Manrope-Bold.ttf') format('ttf');
+  font-weight: 200;
+  src: url('/fonts/LexendDeca-ExtraLight.ttf');
+}
+
+@font-face {
+  font-family: 'Lexend Deca';
+  font-style: normal;
+  font-weight: 300;
+  src: url('/fonts/LexendDeca-Light.ttf');
+}
+
+@font-face {
+  font-family: 'Lexend Deca';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/LexendDeca-Regular.ttf');
+}
+
+@font-face {
+  font-family: 'Lexend Deca';
+  font-style: normal;
+  font-weight: 500;
+  src: url('/fonts/LexendDeca-Medium.ttf');
+}
+
+@font-face {
+  font-family: 'Lexend Deca';
+  font-style: normal;
+  font-weight: 600;
+  src: url('/fonts/LexendDeca-SemiBold.ttf');
+}
+
+@font-face {
+  font-family: 'Lexend Deca';
+  font-style: normal;
+  font-weight: 700;
+  src: url('/fonts/LexendDeca-Bold.ttf');
+}
+
+@font-face {
+  font-family: 'Lexend Deca';
+  font-style: normal;
+  font-weight: 800;
+  src: url('/fonts/LexendDeca-ExtraBold.ttf');
+}
+
+@font-face {
+  font-family: 'Lexend Deca';
+  font-style: normal;
+  font-weight: 900;
+  src: url('/fonts/LexendDeca-Black.ttf');
+}
+
+@font-face {
+  font-family: 'Pacifico';
+  font-style: normal;
+  font-weight: 400;
+  src: url('/fonts/Pacifico-Regular.ttf');
 }
 
 @theme {
-  --font-sans: 'Oswald', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-sans: 'Lexend Deca', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+  --font-brand: 'Pacifico', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
