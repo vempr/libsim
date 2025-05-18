@@ -182,11 +182,11 @@ export const languages = {
 const languagesKeys = Object.keys(languages) as [string, ...string[]];
 
 export const statusPublication = ['unknown', 'ongoing', 'completed', 'hiatus', 'cancelled'] as const;
-const statusPublicationSchema = z.enum(statusPublication);
+export const statusPublicationSchema = z.enum(statusPublication);
 export type Publication = z.infer<typeof statusPublicationSchema>;
 
 export const statusReading = ['reading', 'completed', 'on hold', 'dropped'] as const;
-const statusReadingSchema = z.enum(statusReading);
+export const statusReadingSchema = z.enum(statusReading);
 export type Reading = z.infer<typeof statusReadingSchema>;
 
 const languageSchema = z.enum(languagesKeys);

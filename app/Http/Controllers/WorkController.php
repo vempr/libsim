@@ -13,75 +13,74 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+function search(Request $request) {
+	$user = Auth::user();
+	$state = [
+		'q' => $request->input('q'),
+		'author' => $request->input('author'),
+		'tags' => $request->input('tags'),
+		'language_original' => $request->input('language_original'),
+		'language_translated' => $request->input('language_translated'),
+		'status_publication' => $request->input('status_publication'),
+		'status_reading' => $request->input('status_reading'),
+		'publication_year' => $request->input('publication_year'),
+	];
+
+	$query = Work::query()->where('user_id', $user->id);
+
+	if ($state['q']) {
+		$query->where('title', 'like', "%{$state['q']}%");
+	}
+
+	if ($state['author']) {
+		$authorsArray = explode(',', $state['author']);
+		foreach ($authorsArray as $author) {
+			$query->where('author', 'like', '%' . trim($author) . '%');
+		}
+	}
+
+	if ($state['tags']) {
+		$tagsArray = explode(',', $state['tags']);
+		foreach ($tagsArray as $tag) {
+			$query->where('tags', 'like', '%' . trim($tag) . '%');
+		}
+	}
+
+	if ($state['language_original']) {
+		$query->where('language_original', $state['language_original']);
+	}
+
+	if ($state['language_translated']) {
+		$query->where('language_translated', $state['language_translated']);
+	}
+
+	if ($state['status_publication']) {
+		$query->where('status_publication', $state['status_publication']);
+	}
+
+	if ($state['status_reading']) {
+		$query->where('status_reading', $state['status_reading']);
+	}
+
+	if ($state['publication_year']) {
+		$query->where('publication_year', $state['publication_year']);
+	}
+
+	return [
+		'works' => $query->get(),
+		'state' => $state,
+	];
+}
+
 class WorkController extends Controller {
 	use AuthorizesRequests;
 	/**
 	 * Display a listing of the resource.
 	 */
-	public function index() {
-		return Inertia::render('works/all', [
-			'works' => Auth::user()->works,
-		]);
-	}
+	public function index(Request $request) {
+		$response = search($request);
 
-	public function search(Request $request) {
-		$user = Auth::user();
-		$state = [
-			'q' => $request->input('q'),
-			'author' => $request->input('author'),
-			'tags' => $request->input('tags'),
-			'language_original' => $request->input('language_original'),
-			'language_translated' => $request->input('language_translated'),
-			'status_publication' => $request->input('status_publication'),
-			'status_reading' => $request->input('status_reading'),
-			'publication_year' => $request->input('publication_year'),
-		];
-
-		$query = Work::query()->where('user_id', $user->id);
-
-		if ($state['q']) {
-			$query->where('title', 'like', "%{$state['q']}%");
-		}
-
-		if ($state['author']) {
-			$authorsArray = explode(',', $state['author']);
-			foreach ($authorsArray as $author) {
-				$query->where('author', 'like', '%' . trim($author) . '%');
-			}
-		}
-
-		if ($state['tags']) {
-			$tagsArray = explode(',', $state['tags']);
-			foreach ($tagsArray as $tag) {
-				$query->where('tags', 'like', '%' . trim($tag) . '%');
-			}
-		}
-
-		if ($state['language_original']) {
-			$query->where('language_original', $state['language_original']);
-		}
-
-		if ($state['language_translated']) {
-			$query->where('language_translated', $state['language_translated']);
-		}
-
-		if ($state['status_publication']) {
-			$query->where('status_publication', $state['status_publication']);
-		}
-
-		if ($state['status_reading']) {
-			$query->where('status_reading', $state['status_reading']);
-		}
-
-		if ($state['publication_year']) {
-			$query->where('publication_year', $state['publication_year']);
-		}
-
-		return Inertia::render('works/all', [
-			'works' => $query->get(),
-			'query' => $state['q'],
-			'state' => $state,
-		]);
+		return Inertia::render('works/all', $response);
 	}
 
 	/**

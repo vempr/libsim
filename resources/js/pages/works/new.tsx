@@ -21,6 +21,8 @@ export default function New() {
 		resolver: zodResolver(workSchema),
 		defaultValues: {
 			status_reading: "reading",
+			tags: "",
+			author: "",
 		},
 	});
 
@@ -195,14 +197,8 @@ export default function New() {
 								<FormControl>
 									<Input
 										{...field}
-										onChange={(e) => {
-											const val = Number(e.target.value);
-											if (isNaN(val)) {
-												field.onChange(0);
-											} else {
-												field.onChange(val);
-											}
-										}}
+										type="number"
+										className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
 									/>
 								</FormControl>
 								<FormDescription>Optional, between -5000 and 5000</FormDescription>

@@ -33,15 +33,15 @@ export default function New() {
 		resolver: zodResolver(workSchema),
 		defaultValues: {
 			title: work.title,
-			description: work.description || undefined,
+			description: work.description || "",
 			status_publication: work.status_publication as Publication || undefined,
 			status_reading: work.status_reading as Reading,
-			author: work.author || undefined,
+			author: work.author || "",
 			language_original: work.language_original || undefined,
 			language_translated: work.language_translated || undefined,
 			publication_year: work.publication_year || undefined,
-			image: work.image || undefined,
-			tags: work.tags || undefined,
+			image: work.image || "",
+			tags: work.tags || "",
 		},
 	});
 
@@ -218,14 +218,8 @@ export default function New() {
 								<FormControl>
 									<Input
 										{...field}
-										onChange={(e) => {
-											const val = Number(e.target.value);
-											if (isNaN(val)) {
-												field.onChange(0);
-											} else {
-												field.onChange(val);
-											}
-										}}
+										type="number"
+										className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
 									/>
 								</FormControl>
 								<FormDescription>Optional, between -5000 and 5000</FormDescription>

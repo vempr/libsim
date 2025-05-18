@@ -5,20 +5,23 @@ import { InputTags } from '@/components/input-tags';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { languages, Publication, Reading, statusPublication, statusReading } from '@/types/schemas/work';
+import { languages, Publication, Reading, statusPublication, statusReading, statusReadingSchema, statusPublicationSchema } from '@/types/schemas/work';
 
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { router } from '@inertiajs/react';
+import { useState } from 'react';
 
 const searchSchema = z.object({
-	author: z.string().max(255, "Author's name can't be longer than 255 characters").optional(),
-	tags: z.string().max(1000, 'Tags cannot exceed 1000 characters').optional(),
-	language_original: z.string().optional(),
-	language_translated: z.string().optional(),
-	status_publication: z.string().optional(),
-	status_reading: z.string().optional(),
+	q: z.string().max(255, "Query can't be longer than 255 characters").optional(),
+	author: z.string().max(255, "Author's name can't be longer than 255 characters").nullable().optional(),
+	tags: z.string().max(1000, 'Tags cannot exceed 1000 characters').nullable().optional(),
+	language_original: z.string().nullable().optional(),
+	language_translated: z.string().nullable().optional(),
+	status_publication: statusPublicationSchema.nullable().optional(),
+	status_reading: statusReadingSchema.nullable().optional(),
 	publication_year: z
+		.coerce
 		.number()
 		.min(-5000, 'The publication year cannot be earlier than -5000')
 		.max(5000, 'The publication year cannot be later than 5000')
@@ -27,25 +30,78 @@ const searchSchema = z.object({
 
 type Search = z.infer<typeof searchSchema>;
 
-export function AdvancedSearchForm() {
+export function AdvancedSearchForm({ state }: {
+	state: {
+		q: string | null;
+		author: string | null;
+		tags: string | null;
+		language_original: string | null;
+		language_translated: string | null;
+		status_publication: Publication | null;
+		status_reading: Reading | null;
+		publication_year: number | null;
+	};
+}) {
+
+	// const [advanced, setAdvanced] = useState(false);
+
 	const form = useForm<Search>({
 		resolver: zodResolver(searchSchema),
+		defaultValues: {
+			q: state.q || "",
+			author: state.author,
+			tags: state.tags,
+			language_original: state.language_original || undefined,
+			language_translated: state.language_translated || undefined,
+			status_publication: state.status_publication,
+			status_reading: state.status_reading,
+			publication_year: state.publication_year || undefined,
+		},
 	});
 
+	const handleSearch = (values?: z.infer<typeof searchSchema>) => {
+		router.get(route('work.index'), values);
+	}
+
 	const onSubmit = (values: z.infer<typeof searchSchema>) => {
-		router.get(route('work.search'), values);
+		handleSearch(values);
 	}
 
 	return (
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+
+				<FormField
+					control={form.control}
+					name="q"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Search by title</FormLabel>
+							<FormControl>
+								<Input
+									{...field}
+									onChange={(e) => {
+										const val = e.target.value
+										if (val.length === 0) {
+											field.onChange("")
+											handleSearch();
+										} else field.onChange(val);
+									}}
+								/>
+							</FormControl>
+							<FormMessage />
+						</FormItem>
+					)
+					}
+				/>
+
 				<FormField
 					control={form.control}
 					name="status_publication"
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel>Publication status</FormLabel>
-							<Select onValueChange={field.onChange}>
+							<Select onValueChange={field.onChange} defaultValue={state.status_publication as Publication ?? undefined}>
 								<FormControl>
 									<SelectTrigger>
 										<SelectValue placeholder="Select publication status" />
@@ -70,7 +126,7 @@ export function AdvancedSearchForm() {
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel>Reading status</FormLabel>
-							<Select onValueChange={field.onChange}>
+							<Select onValueChange={field.onChange} defaultValue={state.status_reading as Reading ?? undefined}>
 								<FormControl>
 									<SelectTrigger>
 										<SelectValue placeholder="Select reading status" />
@@ -114,7 +170,7 @@ export function AdvancedSearchForm() {
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel>Original Language</FormLabel>
-							<Select onValueChange={field.onChange}>
+							<Select onValueChange={field.onChange} defaultValue={state.language_original ?? undefined}>
 								<FormControl>
 									<SelectTrigger>
 										<SelectValue placeholder="Select original language" />
@@ -140,7 +196,7 @@ export function AdvancedSearchForm() {
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel>Translated Language</FormLabel>
-							<Select onValueChange={field.onChange}>
+							<Select onValueChange={field.onChange} defaultValue={state.language_translated ?? undefined}>
 								<FormControl>
 									<SelectTrigger>
 										<SelectValue placeholder="Select translated language" />
@@ -169,14 +225,8 @@ export function AdvancedSearchForm() {
 							<FormControl>
 								<Input
 									{...field}
-									onChange={(e) => {
-										const val = Number(e.target.value);
-										if (isNaN(val)) {
-											field.onChange(0);
-										} else {
-											field.onChange(val);
-										}
-									}}
+									type="number"
+									className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
 								/>
 							</FormControl>
 							<FormDescription>Optional, between -5000 and 5000</FormDescription>
@@ -204,7 +254,17 @@ export function AdvancedSearchForm() {
 					)}
 				/>
 
+				{/* <Button type="button" variant="secondary" onClick={() => {
+						setAdvanced(!advanced);
+						window.scrollTo(0, 0);
+					}}
+					>
+						{advanced ? "Simple search" : "Advanced search"}
+					</Button> */}
+
 				<Button type="submit">Submit</Button>
+
+				<Button type="button" variant="secondary" onClick={() => handleSearch()}>Reset query options</Button>
 			</form>
 		</Form>
 	);

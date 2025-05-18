@@ -13,6 +13,15 @@ declare global {
       success: string | undefined;
       error: string | undefined;
     };
-    query: string | null;
+    state: {
+      q: string | null;
+      author: string | null;
+      tags: string | null;
+      language_original: string | null;
+      language_translated: string | null;
+      status_publication: 'unknown' | 'ongoing' | 'completed' | 'hiatus' | 'cancelled' | null;
+      status_reading: 'reading' | 'completed' | 'on hold' | 'dropped' | null;
+      publication_year: number | null;
+    };
   }
 }
