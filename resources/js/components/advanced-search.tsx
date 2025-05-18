@@ -43,7 +43,7 @@ export function AdvancedSearchForm({ state }: {
 	};
 }) {
 
-	// const [advanced, setAdvanced] = useState(false);
+	const [advanced, setAdvanced] = useState(false);
 
 	const form = useForm<Search>({
 		resolver: zodResolver(searchSchema),
@@ -64,207 +64,217 @@ export function AdvancedSearchForm({ state }: {
 	}
 
 	const onSubmit = (values: z.infer<typeof searchSchema>) => {
-		handleSearch(values);
+		if (!advanced) {
+			handleSearch({ q: values.q });
+		} else {
+			delete values.q;
+			handleSearch(values);
+		}
 	}
 
 	return (
 		<Form {...form}>
 			<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
 
-				<FormField
-					control={form.control}
-					name="q"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Search by title</FormLabel>
-							<FormControl>
-								<Input
-									{...field}
-									onChange={(e) => {
-										const val = e.target.value
-										if (val.length === 0) {
-											field.onChange("")
-											handleSearch();
-										} else field.onChange(val);
-									}}
-								/>
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)
-					}
-				/>
+				<div className={advanced ? "hidden" : "block"}>
+					<FormField
+						control={form.control}
+						name="q"
 
-				<FormField
-					control={form.control}
-					name="status_publication"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Publication status</FormLabel>
-							<Select onValueChange={field.onChange} defaultValue={state.status_publication as Publication ?? undefined}>
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Search by title</FormLabel>
 								<FormControl>
-									<SelectTrigger>
-										<SelectValue placeholder="Select publication status" />
-									</SelectTrigger>
+									<Input
+										{...field}
+										onChange={(e) => {
+											const val = e.target.value
+											if (val.length === 0) {
+												field.onChange("")
+												handleSearch();
+											} else field.onChange(val);
+										}}
+									/>
 								</FormControl>
-								<SelectContent>
-									{statusPublication.map((s: Publication) => (
-										<SelectItem key={s} value={s}>
-											{s.charAt(0).toUpperCase() + s.slice(1)}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+								<FormMessage />
+							</FormItem>
+						)
+						}
+					/>
+				</div>
 
-				<FormField
-					control={form.control}
-					name="status_reading"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Reading status</FormLabel>
-							<Select onValueChange={field.onChange} defaultValue={state.status_reading as Reading ?? undefined}>
+				<div className={advanced ? "block space-y-6" : "hidden"}>
+					<FormField
+						control={form.control}
+						name="status_publication"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Publication status</FormLabel>
+								<Select onValueChange={field.onChange} defaultValue={state.status_publication as Publication ?? undefined}>
+									<FormControl>
+										<SelectTrigger>
+											<SelectValue placeholder="Select publication status" />
+										</SelectTrigger>
+									</FormControl>
+									<SelectContent>
+										{statusPublication.map((s: Publication) => (
+											<SelectItem key={s} value={s}>
+												{s.charAt(0).toUpperCase() + s.slice(1)}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+
+					<FormField
+						control={form.control}
+						name="status_reading"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Reading status</FormLabel>
+								<Select onValueChange={field.onChange} defaultValue={state.status_reading as Reading ?? undefined}>
+									<FormControl>
+										<SelectTrigger>
+											<SelectValue placeholder="Select reading status" />
+										</SelectTrigger>
+									</FormControl>
+									<SelectContent>
+										{statusReading.map((s: Reading) => (
+											<SelectItem key={s} value={s}>
+												{s.charAt(0).toUpperCase() + s.slice(1)}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+
+
+					<FormField
+						control={form.control}
+						name="author"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Author</FormLabel>
 								<FormControl>
-									<SelectTrigger>
-										<SelectValue placeholder="Select reading status" />
-									</SelectTrigger>
+									<InputTags
+										value={field.value ?? ""}
+										onChange={(e) => field.onChange(e.target.value)}
+									/>
 								</FormControl>
-								<SelectContent>
-									{statusReading.map((s: Reading) => (
-										<SelectItem key={s} value={s}>
-											{s.charAt(0).toUpperCase() + s.slice(1)}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+								<FormDescription>Use commas as separator for multiple names, optional, up to 255 characters.</FormDescription>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+
+					<FormField
+						control={form.control}
+						name="language_original"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Original Language</FormLabel>
+								<Select onValueChange={field.onChange} defaultValue={state.language_original ?? undefined}>
+									<FormControl>
+										<SelectTrigger>
+											<SelectValue placeholder="Select original language" />
+										</SelectTrigger>
+									</FormControl>
+									<SelectContent>
+										{Object.entries(languages).map(([code, name]) => (
+											<SelectItem key={code} value={code}>
+												{name}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
 
 
-				<FormField
-					control={form.control}
-					name="author"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Author</FormLabel>
-							<FormControl>
-								<InputTags
-									value={field.value ?? ""}
-									onChange={(e) => field.onChange(e.target.value)}
-								/>
-							</FormControl>
-							<FormDescription>Use commas as separator for multiple names, optional, up to 255 characters.</FormDescription>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+					<FormField
+						control={form.control}
+						name="language_translated"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Translated Language</FormLabel>
+								<Select onValueChange={field.onChange} defaultValue={state.language_translated ?? undefined}>
+									<FormControl>
+										<SelectTrigger>
+											<SelectValue placeholder="Select translated language" />
+										</SelectTrigger>
+									</FormControl>
+									<SelectContent>
+										{Object.entries(languages).map(([code, name]) => (
+											<SelectItem key={code} value={code}>
+												{name}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
 
-				<FormField
-					control={form.control}
-					name="language_original"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Original Language</FormLabel>
-							<Select onValueChange={field.onChange} defaultValue={state.language_original ?? undefined}>
+
+					<FormField
+						control={form.control}
+						name="publication_year"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Publication Year</FormLabel>
 								<FormControl>
-									<SelectTrigger>
-										<SelectValue placeholder="Select original language" />
-									</SelectTrigger>
+									<Input
+										{...field}
+										type="number"
+										className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+									/>
 								</FormControl>
-								<SelectContent>
-									{Object.entries(languages).map(([code, name]) => (
-										<SelectItem key={code} value={code}>
-											{name}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+								<FormDescription>Optional, between -5000 and 5000</FormDescription>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
 
-
-				<FormField
-					control={form.control}
-					name="language_translated"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Translated Language</FormLabel>
-							<Select onValueChange={field.onChange} defaultValue={state.language_translated ?? undefined}>
+					<FormField
+						control={form.control}
+						name="tags"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Tags</FormLabel>
 								<FormControl>
-									<SelectTrigger>
-										<SelectValue placeholder="Select translated language" />
-									</SelectTrigger>
+									<InputTags
+										lowercase
+										value={field.value ?? ""}
+										onChange={(e) => field.onChange(e.target.value)}
+									/>
 								</FormControl>
-								<SelectContent>
-									{Object.entries(languages).map(([code, name]) => (
-										<SelectItem key={code} value={code}>
-											{name}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
+								<FormDescription>Enter tags separated by commas e.g. "romance,comedy, isekai", optional, up to 1000 characters</FormDescription>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+				</div>
 
-
-				<FormField
-					control={form.control}
-					name="publication_year"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Publication Year</FormLabel>
-							<FormControl>
-								<Input
-									{...field}
-									type="number"
-									className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-								/>
-							</FormControl>
-							<FormDescription>Optional, between -5000 and 5000</FormDescription>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-
-				<FormField
-					control={form.control}
-					name="tags"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Tags</FormLabel>
-							<FormControl>
-								<InputTags
-									lowercase
-									value={field.value ?? ""}
-									onChange={(e) => field.onChange(e.target.value)}
-								/>
-							</FormControl>
-							<FormDescription>Enter tags separated by commas e.g. "romance,comedy, isekai", optional, up to 1000 characters</FormDescription>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-
-				{/* <Button type="button" variant="secondary" onClick={() => {
-						setAdvanced(!advanced);
-						window.scrollTo(0, 0);
-					}}
-					>
-						{advanced ? "Simple search" : "Advanced search"}
-					</Button> */}
+				<Button type="button" variant="secondary" onClick={() => {
+					setAdvanced(!advanced);
+					window.scrollTo(0, 0);
+				}}
+				>
+					{advanced ? "Simple search" : "Advanced search"}
+				</Button>
 
 				<Button type="submit">Submit</Button>
 
-				<Button type="button" variant="secondary" onClick={() => handleSearch()}>Reset query options</Button>
+				<Button type="button" variant="secondary" onClick={() => handleSearch()} className={advanced ? "inline" : "hidden"}>Reset query options</Button>
 			</form>
 		</Form>
 	);
