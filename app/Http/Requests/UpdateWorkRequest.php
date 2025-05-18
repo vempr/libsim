@@ -31,6 +31,7 @@ class UpdateWorkRequest extends FormRequest {
 			'publication_year' => 'nullable|integer|min:-5000|max:5000',
 			'image' => 'nullable|string|max:255',
 			'tags' => 'nullable|string|max:1000',
+			'links' => 'nullable|string|max:3000',
 		];
 	}
 }

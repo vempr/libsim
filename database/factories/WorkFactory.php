@@ -26,7 +26,8 @@ class WorkFactory extends Factory {
 			"language_translated" => null,
 			"publication_year" => 1500,
 			"image" => null,
-			"tags" => "fun,something,hellooo"
+			"tags" => "fun,something,hellooo",
+			"links" => "https://www.lipsum.com/|https://en.wikipedia.org/wiki/Lorem_ipsum",
 		];
 	}
 }

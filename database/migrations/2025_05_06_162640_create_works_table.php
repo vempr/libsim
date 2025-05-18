@@ -30,6 +30,7 @@ return new class extends Migration {
 			$table->integer("publication_year")->nullable();
 			$table->string("image")->nullable();
 			$table->string("tags", 1000)->nullable();
+			$table->string("links", 3000)->nullable();
 
 			$table->timestamps();
 		});
