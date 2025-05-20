@@ -24,7 +24,10 @@ export default function All() {
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Saved works" />
 
-      <AdvancedSearchForm state={searchState} advanced={advanced} />
+      <AdvancedSearchForm
+        state={searchState}
+        advanced={advanced}
+      />
 
       <ul>
         {works.map((work) => (

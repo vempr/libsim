@@ -5,57 +5,70 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { Folder, LayoutGrid, LibraryBig, ListPlus } from 'lucide-react';
+
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
-	{
-		title: 'Dashboard',
-		href: '/dashboard',
-		icon: LayoutGrid,
-	},
-	{
-		title: 'Saved works',
-		href: '/works',
-		icon: LibraryBig,
-	},
-	{
-		title: 'New entry',
-		href: '/works/new',
-		icon: ListPlus,
-	},
+  {
+    title: 'Dashboard',
+    href: '/dashboard',
+    icon: LayoutGrid,
+  },
+  {
+    title: 'Saved works',
+    href: '/works',
+    icon: LibraryBig,
+  },
+  {
+    title: 'New entry',
+    href: '/works/new',
+    icon: ListPlus,
+  },
 ];
 
 const footerNavItems: NavItem[] = [
-	{
-		title: 'Repository',
-		href: 'https://github.com/vempr/libsim',
-		icon: Folder,
-	},
+  {
+    title: 'Repository',
+    href: 'https://github.com/vempr/libsim',
+    icon: Folder,
+  },
 ];
 
 export function AppSidebar() {
-	return (
-		<Sidebar collapsible="icon" variant="inset">
-			<SidebarHeader>
-				<SidebarMenu>
-					<SidebarMenuItem>
-						<SidebarMenuButton size="lg" asChild>
-							<Link href="/dashboard" prefetch>
-								<AppLogo />
-							</Link>
-						</SidebarMenuButton>
-					</SidebarMenuItem>
-				</SidebarMenu>
-			</SidebarHeader>
+  return (
+    <Sidebar
+      collapsible="icon"
+      variant="inset"
+    >
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              size="lg"
+              asChild
+            >
+              <Link
+                href="/dashboard"
+                prefetch
+              >
+                <AppLogo />
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
 
-			<SidebarContent>
-				<NavMain items={mainNavItems} />
-			</SidebarContent>
+      <SidebarContent>
+        <NavMain items={mainNavItems} />
+      </SidebarContent>
 
-			<SidebarFooter>
-				<NavFooter items={footerNavItems} className="mt-auto" />
-				<NavUser />
-			</SidebarFooter>
-		</Sidebar>
-	);
+      <SidebarFooter>
+        <NavFooter
+          items={footerNavItems}
+          className="mt-auto"
+        />
+        <NavUser />
+      </SidebarFooter>
+    </Sidebar>
+  );
 }

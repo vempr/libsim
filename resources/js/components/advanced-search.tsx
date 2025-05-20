@@ -58,7 +58,10 @@ export function AdvancedSearchForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-6"
+      >
         <div className={adv ? 'hidden' : 'block'}>
           <FormField
             control={form.control}
@@ -91,7 +94,10 @@ export function AdvancedSearchForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Publication status</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={(state?.status_publication as PublicationStatus) ?? undefined}>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={(state?.status_publication as PublicationStatus) ?? undefined}
+                >
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select publication status" />
@@ -99,7 +105,10 @@ export function AdvancedSearchForm({
                   </FormControl>
                   <SelectContent>
                     {publicationStatuses.map((s: PublicationStatus) => (
-                      <SelectItem key={s} value={s}>
+                      <SelectItem
+                        key={s}
+                        value={s}
+                      >
                         {s.charAt(0).toUpperCase() + s.slice(1)}
                       </SelectItem>
                     ))}
@@ -116,7 +125,10 @@ export function AdvancedSearchForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Reading status</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={(state?.status_reading as ReadingStatus) ?? undefined}>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={(state?.status_reading as ReadingStatus) ?? undefined}
+                >
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select reading status" />
@@ -124,7 +136,10 @@ export function AdvancedSearchForm({
                   </FormControl>
                   <SelectContent>
                     {readingStatuses.map((s: ReadingStatus) => (
-                      <SelectItem key={s} value={s}>
+                      <SelectItem
+                        key={s}
+                        value={s}
+                      >
                         {s.charAt(0).toUpperCase() + s.slice(1)}
                       </SelectItem>
                     ))}
@@ -142,7 +157,10 @@ export function AdvancedSearchForm({
               <FormItem>
                 <FormLabel>Author</FormLabel>
                 <FormControl>
-                  <InputTags value={field.value ?? ''} onChange={(e) => field.onChange(e.target.value)} />
+                  <InputTags
+                    value={field.value ?? ''}
+                    onChange={(e) => field.onChange(e.target.value)}
+                  />
                 </FormControl>
                 <FormDescription>Use commas as separator for multiple names, optional, up to 255 characters.</FormDescription>
                 <FormMessage />
@@ -156,7 +174,10 @@ export function AdvancedSearchForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Original Language</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={state?.language_original ?? undefined}>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={state?.language_original ?? undefined}
+                >
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select original language" />
@@ -164,7 +185,10 @@ export function AdvancedSearchForm({
                   </FormControl>
                   <SelectContent>
                     {Object.entries(languages).map(([code, name]) => (
-                      <SelectItem key={code} value={code}>
+                      <SelectItem
+                        key={code}
+                        value={code}
+                      >
                         {name}
                       </SelectItem>
                     ))}
@@ -181,7 +205,10 @@ export function AdvancedSearchForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Translated Language</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={state?.language_translated ?? undefined}>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={state?.language_translated ?? undefined}
+                >
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select translated language" />
@@ -189,7 +216,10 @@ export function AdvancedSearchForm({
                   </FormControl>
                   <SelectContent>
                     {Object.entries(languages).map(([code, name]) => (
-                      <SelectItem key={code} value={code}>
+                      <SelectItem
+                        key={code}
+                        value={code}
+                      >
                         {name}
                       </SelectItem>
                     ))}
@@ -226,7 +256,11 @@ export function AdvancedSearchForm({
               <FormItem>
                 <FormLabel>Tags</FormLabel>
                 <FormControl>
-                  <InputTags lowercase value={field.value ?? ''} onChange={(e) => field.onChange(e.target.value)} />
+                  <InputTags
+                    lowercase
+                    value={field.value ?? ''}
+                    onChange={(e) => field.onChange(e.target.value)}
+                  />
                 </FormControl>
                 <FormDescription>Enter tags separated by commas e.g. "romance,comedy, isekai", optional, up to 1000 characters</FormDescription>
                 <FormMessage />
@@ -248,7 +282,12 @@ export function AdvancedSearchForm({
 
         <Button type="submit">Submit</Button>
 
-        <Button type="button" variant="secondary" onClick={() => handleSearch()} className={adv ? 'inline' : 'hidden'}>
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={() => handleSearch()}
+          className={adv ? 'inline' : 'hidden'}
+        >
           Reset query options
         </Button>
       </form>

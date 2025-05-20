@@ -5,42 +5,45 @@ import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 
 export default function Work() {
-	const { work } = usePage<InertiaProps>().props;
+  const { work } = usePage<InertiaProps>().props;
 
-	const breadcrumbs: BreadcrumbItem[] = [
-		{
-			title: 'Saved works',
-			href: '/works',
-		},
-		{
-			title: work.title,
-			href: `/works/${work.id}`,
-		}
-	];
+  const breadcrumbs: BreadcrumbItem[] = [
+    {
+      title: 'Saved works',
+      href: '/works',
+    },
+    {
+      title: work.title,
+      href: `/works/${work.id}`,
+    },
+  ];
 
-	return (
-		<AppLayout breadcrumbs={breadcrumbs}>
-			<Head title={work.title} />
-			<p className="max-w-96 overflow-scroll">{JSON.stringify(work)}
-			</p>
-			<Link href={`/works/${work.id}/edit`}>Edit</Link>
-			<Dialog>
-				<DialogTrigger asChild>
-					<Button variant="destructive">Delete</Button>
-				</DialogTrigger>
-				<DialogContent className="sm:max-w-[425px]">
-					<DialogHeader>
-						<DialogTitle>Delete "{work.title}"?</DialogTitle>
-						<DialogDescription>
-							Make changes to your profile here. Click save when you're done.
-						</DialogDescription>
-					</DialogHeader>
+  return (
+    <AppLayout breadcrumbs={breadcrumbs}>
+      <Head title={work.title} />
+      <p className="max-w-96 overflow-scroll">{JSON.stringify(work)}</p>
+      <Link href={`/works/${work.id}/edit`}>Edit</Link>
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button variant="destructive">Delete</Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Delete "{work.title}"?</DialogTitle>
+            <DialogDescription>Make changes to your profile here. Click save when you're done.</DialogDescription>
+          </DialogHeader>
 
-					<DialogFooter>
-						<Button variant="destructive" type="button" onClick={() => router.delete(route('work.destroy', work.id))}>Burn permanently</Button>
-					</DialogFooter>
-				</DialogContent>
-			</Dialog>
-		</AppLayout>
-	);
+          <DialogFooter>
+            <Button
+              variant="destructive"
+              type="button"
+              onClick={() => router.delete(route('work.destroy', work.id))}
+            >
+              Burn permanently
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </AppLayout>
+  );
 }
