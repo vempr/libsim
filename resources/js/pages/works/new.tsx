@@ -19,8 +19,6 @@ export default function New() {
     resolver: zodResolver(workFormSchema),
     defaultValues: {
       status_reading: 'reading',
-      tags: '',
-      author: '',
     },
   });
 
@@ -33,7 +31,10 @@ export default function New() {
       <Head title="Create entry" />
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-6"
+        >
           <FormField
             control={form.control}
             name="title"
@@ -81,7 +82,10 @@ export default function New() {
                   </FormControl>
                   <SelectContent>
                     {publicationStatuses.map((s: PublicationStatus) => (
-                      <SelectItem key={s} value={s}>
+                      <SelectItem
+                        key={s}
+                        value={s}
+                      >
                         {s.charAt(0).toUpperCase() + s.slice(1)}
                       </SelectItem>
                     ))}
@@ -98,7 +102,10 @@ export default function New() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Reading status</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue="reading">
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue="reading"
+                >
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select reading status" />
@@ -106,7 +113,10 @@ export default function New() {
                   </FormControl>
                   <SelectContent>
                     {readingStatuses.map((s: ReadingStatus) => (
-                      <SelectItem key={s} value={s}>
+                      <SelectItem
+                        key={s}
+                        value={s}
+                      >
                         {s.charAt(0).toUpperCase() + s.slice(1)}
                       </SelectItem>
                     ))}
@@ -124,7 +134,10 @@ export default function New() {
               <FormItem>
                 <FormLabel>Author</FormLabel>
                 <FormControl>
-                  <InputTags value={field.value ?? ''} onChange={(e) => field.onChange(e.target.value)} />
+                  <InputTags
+                    value={field.value ?? ''}
+                    onChange={(e) => field.onChange(e.target.value)}
+                  />
                 </FormControl>
                 <FormDescription>Use commas as separator for multiple names, optional, up to 255 characters.</FormDescription>
                 <FormMessage />
@@ -146,7 +159,10 @@ export default function New() {
                   </FormControl>
                   <SelectContent>
                     {Object.entries(languages).map(([code, name]) => (
-                      <SelectItem key={code} value={code}>
+                      <SelectItem
+                        key={code}
+                        value={code}
+                      >
                         {name}
                       </SelectItem>
                     ))}
@@ -171,7 +187,10 @@ export default function New() {
                   </FormControl>
                   <SelectContent>
                     {Object.entries(languages).map(([code, name]) => (
-                      <SelectItem key={code} value={code}>
+                      <SelectItem
+                        key={code}
+                        value={code}
+                      >
                         {name}
                       </SelectItem>
                     ))}
@@ -228,9 +247,33 @@ export default function New() {
               <FormItem>
                 <FormLabel>Tags</FormLabel>
                 <FormControl>
-                  <InputTags lowercase value={field.value ?? ''} onChange={(e) => field.onChange(e.target.value)} />
+                  <InputTags
+                    lowercase
+                    value={field.value ?? ''}
+                    onChange={(e) => field.onChange(e.target.value)}
+                  />
                 </FormControl>
                 <FormDescription>Enter tags separated by commas e.g. "romance,comedy, isekai", optional, up to 1000 characters</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="links"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Links</FormLabel>
+                <FormControl>
+                  <InputTags
+                    asList
+                    pipeAsSeperator
+                    value={field.value ?? ''}
+                    onChange={(e) => field.onChange(e.target.value)}
+                    children={<FormDescription>Enter links separated by pipe symbols |, optional, up to 3000 characters</FormDescription>}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
