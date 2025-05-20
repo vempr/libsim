@@ -12,7 +12,7 @@ import { Head, router, usePage } from '@inertiajs/react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-export default function New() {
+export default function Edit() {
   const { work } = usePage<InertiaProps>().props;
   const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -47,7 +47,11 @@ export default function New() {
   });
 
   function onSubmit(values: z.infer<typeof workFormSchema>) {
-    router.put(route('work.update', work.id), values);
+    if (form.formState.isDirty) {
+      router.put(route('work.update', work.id), values);
+    } else {
+      router.get(route('work', work.id));
+    }
   }
 
   return (
