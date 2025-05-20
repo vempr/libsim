@@ -13,12 +13,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function All() {
-  const { works, searchState, flash, advanced } = usePage<InertiaProps>().props;
-
-  useEffect(() => {
-    if (flash?.success) toast(flash.success);
-    if (flash?.error) toast(flash.error);
-  });
+  const { works, searchState, advanced } = usePage<InertiaProps>().props;
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>

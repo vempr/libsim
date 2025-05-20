@@ -21,6 +21,7 @@ class Work extends Model {
 		'publication_year',
 		'image',
 		'tags',
+		'links',
 	];
 
 	public function user() {

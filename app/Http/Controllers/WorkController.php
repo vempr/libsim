@@ -98,7 +98,7 @@ class WorkController extends Controller {
 
 		$work = Work::create($requestWork);
 
-		return redirect('works/' . $work->id);
+		return redirect('works/' . $work->id)->with('success', 'Your work "' . $work->title . '" has been created.');
 	}
 
 	/**
@@ -131,9 +131,7 @@ class WorkController extends Controller {
 
 		$work->update($request->validated());
 
-		return Inertia::render('works/work', [
-			'work' => $work,
-		]);
+		return redirect('works/' . $work->id)->with('success', 'Your work "' . $work->title . '" has been updated.');
 	}
 
 	/**
