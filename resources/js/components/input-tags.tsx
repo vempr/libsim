@@ -98,13 +98,13 @@ const InputTags = React.forwardRef<HTMLInputElement, InputTagsProps>(
               if (e.key === 'Enter') {
                 e.preventDefault();
               } else {
-                if (e.key === ',') {
+                if (e.key === seperator) {
                   e.preventDefault();
                   addPendingDataPoint();
                 } else if (e.key === 'Backspace' && pendingDataPoint.length === 0 && tags.length > 0) {
                   e.preventDefault();
                   const updatedTags = tags.slice(0, -1);
-                  const newValue = updatedTags.join(',');
+                  const newValue = updatedTags.join(seperator);
                   onChange({ target: { value: newValue } } as React.ChangeEvent<HTMLInputElement>);
                 }
               }

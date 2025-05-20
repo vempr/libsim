@@ -306,7 +306,7 @@ export default function New() {
                     pipeAsSeperator
                     value={field.value ?? ''}
                     onChange={(e) => field.onChange(e.target.value)}
-                    children={<FormDescription>Enter links separated by commas, optional, up to 3000 characters</FormDescription>}
+                    children={<FormDescription>Enter links separated by pipe symbols |, optional, up to 3000 characters</FormDescription>}
                   />
                 </FormControl>
                 <FormMessage />
