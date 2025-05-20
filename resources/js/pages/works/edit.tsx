@@ -47,11 +47,7 @@ export default function Edit() {
   });
 
   function onSubmit(values: z.infer<typeof workFormSchema>) {
-    if (form.formState.isDirty) {
-      router.put(route('work.update', work.id), values);
-    } else {
-      router.get(route('work', work.id));
-    }
+    router.put(route('work.update', work.id), values);
   }
 
   return (
