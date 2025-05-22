@@ -8,54 +8,66 @@ type InputTagsProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value' 
   lowercase?: boolean;
   value: string;
   onChange: React.ChangeEventHandler<HTMLInputElement>;
-  asList?: boolean;
+  displayAsList?: boolean;
   pipeAsSeperator?: boolean;
   children?: React.ReactNode;
 };
 
 const InputTags = React.forwardRef<HTMLInputElement, InputTagsProps>(
-  ({ className, value = '', lowercase, onChange, asList, children, pipeAsSeperator, ...props }, ref) => {
+  ({ className, value = '', lowercase, onChange, displayAsList, children, pipeAsSeperator }, ref) => {
     const [pendingDataPoint, setPendingDataPoint] = React.useState('');
 
-    const seperator = pipeAsSeperator ? '|' : ',';
+    const separator = pipeAsSeperator ? '|' : ',';
 
     const tags = React.useMemo(
       () =>
         value
-          .split(seperator)
+          .split(separator)
           .map((tag) => (lowercase ? tag.trim().toLowerCase() : tag.trim()))
           .filter((tag) => tag !== ''),
-      [value, lowercase],
+      [value, lowercase, separator],
+    );
+
+    const updateTags = React.useCallback(
+      (newTags: string[]) => {
+        const uniqueTags = Array.from(new Set(newTags));
+        const newValue = uniqueTags.join(separator);
+
+        const syntheticEvent = {
+          target: {
+            value: newValue,
+          },
+        } as React.ChangeEvent<HTMLInputElement>;
+
+        onChange(syntheticEvent);
+      },
+      [onChange, separator],
     );
 
     const addPendingDataPoint = React.useCallback(() => {
       if (pendingDataPoint.trim() !== '') {
-        const newTags = lowercase ? new Set([...tags, pendingDataPoint.trim().toLowerCase()]) : new Set([...tags, pendingDataPoint.trim()]);
-        const newValue = Array.from(newTags).join(seperator);
-        onChange({ target: { value: newValue } } as React.ChangeEvent<HTMLInputElement>);
+        const newTag = lowercase ? pendingDataPoint.trim().toLowerCase() : pendingDataPoint.trim();
+        updateTags([...tags, newTag]);
         setPendingDataPoint('');
       }
-    }, [pendingDataPoint, tags, lowercase, onChange]);
+    }, [pendingDataPoint, tags, lowercase, updateTags]);
 
     React.useEffect(() => {
-      if (pendingDataPoint.includes(seperator)) {
-        const newTags = new Set([
+      if (pendingDataPoint.includes(separator)) {
+        const newTags = [
           ...tags,
           ...pendingDataPoint
-            .split(seperator)
+            .split(separator)
             .map((chunk) => (lowercase ? chunk.trim().toLowerCase() : chunk.trim()))
             .filter(Boolean),
-        ]);
-        const newValue = Array.from(newTags).join(seperator);
-        onChange({ target: { value: newValue } } as React.ChangeEvent<HTMLInputElement>);
+        ];
+        updateTags(newTags);
         setPendingDataPoint('');
       }
-    }, [pendingDataPoint, tags, lowercase, onChange]);
+    }, [pendingDataPoint, tags, lowercase, separator, updateTags]);
 
     const handleRemoveTag = (tagToRemove: string) => {
-      const updatedTags = tags.filter((t) => t !== tagToRemove);
-      const newValue = updatedTags.join(seperator);
-      onChange({ target: { value: newValue } } as React.ChangeEvent<HTMLInputElement>);
+      updateTags(tags.filter((t) => t !== tagToRemove));
     };
 
     return (
@@ -68,7 +80,7 @@ const InputTags = React.forwardRef<HTMLInputElement, InputTagsProps>(
             className,
           )}
         >
-          {!asList &&
+          {!displayAsList &&
             tags.map((item, index) => (
               <Badge
                 key={index}
@@ -97,24 +109,28 @@ const InputTags = React.forwardRef<HTMLInputElement, InputTagsProps>(
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 e.preventDefault();
-              } else {
-                if (e.key === seperator) {
-                  e.preventDefault();
-                  addPendingDataPoint();
-                } else if (e.key === 'Backspace' && pendingDataPoint.length === 0 && tags.length > 0) {
-                  e.preventDefault();
-                  const updatedTags = tags.slice(0, -1);
-                  const newValue = updatedTags.join(seperator);
-                  onChange({ target: { value: newValue } } as React.ChangeEvent<HTMLInputElement>);
-                }
+                addPendingDataPoint();
+              } else if (e.key === separator) {
+                e.preventDefault();
+                addPendingDataPoint();
+              } else if (e.key === 'Backspace' && pendingDataPoint.length === 0 && tags.length > 0) {
+                e.preventDefault();
+                updateTags(tags.slice(0, -1));
               }
             }}
-            {...props}
-            ref={ref}
           />
         </div>
+
+        <input
+          type="hidden"
+          ref={ref}
+          value={value}
+          readOnly
+        />
+
         {children}
-        {asList && tags.length > 0 && (
+
+        {displayAsList && tags.length > 0 && (
           <div className="mb-2 flex flex-wrap gap-2">
             {tags.map((item, index) => (
               <Badge

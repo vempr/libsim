@@ -9,6 +9,7 @@ import { type InertiaProps, type BreadcrumbItem } from '@/types/index';
 import { languages, PublicationStatus, publicationStatuses, ReadingStatus, readingStatuses, workFormSchema } from '@/types/schemas/work';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, router, usePage } from '@inertiajs/react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -46,8 +47,14 @@ export default function Edit() {
     },
   });
 
+  const isDirty = form.formState.isDirty;
+
   function onSubmit(values: z.infer<typeof workFormSchema>) {
-    router.put(route('work.update', work.id), values);
+    if (isDirty) {
+      router.put(route('work.update', work.id), values);
+    } else {
+      router.get(route('work', work.id));
+    }
   }
 
   return (
@@ -81,12 +88,7 @@ export default function Edit() {
               <FormItem>
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <Textarea
-                    {...field}
-                    {...form.register('description', {
-                      required: false,
-                    })}
-                  />
+                  <Textarea {...field} />
                 </FormControl>
                 <FormDescription>A brief summary or synopsis of the work, optional</FormDescription>
                 <FormMessage />
@@ -102,7 +104,7 @@ export default function Edit() {
                 <FormLabel>Publication status</FormLabel>
                 <Select
                   onValueChange={field.onChange}
-                  defaultValue={work.status_publication ?? undefined}
+                  defaultValue={field.value ?? undefined}
                 >
                   <FormControl>
                     <SelectTrigger>
@@ -133,7 +135,7 @@ export default function Edit() {
                 <FormLabel>Reading status</FormLabel>
                 <Select
                   onValueChange={field.onChange}
-                  defaultValue={work.status_reading}
+                  defaultValue={field.value}
                 >
                   <FormControl>
                     <SelectTrigger>
@@ -182,7 +184,7 @@ export default function Edit() {
                 <FormLabel>Original Language</FormLabel>
                 <Select
                   onValueChange={field.onChange}
-                  defaultValue={work.language_original ?? undefined}
+                  defaultValue={field.value ?? undefined}
                 >
                   <FormControl>
                     <SelectTrigger>
@@ -213,7 +215,7 @@ export default function Edit() {
                 <FormLabel>Translated Language</FormLabel>
                 <Select
                   onValueChange={field.onChange}
-                  defaultValue={work.language_translated ?? undefined}
+                  defaultValue={field.value ?? undefined}
                 >
                   <FormControl>
                     <SelectTrigger>
@@ -284,6 +286,7 @@ export default function Edit() {
                 <FormControl>
                   <InputTags
                     lowercase
+                    {...field}
                     value={field.value ?? ''}
                     onChange={(e) => field.onChange(e.target.value)}
                   />
@@ -302,8 +305,9 @@ export default function Edit() {
                 <FormLabel>Links</FormLabel>
                 <FormControl>
                   <InputTags
-                    asList
+                    displayAsList
                     pipeAsSeperator
+                    {...field}
                     value={field.value ?? ''}
                     onChange={(e) => field.onChange(e.target.value)}
                     children={<FormDescription>Enter links separated by pipe symbols |, optional, up to 3000 characters</FormDescription>}
