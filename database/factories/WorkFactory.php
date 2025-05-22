@@ -17,17 +17,17 @@ class WorkFactory extends Factory {
 	public function definition(): array {
 		return [
 			"user_id" => User::factory(),
-			"title" => "Lorem Ipsum",
-			"description" => "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+			"title" => "Shadow of the Crimson Moon",
+			"description" => "In a world haunted by ancient beasts, a lone warrior must uncover forgotten powers to protect a kingdom on the brink of war.",
 			"status_publication" => "ongoing",
 			"status_reading" => "reading",
-			"author" => null,
-			"language_original" => "la",
-			"language_translated" => null,
-			"publication_year" => 1500,
+			"author" => "Kaito Nakamura",
+			"language_original" => "ja",
+			"language_translated" => "en",
+			"publication_year" => 2023,
 			"image" => null,
-			"tags" => "fun,something,hellooo",
-			"links" => "https://www.lipsum.com/|https://en.wikipedia.org/wiki/Lorem_ipsum",
+			"tags" => "action,fantasy,adventure",
+			"links" => "https://mangaexample.com/shadow-crimson|https://en.wikipedia.org/wiki/Manga",
 		];
 	}
 }
