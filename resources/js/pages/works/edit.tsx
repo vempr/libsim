@@ -1,3 +1,4 @@
+import { Flag } from '@/components/flag';
 import { InputTags } from '@/components/input-tags';
 import { Button } from '@/components/ui/button';
 import { Form, FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from '@/components/ui/form';
@@ -9,7 +10,6 @@ import { type InertiaProps, type BreadcrumbItem } from '@/types/index';
 import { languages, PublicationStatus, publicationStatuses, ReadingStatus, readingStatuses, workFormSchema } from '@/types/schemas/work';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, router, usePage } from '@inertiajs/react';
-import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -197,6 +197,10 @@ export default function Edit() {
                         key={code}
                         value={code}
                       >
+                        <Flag
+                          name={name}
+                          code={code}
+                        />
                         {name}
                       </SelectItem>
                     ))}
@@ -228,6 +232,10 @@ export default function Edit() {
                         key={code}
                         value={code}
                       >
+                        <Flag
+                          name={name}
+                          code={code}
+                        />
                         {name}
                       </SelectItem>
                     ))}

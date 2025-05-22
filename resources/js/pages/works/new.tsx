@@ -1,3 +1,4 @@
+import { Flag } from '@/components/flag';
 import { InputTags } from '@/components/input-tags';
 import { Button } from '@/components/ui/button';
 import { Form, FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from '@/components/ui/form';
@@ -163,6 +164,10 @@ export default function New() {
                         key={code}
                         value={code}
                       >
+                        <Flag
+                          name={name}
+                          code={code}
+                        />
                         {name}
                       </SelectItem>
                     ))}
@@ -191,6 +196,10 @@ export default function New() {
                         key={code}
                         value={code}
                       >
+                        <Flag
+                          name={name}
+                          code={code}
+                        />
                         {name}
                       </SelectItem>
                     ))}
