@@ -2,8 +2,6 @@ import { AdvancedSearchForm } from '@/components/advanced-search';
 import AppLayout from '@/layouts/app-layout';
 import { type InertiaProps, type BreadcrumbItem } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
-import { useEffect } from 'react';
-import { toast } from 'sonner';
 
 const breadcrumbs: BreadcrumbItem[] = [
   {

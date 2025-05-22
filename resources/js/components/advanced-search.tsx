@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { Flag } from './flag';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 
@@ -189,6 +190,10 @@ export function AdvancedSearchForm({
                         key={code}
                         value={code}
                       >
+                        <Flag
+                          name={name}
+                          code={code}
+                        />
                         {name}
                       </SelectItem>
                     ))}
@@ -220,6 +225,10 @@ export function AdvancedSearchForm({
                         key={code}
                         value={code}
                       >
+                        <Flag
+                          name={name}
+                          code={code}
+                        />
                         {name}
                       </SelectItem>
                     ))}
