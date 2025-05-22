@@ -267,7 +267,7 @@ export default function New() {
                 <FormLabel>Links</FormLabel>
                 <FormControl>
                   <InputTags
-                    asList
+                    displayAsList
                     pipeAsSeperator
                     value={field.value ?? ''}
                     onChange={(e) => field.onChange(e.target.value)}
