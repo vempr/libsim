@@ -62,6 +62,7 @@ export interface InertiaProps extends Page<PageProps> {
   user: User;
   users: PartialUser[];
   userQuery?: string | null;
+  friends?: PartialUser[] | null;
   friendRequestStatus?: FriendRequestStatus;
   work: Work;
   works: Work[];

@@ -55,8 +55,15 @@ class FriendController extends Controller {
 			$users = User::all();
 		}
 
+		$user = Auth::user();
+		$friends = $user->allFriends();
+		$nonFriends = $users->reject(function ($u) use ($friends, $user) {
+			return $friends->contains('id', $u->id) || $u->id === $user->id;
+		})->values();
+
 		return Inertia::render('users/all', [
-			'users' => $users->select(['id', 'name', 'avatar', 'introduction']),
+			'users' => $nonFriends->select(['id', 'name', 'avatar', 'introduction']),
+			'friends' => $friends->select(['id', 'name', 'avatar', 'introduction']),
 			'userQuery' => $q,
 		]);
 	}

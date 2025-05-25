@@ -14,7 +14,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function All() {
-  const { users, userQuery } = usePage<InertiaProps>().props;
+  const { users, userQuery, friends } = usePage<InertiaProps>().props;
   const [searchQuery, setSearchQuery] = useState(userQuery || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const initialLoad = useRef(true);
@@ -77,6 +77,16 @@ export default function All() {
       </form>
 
       <ul>
+        {friends?.map((friend) => (
+          <li>
+            <Link
+              href={`/users/${friend.id}`}
+              className="bg-green-600"
+            >
+              {JSON.stringify(friend)}
+            </Link>
+          </li>
+        ))}
         {users.map((user) => (
           <li>
             <Link href={`/users/${user.id}`}>{JSON.stringify(user)}</Link>
