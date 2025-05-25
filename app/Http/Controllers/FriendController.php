@@ -99,6 +99,36 @@ class FriendController extends Controller {
 		return back()->with('success', 'Friend request sent.');
 	}
 
-	public function destroy(User $user) {
+	public function destroy(Request $request) {
+		$validated = $request->validate([
+			'receiver_id' => [
+				'required',
+				'numeric',
+				'exists:users,id',
+				'not_in:' . Auth::id(),
+			],
+		]);
+
+		$authUser = Auth::user();
+		$receiverId = $validated['receiver_id'];
+		$user = User::find($receiverId);
+
+		$pendingRequest = FriendRequest::where(function ($q) use ($authUser, $user) {
+			$q->where('sender_id', $user->id)->where('receiver_id', $authUser->id);
+		})
+			->orWhere(function ($q) use ($authUser, $user) {
+				$q->where('sender_id', $authUser->id)->where('receiver_id', $user->id);
+			})
+			->first();
+
+		if ($pendingRequest) {
+			$pendingRequest->delete();
+			return back()->with('success', 'You have declined ' . $user->name . '\'s friend request.');
+		}
+
+		$authUser->friends()->detach($user->id);
+		$user->friends()->detach($authUser->id);
+
+		return back()->with('success', 'You have unfriended ' . $user->name . '.');
 	}
 }

@@ -29,6 +29,8 @@ function FriendButton({ friendRequestStatus, processing }: FriendButtonProps) {
           Accept friend request
         </Button>
       );
+    case 'mutual':
+      return null;
     default:
       return (
         <Button
@@ -38,6 +40,31 @@ function FriendButton({ friendRequestStatus, processing }: FriendButtonProps) {
           Send friend request
         </Button>
       );
+  }
+}
+
+function UnfriendButton({ friendRequestStatus, processing }: FriendButtonProps) {
+  switch (friendRequestStatus) {
+    case 'expecting':
+      return (
+        <Button
+          type="submit"
+          disabled={processing}
+        >
+          Decline friend request
+        </Button>
+      );
+    case 'mutual':
+      return (
+        <Button
+          type="submit"
+          disabled={processing}
+        >
+          Unfriend
+        </Button>
+      );
+    default:
+      return null;
   }
 }
 
@@ -78,23 +105,18 @@ export default function Work() {
       <Head title={user.name} />
       <p className="max-w-96 overflow-scroll">{JSON.stringify(user)}</p>
 
-      {friendRequestStatus === 'mutual' ? (
-        <form onSubmit={handleUnfriend}>
-          <Button
-            type="submit"
-            disabled={processing}
-          >
-            Unfriend
-          </Button>
-        </form>
-      ) : (
-        <form onSubmit={handleFriend}>
-          <FriendButton
-            friendRequestStatus={friendRequestStatus}
-            processing={processing}
-          />
-        </form>
-      )}
+      <form onSubmit={handleUnfriend}>
+        <UnfriendButton
+          friendRequestStatus={friendRequestStatus}
+          processing={processing}
+        />
+      </form>
+      <form onSubmit={handleFriend}>
+        <FriendButton
+          friendRequestStatus={friendRequestStatus}
+          processing={processing}
+        />
+      </form>
 
       {/* <Dialog>
 				<DialogTrigger asChild>

@@ -15,5 +15,5 @@ Route::middleware(['auth', 'verified'])
 
 		Route::get('{user}', 'create')->name('users.create');
 		Route::post('/', 'store')->name('users.store');
-		Route::delete('{user}', 'destroy')->name('users.destroy');
+		Route::delete('/', 'destroy')->name('users.destroy');
 	});
