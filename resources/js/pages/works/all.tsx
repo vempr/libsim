@@ -1,7 +1,7 @@
 import { AdvancedSearchForm } from '@/components/advanced-search';
 import AppLayout from '@/layouts/app-layout';
 import { type InertiaProps, type BreadcrumbItem } from '@/types';
-import { Head, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -24,7 +24,9 @@ export default function All() {
 
       <ul>
         {works.map((work) => (
-          <li>{JSON.stringify(work)}</li>
+          <li>
+            <Link href={`/works/${work.id}`}>{JSON.stringify(work)}</Link>
+          </li>
         ))}
       </ul>
     </AppLayout>

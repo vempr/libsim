@@ -28,11 +28,17 @@ export interface NavItem {
 export interface User {
   id: number;
   name: string;
-  email: string;
   avatar?: string;
-  email_verified_at: string | null;
-  created_at: string;
-  updated_at: string;
+  introduction?: string;
+  description?: string;
+  [key: string]: unknown;
+}
+
+export interface PartialUser {
+  id: number;
+  name: string;
+  avatar?: string;
+  introduction?: string;
   [key: string]: unknown;
 }
 
@@ -51,6 +57,8 @@ export interface SharedData {
 }
 
 export interface InertiaProps extends Page<PageProps> {
+  user: User;
+  users: PartialUser[];
   work: Work;
   works: Work[];
   flash?: FlashMessages;
