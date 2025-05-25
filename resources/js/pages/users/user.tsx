@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
 import { FriendRequestStatus, InertiaProps, type BreadcrumbItem } from '@/types';
 import { Head, usePage, useForm } from '@inertiajs/react';
@@ -43,31 +44,6 @@ function FriendButton({ friendRequestStatus, processing }: FriendButtonProps) {
   }
 }
 
-function UnfriendButton({ friendRequestStatus, processing }: FriendButtonProps) {
-  switch (friendRequestStatus) {
-    case 'expecting':
-      return (
-        <Button
-          type="submit"
-          disabled={processing}
-        >
-          Decline friend request
-        </Button>
-      );
-    case 'mutual':
-      return (
-        <Button
-          type="submit"
-          disabled={processing}
-        >
-          Unfriend
-        </Button>
-      );
-    default:
-      return null;
-  }
-}
-
 export default function Work() {
   const { user, friendRequestStatus } = usePage<InertiaProps>().props;
 
@@ -105,12 +81,6 @@ export default function Work() {
       <Head title={user.name} />
       <p className="max-w-96 overflow-scroll">{JSON.stringify(user)}</p>
 
-      <form onSubmit={handleUnfriend}>
-        <UnfriendButton
-          friendRequestStatus={friendRequestStatus}
-          processing={processing}
-        />
-      </form>
       <form onSubmit={handleFriend}>
         <FriendButton
           friendRequestStatus={friendRequestStatus}
@@ -118,27 +88,45 @@ export default function Work() {
         />
       </form>
 
-      {/* <Dialog>
-				<DialogTrigger asChild>
-					<Button variant="destructive">Delete</Button>
-				</DialogTrigger>
-				<DialogContent className="sm:max-w-[425px]">
-					<DialogHeader>
-						<DialogTitle>Delete "{work.title}"?</DialogTitle>
-						<DialogDescription>Make changes to your profile here. Click save when you're done.</DialogDescription>
-					</DialogHeader>
+      {friendRequestStatus === 'expecting' && (
+        <form onSubmit={handleUnfriend}>
+          <Button
+            type="submit"
+            disabled={processing}
+          >
+            Decline friend request
+          </Button>
+        </form>
+      )}
 
-					<DialogFooter>
-						<Button
-							variant="destructive"
-							type="button"
-							onClick={() => router.delete(route('work.destroy', work.id))}
-						>
-							Burn permanently
-						</Button>
-					</DialogFooter>
-				</DialogContent>
-			</Dialog> */}
+      {friendRequestStatus === 'mutual' && (
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button
+              type="button"
+              disabled={processing}
+            >
+              Unfriend
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Are you sure?</DialogTitle>
+              <DialogDescription>You will not be able to message {user.name} if their DMs are deactivated.</DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <form onSubmit={handleUnfriend}>
+                <Button
+                  type="submit"
+                  disabled={processing}
+                >
+                  Unfriend
+                </Button>
+              </form>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </AppLayout>
   );
 }
