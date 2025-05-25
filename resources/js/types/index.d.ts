@@ -61,6 +61,7 @@ export interface SharedData {
 export interface InertiaProps extends Page<PageProps> {
   user: User;
   users: PartialUser[];
+  userQuery?: string | null;
   friendRequestStatus?: FriendRequestStatus;
   work: Work;
   works: Work[];

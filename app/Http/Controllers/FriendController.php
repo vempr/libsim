@@ -35,7 +35,30 @@ class FriendController extends Controller {
 	}
 
 	public function index(Request $request) {
-		return Inertia::render('users/all', ['users' => User::all()->select(['id', 'name', 'avatar', 'introduction'])]);
+		$validated = $request->validate([
+			'userQuery' => [
+				'sometimes',
+				'string',
+				'min:1',
+				'max:255',
+			],
+		]);
+
+		$q = $validated['userQuery'] ?? null;
+		$users = null;
+
+		if ($q) {
+			$users = User::query()
+				->where('name', 'like', '%' . $q . '%')
+				->get();
+		} else {
+			$users = User::all();
+		}
+
+		return Inertia::render('users/all', [
+			'users' => $users->select(['id', 'name', 'avatar', 'introduction']),
+			'userQuery' => $q,
+		]);
 	}
 
 	public function create(User $user) {
@@ -70,6 +93,8 @@ class FriendController extends Controller {
 				'numeric',
 				'exists:users,id',
 				'not_in:' . Auth::id(),
+				'min:1',
+				'max:1000000',
 			],
 		]);
 
@@ -106,6 +131,8 @@ class FriendController extends Controller {
 				'numeric',
 				'exists:users,id',
 				'not_in:' . Auth::id(),
+				'min:1',
+				'max:1000000',
 			],
 		]);
 
