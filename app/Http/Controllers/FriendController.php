@@ -19,7 +19,7 @@ function friendRequestExists(int $senderId, int $receiverId): bool {
 		->exists();
 }
 
-function acceptRequest(int $senderId, int $receiverId): FriendRequest|null {
+function getAcceptRequest(int $senderId, int $receiverId): FriendRequest|null {
 	return FriendRequest::where('sender_id', $receiverId)
 		->where('receiver_id', $senderId)
 		->first();
@@ -76,7 +76,7 @@ class FriendController extends Controller {
 		if (friendRequestExists($senderId, $receiverId)) {
 			$status = 'pending';
 		}
-		if (acceptRequest($senderId, $receiverId)) {
+		if (getAcceptRequest($senderId, $receiverId)) {
 			$status = 'expecting';
 		}
 
@@ -108,7 +108,7 @@ class FriendController extends Controller {
 			return back()->with('error', 'Friend request already sent.');
 		}
 
-		$acceptRequest = acceptRequest($senderId, $receiverId);
+		$acceptRequest = getAcceptRequest($senderId, $receiverId);
 		if ($acceptRequest) {
 			Auth::user()->friends()->attach($receiverId);
 			User::find($receiverId)->friends()->attach($senderId);
