@@ -15,7 +15,7 @@ export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => {
   useEffect(() => {
     if (flash?.success) toast(flash.success);
     if (flash?.error) toast(flash.error);
-  });
+  }, [flash?.success, flash?.error]);
 
   return (
     <AppLayoutTemplate

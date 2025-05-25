@@ -2,12 +2,28 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\FriendRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+
+function areFriends(int $receiverId): bool {
+	return Auth::user()->friends()->where('friend_id', $receiverId)->exists();
+}
+
+function friendRequestExists(int $senderId, int $receiverId): bool {
+	return FriendRequest::where('sender_id', $senderId)
+		->where('receiver_id', $receiverId)
+		->exists();
+}
+
+function acceptRequest(int $senderId, int $receiverId): FriendRequest|null {
+	return FriendRequest::where('sender_id', $receiverId)
+		->where('receiver_id', $senderId)
+		->first();
+}
 
 class FriendController extends Controller {
 	use AuthorizesRequests;
@@ -18,51 +34,71 @@ class FriendController extends Controller {
 		]);
 	}
 
-	/**
-	 * Display a listing of the resource.
-	 */
 	public function index(Request $request) {
 		return Inertia::render('users/all', ['users' => User::all()->select(['id', 'name', 'avatar', 'introduction'])]);
 	}
 
-	/**
-	 * Show the form for creating a new resource.
-	 */
-	public function create() {
-		return Inertia::render('users/user');
-	}
+	public function create(User $user) {
+		if (Auth::id() === $user->id) {
+			return redirect('u');
+		}
 
-	/**
-	 * Store a newly created resource in storage.
-	 */
-	// public function store(StoreWorkRequest $request): RedirectResponse {
-	// 	$requestWork = $request->validated();
-	// 	$requestWork['user_id'] = Auth::id();
+		$senderId = Auth::id();
+		$receiverId = $user->id;
+		$status = null;
 
-	// 	$work = Work::create($requestWork);
-
-	// 	return redirect('works/' . $work->id)->with('success', 'Your work "' . $work->title . '" has been created.');
-	// }
-
-	/**
-	 * Display the specified resource.
-	 */
-	public function show(User $user) {
-		// $this->authorize('view', $user);
+		if (areFriends($receiverId)) {
+			$status = 'mutual';
+		}
+		if (friendRequestExists($senderId, $receiverId)) {
+			$status = 'pending';
+		}
+		if (acceptRequest($senderId, $receiverId)) {
+			$status = 'expecting';
+		}
 
 		return Inertia::render('users/user', [
 			'user' => $user->only(['id', 'name', 'avatar', 'introduction', 'description']),
+			'friendRequestStatus' => $status,
 		]);
 	}
 
-	/**
-	 * Remove the specified resource from storage.
-	 */
-	// public function destroy(Work $work) {
-	// 	$this->authorize('delete', $work);
+	public function store(Request $request) {
+		$validated = $request->validate([
+			'receiver_id' => [
+				'required',
+				'numeric',
+				'exists:users,id',
+				'not_in:' . Auth::id(),
+			],
+		]);
 
-	// 	$work->delete();
+		$senderId = Auth::id();
+		$receiverId = $validated['receiver_id'];
 
-	// 	return redirect('works')->with('success', 'Your work "' . $work->title . '" has been deleted.');
-	// }
+		if (areFriends($receiverId)) {
+			return back()->with('error', 'You are already friends.');
+		}
+		if (friendRequestExists($senderId, $receiverId)) {
+			return back()->with('error', 'Friend request already sent.');
+		}
+
+		$acceptRequest = acceptRequest($senderId, $receiverId);
+		if ($acceptRequest) {
+			Auth::user()->friends()->attach($receiverId);
+			User::find($receiverId)->friends()->attach($senderId);
+			$acceptRequest->delete();
+
+			return back()->with('success', 'Friend request accepted!');
+		}
+
+		FriendRequest::create([
+			'sender_id' => $senderId,
+			'receiver_id' => $receiverId,
+		]);
+		return back()->with('success', 'Friend request sent.');
+	}
+
+	public function destroy(User $user) {
+	}
 }

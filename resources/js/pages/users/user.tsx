@@ -1,9 +1,48 @@
+import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
-import { InertiaProps, type BreadcrumbItem } from '@/types';
-import { Head, usePage } from '@inertiajs/react';
+import { FriendRequestStatus, InertiaProps, type BreadcrumbItem } from '@/types';
+import { Head, usePage, useForm } from '@inertiajs/react';
+import { FormEventHandler } from 'react';
+
+interface FriendButtonProps {
+  friendRequestStatus?: FriendRequestStatus;
+  processing: boolean;
+}
+
+function FriendButton({ friendRequestStatus, processing }: FriendButtonProps) {
+  switch (friendRequestStatus) {
+    case 'pending':
+      return (
+        <Button
+          type="submit"
+          disabled
+        >
+          Friend request sent
+        </Button>
+      );
+    case 'expecting':
+      return (
+        <Button
+          type="submit"
+          disabled={processing}
+        >
+          Accept friend request
+        </Button>
+      );
+    default:
+      return (
+        <Button
+          type="submit"
+          disabled={processing}
+        >
+          Send friend request
+        </Button>
+      );
+  }
+}
 
 export default function Work() {
-  const { user } = usePage<InertiaProps>().props;
+  const { user, friendRequestStatus } = usePage<InertiaProps>().props;
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -16,12 +55,46 @@ export default function Work() {
     },
   ];
 
+  const {
+    post,
+    processing,
+    delete: destroy,
+  } = useForm({
+    receiver_id: user.id,
+  });
+
+  const handleFriend: FormEventHandler = (e) => {
+    e.preventDefault();
+    post(route('users.store'));
+  };
+
+  const handleUnfriend: FormEventHandler = (e) => {
+    e.preventDefault();
+    destroy(route('users.destroy'));
+  };
+
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={user.name} />
       <p className="max-w-96 overflow-scroll">{JSON.stringify(user)}</p>
 
-      {/* <Link href={`/works/${work.id}/edit`}>Edit</Link> */}
+      {friendRequestStatus === 'mutual' ? (
+        <form onSubmit={handleUnfriend}>
+          <Button
+            type="submit"
+            disabled={processing}
+          >
+            Unfriend
+          </Button>
+        </form>
+      ) : (
+        <form onSubmit={handleFriend}>
+          <FriendButton
+            friendRequestStatus={friendRequestStatus}
+            processing={processing}
+          />
+        </form>
+      )}
 
       {/* <Dialog>
 				<DialogTrigger asChild>
