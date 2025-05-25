@@ -14,7 +14,8 @@ createInertiaApp({
     root.render(<App {...props} />);
   },
   progress: {
-    color: 'oklch(0.63 0.37 360)',
+    color: 'oklch(0.628 0.2502 12.28 / 70.00%)',
+    showSpinner: true,
   },
 });
 

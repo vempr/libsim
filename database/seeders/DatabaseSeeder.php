@@ -17,14 +17,14 @@ class DatabaseSeeder extends Seeder {
 		]);
 
 		$staticUser = User::factory()->create([
-			'name' => 'Static User',
+			'name' => 'static user 123',
 			'email' => 'static@example.com',
 		]);
 
-		$randomUser = User::factory()->create();
+		$randomUsers = User::factory(4)->create();
 
-		Work::factory(20)
-			->recycle([$staticUser, $randomUser])
+		Work::factory(50)
+			->recycle(array_merge([$staticUser], $randomUsers->all()))
 			->create();
 	}
 }
