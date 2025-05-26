@@ -16,12 +16,12 @@ class DatabaseSeeder extends Seeder {
 			LanguageSeeder::class,
 		]);
 
-		$staticUser = User::factory()->create([
+		$staticUser1 = User::factory()->create([
 			'name' => 'static user 123',
 			'email' => 'static@example.com',
 		]);
 
-		$staticUser = User::factory()->create([
+		$staticUser2 = User::factory()->create([
 			'name' => 'static user 124',
 			'email' => 'static2@example.com',
 		]);
@@ -29,7 +29,7 @@ class DatabaseSeeder extends Seeder {
 		$randomUsers = User::factory(3)->create();
 
 		Work::factory(50)
-			->recycle(array_merge([$staticUser], $randomUsers->all()))
+			->recycle(array_merge([$staticUser1, $staticUser2], $randomUsers->all()))
 			->create();
 	}
 }

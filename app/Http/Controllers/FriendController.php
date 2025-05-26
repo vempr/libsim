@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\FriendRequest;
+use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -110,7 +111,8 @@ class FriendController extends Controller {
 			],
 		]);
 
-		$senderId = Auth::id();
+		$sender = Auth::user();
+		$senderId = $sender->id;
 		$receiverId = $validated['receiver_id'];
 
 		if (areFriends($receiverId)) {
@@ -126,6 +128,15 @@ class FriendController extends Controller {
 			User::find($receiverId)->friends()->attach($senderId);
 			$acceptRequest->delete();
 
+			Notification::create([
+				'sender_id' => $senderId,
+				'receiver_id' => $receiverId,
+				'mood' => 'positive',
+				'title' => 'Friend request accepted',
+				'description' => $sender->name . " and you are now friends. You can both see each other's works.",
+				'image' => $sender->avatar,
+			]);
+
 			return back()->with('success', 'Friend request accepted!');
 		}
 
@@ -133,6 +144,16 @@ class FriendController extends Controller {
 			'sender_id' => $senderId,
 			'receiver_id' => $receiverId,
 		]);
+
+		Notification::create([
+			'sender_id' => $senderId,
+			'receiver_id' => $receiverId,
+			'mood' => 'neutral',
+			'title' => 'Pending friend request',
+			'description' => $sender->name . " has sent you a friend request. They have 'share works' enabled.",
+			'image' => $sender->avatar,
+		]);
+
 		return back()->with('success', 'Friend request sent.');
 	}
 
@@ -162,11 +183,30 @@ class FriendController extends Controller {
 
 		if ($pendingRequest) {
 			$pendingRequest->delete();
+
+			Notification::create([
+				'sender_id' => $authUser->id,
+				'receiver_id' => $receiverId,
+				'mood' => 'negative',
+				'title' => 'Friend request declined',
+				'description' => $user->name . " has declined your friend request. You can not see each other's works.",
+				'image' => $user->avatar,
+			]);
+
 			return back()->with('success', 'You have declined ' . $user->name . '\'s friend request.');
 		}
 
 		$authUser->friends()->detach($user->id);
 		$user->friends()->detach($authUser->id);
+
+		Notification::create([
+			'sender_id' => $authUser->id,
+			'receiver_id' => $receiverId,
+			'mood' => 'negative',
+			'title' => 'You have been unfriended',
+			'description' => $user->name . " has unfriended you. You can no longer see each other's works.",
+			'image' => $user->avatar,
+		]);
 
 		return back()->with('success', 'You have unfriended ' . $user->name . '.');
 	}

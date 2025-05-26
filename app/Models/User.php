@@ -50,6 +50,10 @@ class User extends Authenticatable implements MustVerifyEmail {
 		return $this->hasMany(Work::class);
 	}
 
+	public function notifications() {
+		return $this->hasMany(Notification::class, 'user_id', 'receiver_id');
+	}
+
 	public function friends() {
 		return $this->belongsToMany(User::class, 'friends', 'user_id', 'friend_id')->withTimestamps();
 	}
