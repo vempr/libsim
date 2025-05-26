@@ -1,5 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import AppLayout from '@/layouts/app-layout';
 import { type InertiaProps, type BreadcrumbItem } from '@/types';
 import { Head, Link, usePage, router } from '@inertiajs/react';
@@ -16,6 +18,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function All() {
   const { users, userQuery, friends } = usePage<InertiaProps>().props;
   const [searchQuery, setSearchQuery] = useState(userQuery || '');
+  const [friendsOnly, setFriendsOnly] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const initialLoad = useRef(true);
 
@@ -76,22 +79,45 @@ export default function All() {
         </Button>
       </form>
 
+      <div className="flex items-center space-x-2">
+        <Switch
+          id="friends-only"
+          checked={friendsOnly}
+          onCheckedChange={setFriendsOnly}
+        />
+        <Label htmlFor="friends-only">Show friends only</Label>
+      </div>
+
       <ul>
-        {friends?.map((friend) => (
-          <li>
-            <Link
-              href={`/users/${friend.id}`}
-              className="bg-green-600"
-            >
-              {JSON.stringify(friend)}
-            </Link>
-          </li>
-        ))}
-        {users.map((user) => (
-          <li>
-            <Link href={`/users/${user.id}`}>{JSON.stringify(user)}</Link>
-          </li>
-        ))}
+        {friendsOnly
+          ? friends?.map((friend) => (
+              <li>
+                <Link
+                  href={`/users/${friend.id}`}
+                  className="bg-green-600"
+                >
+                  {JSON.stringify(friend)}
+                </Link>
+              </li>
+            ))
+          : users.map((user) => {
+              if (friends?.some((f) => f.id === user.id))
+                return (
+                  <li>
+                    <Link
+                      href={`/users/${user.id}`}
+                      className="bg-green-600"
+                    >
+                      {JSON.stringify(user)}
+                    </Link>
+                  </li>
+                );
+              return (
+                <li>
+                  <Link href={`/users/${user.id}`}>{JSON.stringify(user)}</Link>
+                </li>
+              );
+            })}
       </ul>
     </AppLayout>
   );

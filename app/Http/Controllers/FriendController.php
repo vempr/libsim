@@ -45,24 +45,21 @@ class FriendController extends Controller {
 		]);
 
 		$q = $validated['userQuery'] ?? null;
-		$users = null;
+		$query = User::query();
 
 		if ($q) {
-			$users = User::query()
-				->where('name', 'like', '%' . $q . '%')
-				->get();
-		} else {
-			$users = User::all();
+			$query->where('name', 'like', '%' . $q . '%');
 		}
+
+		$users = $query
+			->where('id', '!=', Auth::id())
+			->get();
 
 		$user = Auth::user();
 		$friends = $user->allFriends();
-		$nonFriends = $users->reject(function ($u) use ($friends, $user) {
-			return $friends->contains('id', $u->id) || $u->id === $user->id;
-		})->values();
 
 		return Inertia::render('users/all', [
-			'users' => $nonFriends->select(['id', 'name', 'avatar', 'introduction']),
+			'users' => $users->select(['id', 'name', 'avatar', 'introduction']),
 			'friends' => $friends->select(['id', 'name', 'avatar', 'introduction']),
 			'userQuery' => $q,
 		]);
