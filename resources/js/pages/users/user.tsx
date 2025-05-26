@@ -45,7 +45,7 @@ function FriendButton({ friendRequestStatus, processing }: FriendButtonProps) {
 }
 
 export default function Work() {
-  const { user, friendRequestStatus } = usePage<InertiaProps>().props;
+  const { user, friendRequestStatus, works } = usePage<InertiaProps>().props;
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -127,6 +127,8 @@ export default function Work() {
           </DialogContent>
         </Dialog>
       )}
+
+      {JSON.stringify(works)}
     </AppLayout>
   );
 }

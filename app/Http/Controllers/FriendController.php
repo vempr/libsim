@@ -73,6 +73,7 @@ class FriendController extends Controller {
 		$senderId = Auth::id();
 		$receiverId = $user->id;
 		$status = null;
+		$works = null;
 
 		if (areFriends($receiverId)) {
 			$status = 'mutual';
@@ -84,8 +85,15 @@ class FriendController extends Controller {
 			$status = 'expecting';
 		}
 
+
+		if ($status === 'mutual') {
+			$works = $user->works;
+		}
+
+
 		return Inertia::render('users/user', [
 			'user' => $user->only(['id', 'name', 'avatar', 'introduction', 'description']),
+			'works' => $works,
 			'friendRequestStatus' => $status,
 		]);
 	}
