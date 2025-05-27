@@ -138,6 +138,11 @@ class FriendController extends Controller {
 				'image' => $sender->avatar,
 			]);
 
+			Notification::where('type', 'friend_request')
+				->where('sender_id', $receiverId)
+				->where('receiver_id', $senderId)
+				->delete();
+
 			return back()->with('success', 'Friend request accepted!');
 		}
 
@@ -195,6 +200,11 @@ class FriendController extends Controller {
 				'description' => $user->name . " has declined your friend request. You can not see each other's works.",
 				'image' => $user->avatar,
 			]);
+
+			Notification::where('type', 'friend_request')
+				->where('sender_id', $receiverId)
+				->where('receiver_id', $authUser->id)
+				->delete();
 
 			return back()->with('success', 'You have declined ' . $user->name . '\'s friend request.');
 		}
