@@ -62,6 +62,28 @@ export default function Notifications() {
                 </form>
               </div>
             )}
+
+            {notification.type === 'reminder' && (
+              <div>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    destroy(
+                      route('notification.destroy', {
+                        notification: notification.id,
+                      }),
+                    );
+                  }}
+                >
+                  <Button
+                    type="submit"
+                    disabled={processing}
+                  >
+                    Dismiss
+                  </Button>
+                </form>
+              </div>
+            )}
           </li>
         ))}
       </ul>
