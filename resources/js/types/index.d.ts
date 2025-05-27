@@ -49,6 +49,17 @@ export interface FlashMessages {
 
 export type FriendRequestStatus = 'mutual' | 'pending' | 'expecting' | null;
 
+export interface Notification {
+  id: number;
+  sender_id: number;
+  receiver_id: number;
+  mood: 'positive' | 'negative' | 'neutral';
+  title: string;
+  description: string;
+  image?: string | null;
+  created_at: string;
+}
+
 export interface SharedData {
   name: string;
   quote: { message: string; author: string };
@@ -64,6 +75,7 @@ export interface InertiaProps extends Page<PageProps> {
   userQuery?: string | null;
   friends?: PartialUser[] | null;
   friendRequestStatus?: FriendRequestStatus;
+  notifications?: Notification[] | null;
   work: Work;
   works: Work[];
   flash?: FlashMessages;
