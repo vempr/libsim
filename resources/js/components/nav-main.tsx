@@ -5,8 +5,8 @@ import { Link, usePage } from '@inertiajs/react';
 export function NavMain({ items = [] }: { items: NavItem[] }) {
   const page = usePage();
   const dashboardItems = items.slice(0, 2);
-  const memberItems = items.slice(2, 4);
-  const createItems = items.slice(4, 5);
+  const memberItems = items.slice(2, 5);
+  const createItems = items.slice(5, 6);
 
   return (
     <SidebarGroup className="px-2 py-0">
@@ -24,7 +24,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                 prefetch
               >
                 {item.icon && <item.icon />}
-                <span>{item.title}</span>
+                <span className="-translate-y-[1px]">{item.title}</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -45,7 +45,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                 prefetch
               >
                 {item.icon && <item.icon />}
-                <span>{item.title}</span>
+                <span className="-translate-y-[1px]">{item.title}</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -66,7 +66,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                 prefetch
               >
                 {item.icon && <item.icon />}
-                <span>{item.title}</span>
+                <span className="-translate-y-[1px]">{item.title}</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

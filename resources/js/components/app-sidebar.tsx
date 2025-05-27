@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { CircleUser, Folder, LayoutGrid, LibraryBig, ListPlus, Users } from 'lucide-react';
+import { Bell, CircleUser, Folder, LayoutGrid, LibraryBig, ListPlus, Users } from 'lucide-react';
 
 import AppLogo from './app-logo';
 
@@ -28,6 +28,11 @@ const mainNavItems: NavItem[] = [
     title: 'Your profile',
     href: '/u',
     icon: CircleUser,
+  },
+  {
+    title: 'Notifications',
+    href: '/notifications',
+    icon: Bell,
   },
   {
     title: 'New entry',
