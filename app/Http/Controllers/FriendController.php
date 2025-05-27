@@ -129,6 +129,7 @@ class FriendController extends Controller {
 			$acceptRequest->delete();
 
 			Notification::create([
+				'type' => 'reminder',
 				'sender_id' => $senderId,
 				'receiver_id' => $receiverId,
 				'mood' => 'positive',
@@ -146,6 +147,7 @@ class FriendController extends Controller {
 		]);
 
 		Notification::create([
+			'type' => 'friend_request',
 			'sender_id' => $senderId,
 			'receiver_id' => $receiverId,
 			'mood' => 'neutral',
@@ -185,6 +187,7 @@ class FriendController extends Controller {
 			$pendingRequest->delete();
 
 			Notification::create([
+				'type' => 'reminder',
 				'sender_id' => $authUser->id,
 				'receiver_id' => $receiverId,
 				'mood' => 'negative',
@@ -200,6 +203,7 @@ class FriendController extends Controller {
 		$user->friends()->detach($authUser->id);
 
 		Notification::create([
+			'type' => 'reminder',
 			'sender_id' => $authUser->id,
 			'receiver_id' => $receiverId,
 			'mood' => 'negative',

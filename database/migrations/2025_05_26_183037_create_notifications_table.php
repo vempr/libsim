@@ -11,6 +11,7 @@ return new class extends Migration {
 	public function up(): void {
 		Schema::create('notifications', function (Blueprint $table) {
 			$table->id();
+			$table->string('type');
 			$table->foreignId('sender_id')->constrained('users')->onDelete('cascade');
 			$table->foreignId('receiver_id')->constrained('users')->onDelete('cascade');
 

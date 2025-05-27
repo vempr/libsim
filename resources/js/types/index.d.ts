@@ -51,6 +51,7 @@ export type FriendRequestStatus = 'mutual' | 'pending' | 'expecting' | null;
 
 export interface Notification {
   id: number;
+  type: 'friend_request' | 'reminder';
   sender_id: number;
   receiver_id: number;
   mood: 'positive' | 'negative' | 'neutral';
