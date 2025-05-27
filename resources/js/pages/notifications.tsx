@@ -68,6 +68,14 @@ export default function Notifications() {
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
+
+                    const form = e.target as HTMLFormElement;
+                    const li = form.closest('li');
+
+                    if (li) {
+                      li.style.display = 'none';
+                    }
+
                     destroy(
                       route('notification.destroy', {
                         notification: notification.id,
