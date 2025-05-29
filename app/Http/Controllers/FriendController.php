@@ -54,6 +54,7 @@ class FriendController extends Controller {
 
 		$users = $query
 			->where('id', '!=', Auth::id())
+			->where('hide_profile', '=', 0)
 			->get();
 
 		$user = Auth::user();
@@ -76,6 +77,10 @@ class FriendController extends Controller {
 		$status = null;
 		$works = null;
 
+		if ($user->hide_profile === 1) {
+			return redirect('users');
+		}
+
 		if (areFriends($receiverId)) {
 			$status = 'mutual';
 		}
@@ -87,13 +92,13 @@ class FriendController extends Controller {
 		}
 
 
-		if ($status === 'mutual') {
+		if ($status === 'mutual' && $user->private_works === 0) {
 			$works = $user->works;
 		}
 
 
 		return Inertia::render('users/user', [
-			'user' => $user->only(['id', 'name', 'avatar', 'introduction', 'description']),
+			'profile' => $user->only(['id', 'name', 'avatar', 'introduction', 'description']),
 			'works' => $works,
 			'friendRequestStatus' => $status,
 		]);
@@ -114,6 +119,10 @@ class FriendController extends Controller {
 		$sender = Auth::user();
 		$senderId = $sender->id;
 		$receiverId = $validated['receiver_id'];
+
+		if (User::where($receiverId)->hide_profile === 1) {
+			return redirect('users');
+		}
 
 		if (areFriends($receiverId)) {
 			return back()->with('error', 'You are already friends.');
