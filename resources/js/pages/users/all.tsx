@@ -53,7 +53,7 @@ export default function All() {
         },
       );
     }
-  }, [searchQuery]);
+  }, [searchQuery, userQuery]);
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>

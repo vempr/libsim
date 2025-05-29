@@ -35,7 +35,7 @@ const newPasswordSchema = z
 type PasswordFormValues = z.infer<typeof newPasswordSchema>;
 
 export default function Password() {
-  const { put, processing, recentlySuccessful, errors, reset } = useInertiaForm<PasswordFormValues>();
+  const { put, processing, recentlySuccessful, errors } = useInertiaForm<PasswordFormValues>();
 
   const form = useForm<PasswordFormValues>({
     resolver: zodResolver(newPasswordSchema),

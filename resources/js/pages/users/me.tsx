@@ -3,7 +3,7 @@ import { InertiaProps, type BreadcrumbItem } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 
 export default function Work() {
-  const { profile } = usePage<InertiaProps>().props;
+  const { user } = usePage<InertiaProps>().props;
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -15,7 +15,7 @@ export default function Work() {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Your profile" />
-      <p className="max-w-96 overflow-scroll">{JSON.stringify(profile)}</p>
+      <p className="max-w-96 overflow-scroll">{JSON.stringify(user)}</p>
 
       {/* <Link href={`/works/${work.id}/edit`}>Edit</Link> */}
     </AppLayout>

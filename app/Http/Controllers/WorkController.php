@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreWorkRequest;
 use App\Http\Requests\UpdateWorkRequest;
+use App\Models\User;
 use App\Models\Work;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -107,8 +108,11 @@ class WorkController extends Controller {
 	public function show(Work $work) {
 		$this->authorize('view', $work);
 
+		$creator = User::find($work->user_id);
+
 		return Inertia::render('works/work', [
 			'work' => $work,
+			'creator' => $creator->name,
 		]);
 	}
 
@@ -116,7 +120,7 @@ class WorkController extends Controller {
 	 * Show the form for editing the specified resource.
 	 */
 	public function edit(Work $work) {
-		$this->authorize('view', $work);
+		$this->authorize('edit', $work);
 
 		return Inertia::render('works/edit', [
 			'work' => $work,

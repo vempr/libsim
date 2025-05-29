@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
 import { FriendRequestStatus, InertiaProps, type BreadcrumbItem } from '@/types';
-import { Head, usePage, useForm } from '@inertiajs/react';
+import { Head, usePage, useForm, Link } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
 
 interface FriendButtonProps {
@@ -46,6 +46,7 @@ function FriendButton({ friendRequestStatus, processing }: FriendButtonProps) {
 
 export default function Work() {
   const { profile, friendRequestStatus, works } = usePage<InertiaProps>().props;
+  const loadWorks = works && friendRequestStatus === 'mutual';
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -128,7 +129,15 @@ export default function Work() {
         </Dialog>
       )}
 
-      {JSON.stringify(works)}
+      {loadWorks && (
+        <ul>
+          {works.map((work) => (
+            <li>
+              <Link href={`/works/${work.id}`}>{JSON.stringify(work)}</Link>
+            </li>
+          ))}
+        </ul>
+      )}
     </AppLayout>
   );
 }
