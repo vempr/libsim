@@ -10,17 +10,17 @@ use Inertia\Inertia;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 
-function areFriends(int $receiverId): bool {
+function areFriends(string $receiverId): bool {
 	return Auth::user()->friends()->where('friend_id', $receiverId)->exists();
 }
 
-function friendRequestExists(int $senderId, int $receiverId): bool {
+function friendRequestExists(string $senderId, string $receiverId): bool {
 	return FriendRequest::where('sender_id', $senderId)
 		->where('receiver_id', $receiverId)
 		->exists();
 }
 
-function getAcceptRequest(int $senderId, int $receiverId): FriendRequest|null {
+function getAcceptRequest(string $senderId, string $receiverId): FriendRequest|null {
 	return FriendRequest::where('sender_id', $receiverId)
 		->where('receiver_id', $senderId)
 		->first();

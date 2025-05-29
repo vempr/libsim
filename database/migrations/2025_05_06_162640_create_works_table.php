@@ -10,8 +10,8 @@ return new class extends Migration {
 	 */
 	public function up(): void {
 		Schema::create('works', function (Blueprint $table) {
-			$table->id();
-			$table->foreignIdFor(\App\Models\User::class)
+			$table->uuid('id')->primary();
+			$table->foreignUuid('user_id')
 				->constrained()
 				->onDelete('cascade');
 
