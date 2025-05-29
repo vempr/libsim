@@ -56,7 +56,7 @@ export default function Register() {
                       autoFocus
                       tabIndex={1}
                       disabled={processing}
-                      placeholder="books12"
+                      placeholder="e.g. books12"
                     />
                   </FormControl>
                   <FormMessage />
@@ -81,7 +81,7 @@ export default function Register() {
                       tabIndex={2}
                       autoComplete="email"
                       disabled={processing}
-                      placeholder="booky@umail.org"
+                      placeholder="e.g. booky@umail.org"
                     />
                   </FormControl>
                   <FormMessage />
@@ -103,9 +103,9 @@ export default function Register() {
                         type={showPassword ? 'text' : 'password'}
                         tabIndex={3}
                         disabled={processing}
-                        placeholder="secretb00k_"
+                        placeholder="e.g. secretb00k_"
                       />
-                      <div className="mt-2 flex items-center space-x-2">
+                      <div className="mt-4 flex items-center space-x-2">
                         <Checkbox
                           id="see-password"
                           tabIndex={4}

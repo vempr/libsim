@@ -90,7 +90,7 @@ export default function Password() {
                       <Input
                         {...field}
                         type="password"
-                        placeholder="abcd1234"
+                        placeholder="e.g. abcd1234"
                       />
                     </FormControl>
                     <FormMessage />
@@ -109,7 +109,7 @@ export default function Password() {
                       <Input
                         {...field}
                         type="password"
-                        placeholder="QN2uXYpcUI"
+                        placeholder="e.g. QN2uXYpcUI"
                       />
                     </FormControl>
                     <FormMessage />
@@ -128,7 +128,7 @@ export default function Password() {
                       <Input
                         {...field}
                         type="password"
-                        placeholder="QN2uXYpcUI"
+                        placeholder="e.g. QN2uXYpcUI"
                       />
                     </FormControl>
                     <FormMessage />
