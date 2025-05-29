@@ -108,11 +108,12 @@ class WorkController extends Controller {
 	public function show(Work $work) {
 		$this->authorize('view', $work);
 
-		$creator = User::find($work->user_id);
+		$user = User::find($work->user_id);
 
 		return Inertia::render('works/work', [
 			'work' => $work,
-			'creator' => $creator->name,
+			'profile' => $user->only(['id', 'name', 'avatar', 'introduction', 'description']),
+			'favorited' => Auth::user()->favoriteWorks()->where('work_id', $work->id)->exists(),
 		]);
 	}
 

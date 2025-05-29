@@ -1,12 +1,29 @@
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import useDebounce from '@/hooks/use-debounce';
 import AppLayout from '@/layouts/app-layout';
 import { InertiaProps, SharedData, type BreadcrumbItem } from '@/types';
-import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { Star } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function Work() {
-  const { auth, work, creator } = usePage<InertiaProps & SharedData>().props;
+  const { post, delete: destroy, processing } = useForm();
+  const { auth, work, profile, favorited } = usePage<InertiaProps & SharedData>().props;
   const isOwnWork = work.user_id === auth.user.id;
+
+  const [favorite, setFavorite] = useState(favorited);
+  const favoriteDebounced = useDebounce(favorite, 300);
+  const isFirstRender = useRef(true);
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    if (favoriteDebounced === true) post(route('favorite.store', work.id));
+    if (favoriteDebounced === false) destroy(route('favorite.destroy', work.id));
+  }, [favoriteDebounced]);
 
   const breadcrumbs: BreadcrumbItem[] = isOwnWork
     ? [
@@ -25,7 +42,7 @@ export default function Work() {
           href: '/users',
         },
         {
-          title: creator,
+          title: profile.name,
           href: `/users/${work.user_id}`,
         },
         {
@@ -33,6 +50,29 @@ export default function Work() {
           href: `/works/${work.id}`,
         },
       ];
+
+  const favoriteWork = (
+    <button
+      onClick={() => setFavorite(!favorite)}
+      className="bg-secondary hover:bg-secondary/90 w-min rounded-md p-1 shadow-xs hover:cursor-pointer disabled:pointer-events-none disabled:opacity-50"
+      disabled={processing}
+    >
+      <Star
+        className={`absolute transition-opacity ${favorite ? 'opacity-100' : 'opacity-0'}`}
+        fill="#ffff00"
+        stroke="#ffff00"
+        size={35}
+        strokeWidth={1}
+      />
+      <Star
+        className={`transition-opacity ${favorite ? 'opacity-0' : 'opacity-100'}`}
+        stroke="#ffffff"
+        size={35}
+        strokeWidth={1}
+        strokeOpacity={favorite ? 0.9 : 0.6}
+      />
+    </button>
+  );
 
   const editWork = <Link href={`/works/${work.id}/edit`}>Edit</Link>;
 
@@ -65,6 +105,7 @@ export default function Work() {
       <Head title={work.title} />
       <p className="max-w-96 overflow-scroll">{JSON.stringify(work)}</p>
 
+      {!isOwnWork && favoriteWork}
       {isOwnWork && editWork}
       {isOwnWork && deleteWork}
     </AppLayout>

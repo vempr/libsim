@@ -108,11 +108,10 @@ class FriendController extends Controller {
 		$validated = $request->validate([
 			'receiver_id' => [
 				'required',
-				'numeric',
+				'string',
 				'exists:users,id',
 				'not_in:' . Auth::id(),
-				'min:1',
-				'max:1000000',
+				'max:255',
 			],
 		]);
 
@@ -120,7 +119,7 @@ class FriendController extends Controller {
 		$senderId = $sender->id;
 		$receiverId = $validated['receiver_id'];
 
-		if (User::where($receiverId)->hide_profile === 1) {
+		if (User::find($receiverId)->hide_profile === 1) {
 			return redirect('users');
 		}
 
@@ -177,11 +176,10 @@ class FriendController extends Controller {
 		$validated = $request->validate([
 			'receiver_id' => [
 				'required',
-				'numeric',
+				'string',
 				'exists:users,id',
 				'not_in:' . Auth::id(),
-				'min:1',
-				'max:1000000',
+				'max:255',
 			],
 		]);
 

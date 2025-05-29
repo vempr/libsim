@@ -68,4 +68,8 @@ class User extends Authenticatable implements MustVerifyEmail {
 	public function allFriends() {
 		return $this->friends->merge($this->friendsOf);
 	}
+
+	public function favoriteWorks() {
+		return $this->belongsToMany(Work::class, 'favorites')->withTimestamps();
+	}
 }

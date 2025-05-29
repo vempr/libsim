@@ -18,3 +18,4 @@ require __DIR__ . '/auth.php';
 require __DIR__ . '/work.php';
 require __DIR__ . '/user.php';
 require __DIR__ . '/notification.php';
+require __DIR__ . '/favorite.php';
