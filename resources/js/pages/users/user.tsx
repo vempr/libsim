@@ -45,7 +45,7 @@ function FriendButton({ friendRequestStatus, processing }: FriendButtonProps) {
 }
 
 export default function Work() {
-  const { user, friendRequestStatus, works } = usePage<InertiaProps>().props;
+  const { profile, friendRequestStatus, works } = usePage<InertiaProps>().props;
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -53,8 +53,8 @@ export default function Work() {
       href: '/users',
     },
     {
-      title: user.name,
-      href: `/users/${user.id}`,
+      title: profile.name,
+      href: `/users/${profile.id}`,
     },
   ];
 
@@ -63,7 +63,7 @@ export default function Work() {
     processing,
     delete: destroy,
   } = useForm({
-    receiver_id: user.id,
+    receiver_id: profile.id,
   });
 
   const handleFriend: FormEventHandler = (e) => {
@@ -78,8 +78,8 @@ export default function Work() {
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title={user.name} />
-      <p className="max-w-96 overflow-scroll">{JSON.stringify(user)}</p>
+      <Head title={profile.name} />
+      <p className="max-w-96 overflow-scroll">{JSON.stringify(profile)}</p>
 
       <form onSubmit={handleFriend}>
         <FriendButton
@@ -112,7 +112,7 @@ export default function Work() {
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle>Are you sure?</DialogTitle>
-              <DialogDescription>You will not be able to message {user.name} if their DMs are deactivated.</DialogDescription>
+              <DialogDescription>You will not be able to message {profile.name} if their DMs are deactivated.</DialogDescription>
             </DialogHeader>
             <DialogFooter>
               <form onSubmit={handleUnfriend}>

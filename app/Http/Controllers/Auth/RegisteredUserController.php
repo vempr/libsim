@@ -34,6 +34,8 @@ class RegisteredUserController extends Controller {
 		]);
 
 		$user = User::create([
+			'hide_profile' => false,
+			'private_works' => false,
 			'name' => $request->name,
 			'email' => $request->email,
 			'password' => Hash::make($request->password),

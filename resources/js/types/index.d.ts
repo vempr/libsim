@@ -29,17 +29,22 @@ export interface User {
   id: number;
   name: string;
   avatar?: string;
-  introduction?: string;
-  description?: string;
-  [key: string]: unknown;
+  email: string;
 }
 
-export interface PartialUser {
+export interface ProfileUser {
   id: number;
   name: string;
   avatar?: string;
   introduction?: string;
-  [key: string]: unknown;
+  description?: string;
+}
+
+export interface ListUser {
+  id: number;
+  name: string;
+  avatar?: string;
+  introduction?: string;
 }
 
 export interface FlashMessages {
@@ -72,9 +77,10 @@ export interface SharedData {
 
 export interface InertiaProps extends Page<PageProps> {
   user: User;
-  users: PartialUser[];
+  profile: ProfileUser;
+  users: ListUser[];
   userQuery?: string | null;
-  friends?: PartialUser[] | null;
+  friends?: ListUser[] | null;
   friendRequestStatus?: FriendRequestStatus;
   notifications?: Notification[] | null;
   work: Work;

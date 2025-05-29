@@ -17,6 +17,8 @@ class UserFactory extends Factory {
 	 */
 	public function definition(): array {
 		return [
+			'hide_profile' => false,
+			'private_works' => false,
 			'name' => fake()->name(),
 			'avatar' => fake()->url(),
 			'email' => fake()->unique()->safeEmail(),
