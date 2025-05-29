@@ -5,6 +5,7 @@ namespace App\Http\Requests\Settings;
 use App\Models\User;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class ProfileUpdateRequest extends FormRequest {
@@ -14,16 +15,23 @@ class ProfileUpdateRequest extends FormRequest {
 	 * @return array<string, ValidationRule|array<mixed>|string>
 	 */
 	public function rules(): array {
-		return [
-			'name' => ['required', 'string', 'max:255'],
+		$id = Auth::id();
 
+		return [
+			'name' => [
+				'required',
+				'string',
+				'min:3',
+				'max:30',
+				Rule::unique(User::class)->ignore($id)
+			],
 			'email' => [
 				'required',
 				'string',
 				'lowercase',
 				'email',
 				'max:255',
-				Rule::unique(User::class)->ignore($this->user()->id),
+				Rule::unique(User::class)->ignore($id),
 			],
 		];
 	}
