@@ -31,6 +31,8 @@ export interface User {
   avatar?: string;
   email: string;
   email_verified_at: string | null;
+  hide_profile: boolean;
+  private_works: boolean;
 }
 
 export interface ProfileUser {

@@ -4,6 +4,7 @@ import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import UpdatePrivacy from '@/components/update-privacy';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { type BreadcrumbItem, type SharedData } from '@/types';
@@ -67,10 +68,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                 placeholder="e.g. booky12"
               />
 
-              <InputError
-                className="mt-2"
-                message={errors.name}
-              />
+              <InputError message={errors.name} />
             </div>
 
             <div className="grid gap-2">
@@ -87,10 +85,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                 placeholder="e.g. booky@umail.com"
               />
 
-              <InputError
-                className="mt-2"
-                message={errors.email}
-              />
+              <InputError message={errors.email} />
             </div>
 
             {mustVerifyEmail && auth.user.email_verified_at === null && (
@@ -114,7 +109,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
             )}
 
             <div className="flex items-center gap-4">
-              <Button disabled={processing}>Save</Button>
+              <Button disabled={processing}>Save profile information</Button>
 
               <Transition
                 show={recentlySuccessful}
@@ -128,6 +123,8 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
             </div>
           </form>
         </div>
+
+        <UpdatePrivacy />
 
         <DeleteUser />
       </SettingsLayout>

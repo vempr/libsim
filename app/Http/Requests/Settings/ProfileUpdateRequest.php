@@ -19,20 +19,20 @@ class ProfileUpdateRequest extends FormRequest {
 
 		return [
 			'name' => [
-				'required',
 				'string',
 				'min:3',
 				'max:30',
 				Rule::unique(User::class)->ignore($id)
 			],
 			'email' => [
-				'required',
 				'string',
 				'lowercase',
 				'email',
 				'max:255',
 				Rule::unique(User::class)->ignore($id),
 			],
+			'hide_profile' => 'boolean',
+			'private_works' => 'boolean',
 		];
 	}
 }
