@@ -11,7 +11,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function All() {
-  const { works, searchState, advanced } = usePage<InertiaProps>().props;
+  const { works, favorites, searchState, advanced } = usePage<InertiaProps>().props;
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
@@ -23,6 +23,16 @@ export default function All() {
       />
 
       <ul>
+        FAVORITED WORKS
+        {favorites.map((favorite) => (
+          <li>
+            <Link href={`/works/${favorite.id}`}>{JSON.stringify(favorite)}</Link>
+          </li>
+        ))}
+      </ul>
+
+      <ul>
+        OWN WORKS
         {works.map((work) => (
           <li>
             <Link href={`/works/${work.id}`}>{JSON.stringify(work)}</Link>

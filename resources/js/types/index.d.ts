@@ -87,8 +87,9 @@ export interface InertiaProps extends Page<PageProps> {
   friendRequestStatus?: FriendRequestStatus;
   notifications?: Notification[] | null;
   work: Work;
-  favorited: boolean;
   works: Work[];
+  favorites: Work[];
+  favorited: boolean;
   flash?: FlashMessages;
   searchState?: {
     q: string | null;

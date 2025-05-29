@@ -23,33 +23,34 @@ export default function Work() {
     }
     if (favoriteDebounced === true) post(route('favorite.store', work.id));
     if (favoriteDebounced === false) destroy(route('favorite.destroy', work.id));
-  }, [favoriteDebounced]);
+  }, [favoriteDebounced, post, destroy, work.id]);
 
-  const breadcrumbs: BreadcrumbItem[] = isOwnWork
-    ? [
-        {
-          title: 'Saved works',
-          href: '/works',
-        },
-        {
-          title: work.title,
-          href: `/works/${work.id}`,
-        },
-      ]
-    : [
-        {
-          title: 'Members',
-          href: '/users',
-        },
-        {
-          title: profile.name,
-          href: `/users/${work.user_id}`,
-        },
-        {
-          title: work.title,
-          href: `/works/${work.id}`,
-        },
-      ];
+  const breadcrumbs: BreadcrumbItem[] =
+    isOwnWork || favorited
+      ? [
+          {
+            title: 'Saved works',
+            href: '/works',
+          },
+          {
+            title: work.title,
+            href: `/works/${work.id}`,
+          },
+        ]
+      : [
+          {
+            title: 'Members',
+            href: '/users',
+          },
+          {
+            title: profile.name,
+            href: `/users/${work.user_id}`,
+          },
+          {
+            title: work.title,
+            href: `/works/${work.id}`,
+          },
+        ];
 
   const favoriteWork = (
     <button
@@ -103,6 +104,8 @@ export default function Work() {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={work.title} />
+
+      {!isOwnWork && <h1 className="max-w-96 overflow-scroll">{JSON.stringify(profile)}</h1>}
       <p className="max-w-96 overflow-scroll">{JSON.stringify(work)}</p>
 
       {!isOwnWork && favoriteWork}

@@ -67,6 +67,7 @@ function search(Request $request) {
 
 	return [
 		'works' => $query->get(),
+		'favorites' => $user->favoriteWorks,
 		'searchState' => $state,
 	];
 }
