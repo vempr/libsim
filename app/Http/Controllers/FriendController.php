@@ -118,8 +118,12 @@ class FriendController extends Controller {
 		$sender = Auth::user();
 		$senderId = $sender->id;
 		$receiverId = $validated['receiver_id'];
+		$receiver = User::find($receiverId);
 
-		if (User::find($receiverId)->hide_profile === 1) {
+		if ($receiver === null) {
+			return redirect('users');
+		}
+		if ($receiver->hide_profile === 1) {
 			return redirect('users');
 		}
 
@@ -186,6 +190,10 @@ class FriendController extends Controller {
 		$authUser = Auth::user();
 		$receiverId = $validated['receiver_id'];
 		$user = User::find($receiverId);
+
+		if ($user === null) {
+			return back();
+		}
 
 		$pendingRequest = FriendRequest::where(function ($q) use ($authUser, $user) {
 			$q->where('sender_id', $user->id)->where('receiver_id', $authUser->id);
