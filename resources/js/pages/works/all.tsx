@@ -1,9 +1,11 @@
 import { AdvancedSearchForm } from '@/components/advanced-search';
 import InertiaPagination from '@/components/inertia-pagination';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useLocalStorage } from '@/hooks/use-local-storage';
 import AppLayout from '@/layouts/app-layout';
 import { type InertiaProps, type BreadcrumbItem } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -14,6 +16,13 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function All() {
   const { worksPagiationResponse, favoritesPagiationResponse, searchState } = usePage<InertiaProps>().props;
+  const { ls, updateLs } = useLocalStorage('tabsTrigger');
+  const [value, setValue] = useState<string>(ls ? 'favorited-works' : 'own-works');
+
+  useEffect(() => {
+    if (value === 'own-works') updateLs(false);
+    if (value === 'favorited-works') updateLs(true);
+  }, [value]);
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
@@ -22,12 +31,23 @@ export default function All() {
       <AdvancedSearchForm state={searchState} />
 
       <Tabs
-        defaultValue="own-works"
+        defaultValue={value}
+        onValueChange={setValue}
         className="w-[400px]"
       >
         <TabsList>
-          <TabsTrigger value="own-works">Saved Works</TabsTrigger>
-          <TabsTrigger value="favorited-works">Favorited Works</TabsTrigger>
+          <TabsTrigger
+            value="own-works"
+            onClick={() => updateLs(false)}
+          >
+            Saved Works
+          </TabsTrigger>
+          <TabsTrigger
+            value="favorited-works"
+            onClick={() => updateLs(true)}
+          >
+            Favorited Works
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="own-works">
           <ul>
