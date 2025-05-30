@@ -296,7 +296,7 @@ export function AdvancedSearchForm({ state }: { state?: AdvancedSearchFormState 
             checked={searchIncludeFavorites}
             onCheckedChange={updateSearchIncludeFavorites}
           />
-          <Label htmlFor="include-favorites">Include favorited works</Label>
+          <Label htmlFor="include-favorites">Search includes favorited works?</Label>
         </div>
 
         <Button

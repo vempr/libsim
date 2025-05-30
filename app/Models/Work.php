@@ -25,6 +25,8 @@ class Work extends Model {
 		'links',
 	];
 
+	protected $hidden = ['pivot'];
+
 	public function user() {
 		return $this->belongsTo(User::class);
 	}

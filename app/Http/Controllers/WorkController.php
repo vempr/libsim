@@ -76,19 +76,19 @@ class WorkController extends Controller {
 
 		$user = Auth::user();
 		$worksQuery = Work::query()->where('user_id', $user->id);
-		$works = search($worksQuery, $state)->get();
+		$works = search($worksQuery, $state)->paginate(15, ['*'], 'saved');
 
 		$favoritedWorks = null;
 		if (filter_var($request->input('searchIncludeFavorites', false), FILTER_VALIDATE_BOOLEAN)) {
 			$favoriteQuery = $user->favoriteWorks();
-			$favoritedWorks = search($favoriteQuery, $state)->get();
+			$favoritedWorks = search($favoriteQuery, $state)->paginate(15, ['*'], 'favorited');
 		} else {
-			$favoritedWorks = $user->favoriteWorks;
+			$favoritedWorks = $user->favoriteWorks()->paginate(15, ['*'], 'favorited');
 		}
 
 		return Inertia::render('works/all', [
-			'works' => $works,
-			'favorites' => $favoritedWorks,
+			'worksPagiationResponse' => $works,
+			'favoritesPagiationResponse' => $favoritedWorks,
 			'searchState' => $state,
 		]);
 	}

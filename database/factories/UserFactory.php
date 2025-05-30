@@ -22,7 +22,7 @@ class UserFactory extends Factory {
 			'avatar' => fake()->url(),
 			'email' => fake()->unique()->safeEmail(),
 			'email_verified_at' => now(),
-			'password' => 'p',
+			'password' => 'password',
 			'remember_token' => Str::random(10),
 			'introduction' => fake()->sentence(),
 			'description' => fake()->paragraph(),
