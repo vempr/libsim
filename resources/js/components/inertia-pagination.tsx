@@ -8,9 +8,12 @@ import {
   PaginationPrevious,
 } from '@/components/ui/pagination';
 import { PaginatedResponse } from '@/types';
-import { Work } from '@/types/schemas/work';
 
-export default function InertiaPagination({ paginateItems }: { paginateItems: PaginatedResponse<Work> }) {
+interface PaginationProps {
+  paginateItems: PaginatedResponse<any>;
+}
+
+export default function InertiaPagination({ paginateItems }: PaginationProps) {
   const { links } = paginateItems;
 
   const pageLinks = links.filter((link) => !['&laquo; Previous', 'Next &raquo;'].includes(link.label));

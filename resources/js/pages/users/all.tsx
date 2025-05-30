@@ -1,7 +1,7 @@
+import InertiaPagination from '@/components/inertia-pagination';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import AppLayout from '@/layouts/app-layout';
 import { type InertiaProps, type BreadcrumbItem } from '@/types';
@@ -17,9 +17,10 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function All() {
-  const { users, userQuery, friends } = usePage<InertiaProps>().props;
+  const { usersPaginatedResponse, userQuery, friendsPaginatedResponse } = usePage<InertiaProps>().props;
   const [searchQuery, setSearchQuery] = useState(userQuery || '');
   const { ls, updateLs } = useLocalStorage('friendsOnly');
+  const [value, setValue] = useState<string>(ls ? 'friends' : 'others');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const initialLoad = useRef(true);
 
@@ -29,7 +30,7 @@ export default function All() {
 
     setIsSubmitting(true);
     router.get(
-      route('users.index', { userQuery: searchQuery }),
+      route('users.index', { userQuery: searchQuery, friendsPage: friendsPaginatedResponse.current_page }),
       {},
       {
         onFinish: () => setIsSubmitting(false),
@@ -46,7 +47,9 @@ export default function All() {
     if (searchQuery === '' && userQuery !== '') {
       setIsSubmitting(true);
       router.get(
-        route('users.index'),
+        route('users.index', {
+          friendsPage: 1,
+        }),
         {},
         {
           onFinish: () => setIsSubmitting(false),
@@ -80,18 +83,52 @@ export default function All() {
         </Button>
       </form>
 
-      <div className="flex items-center space-x-2">
-        <Switch
-          id="friends-only"
-          checked={ls}
-          onCheckedChange={updateLs}
-        />
-        <Label htmlFor="friends-only">Show friends only</Label>
-      </div>
-
-      <ul>
-        {ls
-          ? friends?.map((friend) => (
+      <Tabs
+        defaultValue={value}
+        onValueChange={setValue}
+        className="w-[400px]"
+      >
+        <TabsList>
+          <TabsTrigger
+            value="others"
+            onClick={() => updateLs(false)}
+          >
+            Browser users
+          </TabsTrigger>
+          <TabsTrigger
+            value="friends"
+            onClick={() => updateLs(true)}
+          >
+            Friends
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="others">
+          <ul>
+            {usersPaginatedResponse.data.map((user) => {
+              if (user.is_friend) {
+                return (
+                  <li>
+                    <Link
+                      href={`/users/${user.id}`}
+                      className="bg-green-800"
+                    >
+                      {JSON.stringify(user)}
+                    </Link>
+                  </li>
+                );
+              }
+              return (
+                <li>
+                  <Link href={`/users/${user.id}`}>{JSON.stringify(user)}</Link>
+                </li>
+              );
+            })}
+          </ul>
+          <InertiaPagination paginateItems={usersPaginatedResponse} />
+        </TabsContent>
+        <TabsContent value="friends">
+          <ul>
+            {friendsPaginatedResponse.data.map((friend) => (
               <li>
                 <Link
                   href={`/users/${friend.id}`}
@@ -100,26 +137,11 @@ export default function All() {
                   {JSON.stringify(friend)}
                 </Link>
               </li>
-            ))
-          : users.map((user) => {
-              if (friends?.some((f) => f.id === user.id))
-                return (
-                  <li>
-                    <Link
-                      href={`/users/${user.id}`}
-                      className="bg-green-600"
-                    >
-                      {JSON.stringify(user)}
-                    </Link>
-                  </li>
-                );
-              return (
-                <li>
-                  <Link href={`/users/${user.id}`}>{JSON.stringify(user)}</Link>
-                </li>
-              );
-            })}
-      </ul>
+            ))}
+          </ul>
+          <InertiaPagination paginateItems={friendsPaginatedResponse} />
+        </TabsContent>
+      </Tabs>
     </AppLayout>
   );
 }

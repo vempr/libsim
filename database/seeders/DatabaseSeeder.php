@@ -26,11 +26,16 @@ class DatabaseSeeder extends Seeder {
 			'email' => 'static2@example.com',
 		]);
 
-		$staticUser1->friends()->attach($staticUser2->id);
+		$randomUsers = User::factory(48)->create();
+		foreach ($randomUsers as $user) {
+			$friends = $randomUsers
+				->whereNotIn('id', [$user->id])
+				->random(35);
 
-		$randomUsers = User::factory(3)->create();
+			$user->friends()->attach($friends->pluck('id'));
+		}
 
-		Work::factory(200)
+		Work::factory(500)
 			->recycle(array_merge([$staticUser1, $staticUser2], $randomUsers->all()))
 			->create();
 	}

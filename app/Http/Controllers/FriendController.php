@@ -55,14 +55,39 @@ class FriendController extends Controller {
 		$users = $query
 			->where('id', '!=', Auth::id())
 			->where('hide_profile', '=', 0)
-			->get();
+			->select(['id', 'name', 'avatar', 'introduction'])
+			->addSelect([
+				'is_friend' => function ($query) {
+					$query->selectRaw('COUNT(*) > 0')
+						->from('friends')
+						->where(function ($q) {
+							$q->where(function ($sub) {
+								$sub->where('friends.user_id', Auth::id())
+									->whereColumn('friends.friend_id', 'users.id');
+							})
+								->orWhere(function ($sub) {
+									$sub->where('friends.friend_id', Auth::id())
+										->whereColumn('friends.user_id', 'users.id');
+								});
+						});
+				}
+			])
+			->paginate(15, ['*'], 'users');
 
-		$user = Auth::user();
-		$friends = $user->allFriends();
+		$friends = User::where(function ($query) {
+			$query->whereHas('friendsOf', function ($q) {
+				$q->where('user_id', Auth::id());
+			})
+				->orWhereHas('friends', function ($q) {
+					$q->where('friend_id', Auth::id());
+				});
+		})
+			->select(['id', 'name', 'avatar', 'introduction'])
+			->paginate(15, ['*'], 'saved');
 
 		return Inertia::render('users/all', [
-			'users' => $users->select(['id', 'name', 'avatar', 'introduction']),
-			'friends' => $friends->select(['id', 'name', 'avatar', 'introduction']),
+			'usersPaginatedResponse' => $users,
+			'friendsPaginatedResponse' => $friends,
 			'userQuery' => $q,
 		]);
 	}

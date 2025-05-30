@@ -101,9 +101,9 @@ export interface PaginatedResponse<T> {
 export interface InertiaProps extends Page<PageProps> {
   user: User;
   profile: ProfileUser;
-  users: ListUser[];
+  usersPaginatedResponse: PaginatedResponse<ListUser & { is_friend: number }>;
   userQuery?: string | null;
-  friends?: ListUser[] | null;
+  friendsPaginatedResponse: PaginatedResponse<ListUser>;
   friendRequestStatus?: FriendRequestStatus;
   notifications?: Notification[] | null;
   work: Work;
