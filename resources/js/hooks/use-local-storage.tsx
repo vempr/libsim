@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 
-type LocalStorageKey = 'friendsOnly' | 'searchIncludeFavorites';
+type LocalStorageKey = 'friendsOnly' | 'searchIncludeFavorites' | 'advancedSearch';
 
 export function useLocalStorage(key: LocalStorageKey) {
   const [ls, setLs] = useState<boolean>(() => {

@@ -11,16 +11,13 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function All() {
-  const { works, favorites, searchState, advanced } = usePage<InertiaProps>().props;
+  const { works, favorites, searchState } = usePage<InertiaProps>().props;
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Saved works" />
 
-      <AdvancedSearchForm
-        state={searchState}
-        advanced={advanced}
-      />
+      <AdvancedSearchForm state={searchState} />
 
       <ul>
         FAVORITED WORKS

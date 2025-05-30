@@ -101,6 +101,5 @@ export interface InertiaProps extends Page<PageProps> {
     status_reading: ReadingStatus | null;
     publication_year: number | null;
   };
-  advanced: boolean;
   [key: string]: unknown;
 }

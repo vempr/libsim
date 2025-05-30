@@ -5,7 +5,6 @@ import { useLocalStorage } from '@/hooks/use-local-storage';
 import { PublicationStatus, ReadingStatus, SearchInput, languages, publicationStatuses, readingStatuses, searchSchema } from '@/types/schemas/work';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from '@inertiajs/react';
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -15,24 +14,20 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Switch } from './ui/switch';
 
-export function AdvancedSearchForm({
-  state,
-  advanced,
-}: {
-  state?: {
-    q: string | null;
-    author: string | null;
-    tags: string | null;
-    language_original: string | null;
-    language_translated: string | null;
-    status_publication: PublicationStatus | null;
-    status_reading: ReadingStatus | null;
-    publication_year: number | null;
-  };
-  advanced: boolean;
-}) {
-  const [adv, setAdv] = useState(advanced);
-  const { ls, updateLs } = useLocalStorage('searchIncludeFavorites');
+type AdvancedSearchFormState = {
+  q: string | null;
+  author: string | null;
+  tags: string | null;
+  language_original: string | null;
+  language_translated: string | null;
+  status_publication: PublicationStatus | null;
+  status_reading: ReadingStatus | null;
+  publication_year: number | null;
+};
+
+export function AdvancedSearchForm({ state }: { state?: AdvancedSearchFormState }) {
+  const { ls: adv, updateLs: setAdv } = useLocalStorage('advancedSearch');
+  const { ls: searchIncludeFavorites, updateLs: updateSearchIncludeFavorites } = useLocalStorage('searchIncludeFavorites');
 
   const form = useForm<SearchInput>({
     resolver: zodResolver(searchSchema),
@@ -49,7 +44,7 @@ export function AdvancedSearchForm({
   });
 
   const handleSearch = (values?: z.infer<typeof searchSchema>) => {
-    router.get(route('work.index'), { ...values, advanced: adv, searchIncludeFavorites: ls });
+    router.get(route('work.index'), { ...values, advanced: adv, searchIncludeFavorites });
   };
 
   const onSubmit = (values: z.infer<typeof searchSchema>) => {
@@ -298,8 +293,8 @@ export function AdvancedSearchForm({
         <div className="flex items-center space-x-2">
           <Switch
             id="include-favorites"
-            checked={ls}
-            onCheckedChange={updateLs}
+            checked={searchIncludeFavorites}
+            onCheckedChange={updateSearchIncludeFavorites}
           />
           <Label htmlFor="include-favorites">Include favorited works</Label>
         </div>

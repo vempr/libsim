@@ -90,8 +90,7 @@ class WorkController extends Controller {
 			'works' => $works,
 			'favorites' => $favoritedWorks,
 			'searchState' => $state,
-		])
-			->with('advanced', filter_var(request('advanced', false), FILTER_VALIDATE_BOOLEAN));
+		]);
 	}
 
 	/**
