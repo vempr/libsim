@@ -18,13 +18,14 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
               asChild
               isActive={item.href === page.url}
               tooltip={{ children: item.title }}
+              size="sm"
             >
               <Link
                 href={item.href}
                 prefetch
               >
                 {item.icon && <item.icon />}
-                <span className="-translate-y-[1px]">{item.title}</span>
+                <span>{item.title}</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -39,13 +40,14 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
               asChild
               isActive={item.href === page.url}
               tooltip={{ children: item.title }}
+              size="sm"
             >
               <Link
                 href={item.href}
                 prefetch
               >
                 {item.icon && <item.icon />}
-                <span className="-translate-y-[1px]">{item.title}</span>
+                <span>{item.title}</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -60,13 +62,14 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
               asChild
               isActive={item.href === page.url}
               tooltip={{ children: item.title }}
+              size="sm"
             >
               <Link
                 href={item.href}
                 prefetch
               >
                 {item.icon && <item.icon />}
-                <span className="-translate-y-[1px]">{item.title}</span>
+                <span>{item.title}</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

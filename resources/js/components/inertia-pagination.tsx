@@ -9,11 +9,11 @@ import {
 } from '@/components/ui/pagination';
 import { PaginatedResponse } from '@/types';
 
-interface PaginationProps {
-  paginateItems: PaginatedResponse<any>;
+interface PaginationProps<T> {
+  paginateItems: PaginatedResponse<T>;
 }
 
-export default function InertiaPagination({ paginateItems }: PaginationProps) {
+export default function InertiaPagination<T>({ paginateItems }: PaginationProps<T>) {
   const { links } = paginateItems;
 
   const pageLinks = links.filter((link) => !['&laquo; Previous', 'Next &raquo;'].includes(link.label));

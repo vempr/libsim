@@ -12,8 +12,8 @@ export function UserInfo({ user, showEmail = false }: { user: User; showEmail?: 
           src={user.avatar}
           alt={user.name}
         />
-        <AvatarFallback className="font-brand rounded-lg bg-white text-red-600/80 italic">
-          <span className="-translate-x-0.5 text-xs">{getInitials(user.name)}</span>
+        <AvatarFallback className="font-brand rounded-lg bg-white text-red-600/80">
+          <span className="text-xs">{getInitials(user.name)}</span>
         </AvatarFallback>
       </Avatar>
       <div className="grid flex-1 text-left text-sm leading-tight">

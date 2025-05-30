@@ -30,7 +30,7 @@ export default function All() {
 
     setIsSubmitting(true);
     router.get(
-      route('users.index', { userQuery: searchQuery, friendsPage: friendsPaginatedResponse.current_page }),
+      route('users.index', { userQuery: searchQuery }),
       {},
       {
         onFinish: () => setIsSubmitting(false),
@@ -47,16 +47,14 @@ export default function All() {
     if (searchQuery === '' && userQuery !== '') {
       setIsSubmitting(true);
       router.get(
-        route('users.index', {
-          friendsPage: 1,
-        }),
+        route('users.index'),
         {},
         {
           onFinish: () => setIsSubmitting(false),
         },
       );
     }
-  }, [searchQuery, userQuery]);
+  }, [searchQuery, userQuery, updateLs]);
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
@@ -93,7 +91,7 @@ export default function All() {
             value="others"
             onClick={() => updateLs(false)}
           >
-            Browser users
+            All users
           </TabsTrigger>
           <TabsTrigger
             value="friends"

@@ -10,10 +10,13 @@ export function useLocalStorage(key: LocalStorageKey) {
     return stored === 'true';
   });
 
-  const updateLs = useCallback((value: boolean) => {
-    setLs(value);
-    localStorage.setItem(key, value.toString());
-  }, []);
+  const updateLs = useCallback(
+    (value: boolean) => {
+      setLs(value);
+      localStorage.setItem(key, value.toString());
+    },
+    [key],
+  );
 
   return { ls, updateLs } as const;
 }
