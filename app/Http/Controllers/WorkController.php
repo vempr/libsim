@@ -11,22 +11,10 @@ use Inertia\Inertia;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
-function search(Request $request) {
-	$user = Auth::user();
-	$state = [
-		'q' => $request->input('q'),
-		'author' => $request->input('author'),
-		'tags' => $request->input('tags'),
-		'language_original' => $request->input('language_original'),
-		'language_translated' => $request->input('language_translated'),
-		'status_publication' => $request->input('status_publication'),
-		'status_reading' => $request->input('status_reading'),
-		'publication_year' => $request->input('publication_year'),
-	];
-
-	$query = Work::query()->where('user_id', $user->id);
-
+function search(Builder | Relation $query, array $state): Builder | Relation {
 	if ($state['q']) {
 		$query->where('title', 'like', "%{$state['q']}%");
 	}
@@ -65,11 +53,7 @@ function search(Request $request) {
 		$query->where('publication_year', $state['publication_year']);
 	}
 
-	return [
-		'works' => $query->get(),
-		'favorites' => $user->favoriteWorks,
-		'searchState' => $state,
-	];
+	return $query;
 }
 
 class WorkController extends Controller {
@@ -78,9 +62,35 @@ class WorkController extends Controller {
 	 * Display a listing of the resource.
 	 */
 	public function index(Request $request) {
-		$response = search($request);
+		$state = [
+			'searchIncludeFavorites' => $request->input('searchIncludeFavorites'),
+			'q' => $request->input('q'),
+			'author' => $request->input('author'),
+			'tags' => $request->input('tags'),
+			'language_original' => $request->input('language_original'),
+			'language_translated' => $request->input('language_translated'),
+			'status_publication' => $request->input('status_publication'),
+			'status_reading' => $request->input('status_reading'),
+			'publication_year' => $request->input('publication_year'),
+		];
 
-		return Inertia::render('works/all', $response)
+		$user = Auth::user();
+		$worksQuery = Work::query()->where('user_id', $user->id);
+		$works = search($worksQuery, $state)->get();
+
+		$favoritedWorks = null;
+		if (filter_var($request->input('searchIncludeFavorites', false), FILTER_VALIDATE_BOOLEAN)) {
+			$favoriteQuery = $user->favoriteWorks();
+			$favoritedWorks = search($favoriteQuery, $state)->get();
+		} else {
+			$favoritedWorks = $user->favoriteWorks;
+		}
+
+		return Inertia::render('works/all', [
+			'works' => $works,
+			'favorites' => $favoritedWorks,
+			'searchState' => $state,
+		])
 			->with('advanced', filter_var(request('advanced', false), FILTER_VALIDATE_BOOLEAN));
 	}
 

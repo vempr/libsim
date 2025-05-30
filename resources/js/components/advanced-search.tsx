@@ -1,6 +1,7 @@
 import { InputTags } from '@/components/input-tags';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useLocalStorage } from '@/hooks/use-local-storage';
 import { PublicationStatus, ReadingStatus, SearchInput, languages, publicationStatuses, readingStatuses, searchSchema } from '@/types/schemas/work';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from '@inertiajs/react';
@@ -11,6 +12,8 @@ import { z } from 'zod';
 import { Flag } from './flag';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
+import { Label } from './ui/label';
+import { Switch } from './ui/switch';
 
 export function AdvancedSearchForm({
   state,
@@ -29,6 +32,7 @@ export function AdvancedSearchForm({
   advanced: boolean;
 }) {
   const [adv, setAdv] = useState(advanced);
+  const { ls, updateLs } = useLocalStorage('searchIncludeFavorites');
 
   const form = useForm<SearchInput>({
     resolver: zodResolver(searchSchema),
@@ -45,7 +49,7 @@ export function AdvancedSearchForm({
   });
 
   const handleSearch = (values?: z.infer<typeof searchSchema>) => {
-    router.get(route('work.index'), { ...values, advanced: adv });
+    router.get(route('work.index'), { ...values, advanced: adv, searchIncludeFavorites: ls });
   };
 
   const onSubmit = (values: z.infer<typeof searchSchema>) => {
@@ -290,6 +294,15 @@ export function AdvancedSearchForm({
         </Button>
 
         <Button type="submit">Submit</Button>
+
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="include-favorites"
+            checked={ls}
+            onCheckedChange={updateLs}
+          />
+          <Label htmlFor="include-favorites">Include favorited works</Label>
+        </div>
 
         <Button
           type="button"

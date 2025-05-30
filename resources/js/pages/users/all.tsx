@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { useFriendsOnly } from '@/hooks/use-friends-only';
+import { useLocalStorage } from '@/hooks/use-local-storage';
 import AppLayout from '@/layouts/app-layout';
 import { type InertiaProps, type BreadcrumbItem } from '@/types';
 import { Head, Link, usePage, router } from '@inertiajs/react';
@@ -19,7 +19,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function All() {
   const { users, userQuery, friends } = usePage<InertiaProps>().props;
   const [searchQuery, setSearchQuery] = useState(userQuery || '');
-  const { friendsOnly, updateFriendsOnly } = useFriendsOnly();
+  const { ls, updateLs } = useLocalStorage('friendsOnly');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const initialLoad = useRef(true);
 
@@ -83,14 +83,14 @@ export default function All() {
       <div className="flex items-center space-x-2">
         <Switch
           id="friends-only"
-          checked={friendsOnly}
-          onCheckedChange={updateFriendsOnly}
+          checked={ls}
+          onCheckedChange={updateLs}
         />
         <Label htmlFor="friends-only">Show friends only</Label>
       </div>
 
       <ul>
-        {friendsOnly
+        {ls
           ? friends?.map((friend) => (
               <li>
                 <Link
