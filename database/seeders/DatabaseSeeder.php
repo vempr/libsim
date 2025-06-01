@@ -27,13 +27,11 @@ class DatabaseSeeder extends Seeder {
 		]);
 
 		$randomUsers = User::factory(48)->create();
-		foreach ($randomUsers as $user) {
-			$friends = $randomUsers
-				->whereNotIn('id', [$user->id])
-				->random(35);
+		$friends = $randomUsers
+			->whereNotIn('id', [$staticUser1->id])
+			->random(35);
 
-			$user->friends()->attach($friends->pluck('id'));
-		}
+		$staticUser1->friends()->attach($friends->pluck('id'));
 
 		Work::factory(500)
 			->recycle(array_merge([$staticUser1, $staticUser2], $randomUsers->all()))
