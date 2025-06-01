@@ -11,14 +11,17 @@ use Inertia\Inertia;
 
 class CollectionController extends Controller {
 	public function index() {
-		$collections = Collection::where('user_id', Auth::id())->paginate(15);
+		$collections = Collection::select(['id', 'name'])
+			->where('user_id', Auth::id())
+			->paginate(15);
+
 		return Inertia::render('collections/all', [
-			'collectionsPaginatedResponse' => $collections->only(['id', 'name']),
+			'collectionsPaginatedResponse' => $collections,
 		]);
 	}
 
 	public function view(Collection $collection) {
-		if ($collection->id !== Auth::id()) {
+		if ($collection->user_id !== Auth::id()) {
 			abort(404);
 		}
 
@@ -33,19 +36,24 @@ class CollectionController extends Controller {
 	public function store(Request $request) {
 		$validated = $request->validate([
 			'name' => 'required|string|min:1|max:255',
-			'work_id' => 'nullable|exists:works,id',
+			'work_id' => 'optional|exists:works,id',
 		]);
 
 		$name = $validated['name'];
-		$workId = $validated['work_id'];
+		$workId = $validated['work_id'] ?? null;
 		$userId = Auth::id();
 
+		$collectionExistsBefore = Collection::where('user_id', $userId)->where('name', $name)->exists();
 		$collection = Collection::firstOrCreate(
 			['user_id' => $userId, 'name' => $name]
 		);
 
 		if ($workId === null) {
-			return back()->with('success', 'Your collection "' . $name . '" has been saved.');
+			if ($collectionExistsBefore) {
+				return back()->with('error', 'The collection "' . $name . '" already exists. Please choose another name.');
+			}
+
+			return back()->with('success', 'Your collection "' . $name . '" has been created.');
 		}
 
 		if (DB::table('collection_entries')
@@ -64,17 +72,14 @@ class CollectionController extends Controller {
 		return back()->with('success', 'Work added to your collection "' . $name . '".');
 	}
 
-	public function update(Request $request) {
+	public function update(Collection $collection, Request $request) {
 		$validated = $request->validate([
-			'collection_id' => 'exists:collections,id',
 			'name' => 'required|string|min:1|max:255',
 		]);
 		$name = $validated['name'];
 
-		$collection = Collection::find($validated['collection_id']);
-
-		if (!$collection) {
-			abort(404);
+		if (Collection::where('user_id', Auth::id())->where('name', $name)->exists()) {
+			return back()->with('error', 'The collection "' . $name . '" already exists. Please choose another name.');
 		}
 
 		$collection->update(['name' => $name]);
@@ -89,7 +94,7 @@ class CollectionController extends Controller {
 		]);
 
 		$collectionId = $validated['collection_id'];
-		$workId = $validated['work_id'];
+		$workId = $validated['work_id'] ?? null;
 
 		$collection = Collection::find($collectionId);
 		$work = Work::find($workId);

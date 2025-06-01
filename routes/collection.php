@@ -9,8 +9,8 @@ Route::middleware(['auth', 'verified'])
 	->group(function () {
 		Route::get('/', 'index')->name('collection.index');
 		Route::post('/', 'store')->name('collection.store');
+		Route::delete('/', 'destroy')->name('collection.destroy');
 
-		Route::get('{collection}', 'show')->name('collection.view');
+		Route::get('{collection}', 'view')->name('collection.view');
 		Route::put('{collection}', 'update')->name('collection.update');
-		Route::delete('{collection}', 'destroy')->name('collection.destroy');
 	});

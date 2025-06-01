@@ -80,7 +80,7 @@ export interface SharedData {
 
 export interface PaginatedResponse<T> {
   current_page: number;
-  data: T[];
+  data: T[] | [];
   first_page_url: string;
   from: number;
   last_page: number;
@@ -115,6 +115,7 @@ export interface InertiaProps extends Page<PageProps> {
   worksPaginatedResponse: PaginatedResponse<Work>;
   favoritesPaginatedResponse: PaginatedResponse<Work>;
   collectionsPaginatedResponse: PaginatedResponse<Collection>;
+  collection: Collection;
   favorited: boolean;
   flash?: FlashMessages;
   searchState?: {
