@@ -122,7 +122,7 @@ export default function Collection() {
               onClick={() =>
                 destroy(
                   route('collection.destroy', {
-                    collection_id: collection.id,
+                    collection: collection.id,
                   }),
                 )
               }

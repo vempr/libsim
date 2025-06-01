@@ -22,7 +22,7 @@ export default function All() {
   useEffect(() => {
     if (value === 'own-works') updateLs(false);
     if (value === 'favorited-works') updateLs(true);
-  }, [value]);
+  }, [value, updateLs]);
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>

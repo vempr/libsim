@@ -2,7 +2,7 @@ import type { Page, PageProps } from '@inertiajs/inertia';
 import { LucideIcon } from 'lucide-react';
 import type { Config } from 'ziggy-js';
 
-import { PublicationStatus, ReadingStatus, Work } from './schemas/work.ts';
+import { Work } from './schemas/work.ts';
 
 export interface Auth {
   user: User;
@@ -125,7 +125,7 @@ export interface InertiaProps extends Page<PageProps> {
   friendsPaginatedResponse: PaginatedResponse<ListUser>;
   worksPaginatedResponse: PaginatedResponse<Work>;
   favoritesPaginatedResponse: PaginatedResponse<Work>;
-  collectionsPaginatedResponse: PaginatedResponse<Collection>;
+  collectionsPaginatedResponse: PaginatedResponse<Collection & { works_count: number }>;
 
   [key: string]: unknown;
 }

@@ -82,7 +82,7 @@ export default function All() {
 
       {collectionsPaginatedResponse.data.map((collection) => (
         <li>
-          <Link href={`/collections/${collection.id}`}>{collection.name}</Link>
+          <Link href={`/collections/${collection.id}`}>{JSON.stringify(collection)}</Link>
         </li>
       ))}
     </AppLayout>

@@ -13,6 +13,7 @@ class CollectionController extends Controller {
 	public function index() {
 		$collections = Collection::select(['id', 'name'])
 			->where('user_id', Auth::id())
+			->withCount(['works as works_count'])
 			->paginate(15);
 
 		return Inertia::render('collections/all', [
