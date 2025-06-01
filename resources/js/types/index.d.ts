@@ -104,29 +104,27 @@ interface Collection {
 }
 
 export interface InertiaProps extends Page<PageProps> {
+  flash?: FlashMessages;
   user: User;
+
+  collection: Collection;
+
   profile: ProfileUser;
-  usersPaginatedResponse: PaginatedResponse<ListUser & { is_friend: number }>;
-  userQuery?: string | null;
-  friendsPaginatedResponse: PaginatedResponse<ListUser>;
   friendRequestStatus?: FriendRequestStatus;
-  notifications?: Notification[] | null;
+
   work: Work;
+  favorited: boolean;
+
+  userQuery?: string | null;
+  searchState?: SearchState;
+
+  notifications?: Notification[] | null;
+
+  usersPaginatedResponse: PaginatedResponse<ListUser & { is_friend: number }>;
+  friendsPaginatedResponse: PaginatedResponse<ListUser>;
   worksPaginatedResponse: PaginatedResponse<Work>;
   favoritesPaginatedResponse: PaginatedResponse<Work>;
   collectionsPaginatedResponse: PaginatedResponse<Collection>;
-  collection: Collection;
-  favorited: boolean;
-  flash?: FlashMessages;
-  searchState?: {
-    q: string | null;
-    author: string | null;
-    tags: string | null;
-    language_original: string | null;
-    language_translated: string | null;
-    status_publication: PublicationStatus | null;
-    status_reading: ReadingStatus | null;
-    publication_year: number | null;
-  };
+
   [key: string]: unknown;
 }
