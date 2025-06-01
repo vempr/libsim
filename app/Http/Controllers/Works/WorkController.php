@@ -87,8 +87,8 @@ class WorkController extends Controller {
 		}
 
 		return Inertia::render('works/all', [
-			'worksPagiationResponse' => $works,
-			'favoritesPagiationResponse' => $favoritedWorks,
+			'worksPaginatedResponse' => $works,
+			'favoritesPaginatedResponse' => $favoritedWorks,
 			'searchState' => $state,
 		]);
 	}

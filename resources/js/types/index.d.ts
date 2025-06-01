@@ -98,6 +98,11 @@ export interface PaginatedResponse<T> {
   total: number;
 }
 
+interface Collection {
+  id: string;
+  name: string;
+}
+
 export interface InertiaProps extends Page<PageProps> {
   user: User;
   profile: ProfileUser;
@@ -107,8 +112,9 @@ export interface InertiaProps extends Page<PageProps> {
   friendRequestStatus?: FriendRequestStatus;
   notifications?: Notification[] | null;
   work: Work;
-  worksPagiationResponse: PaginatedResponse<Work>;
-  favoritesPagiationResponse: PaginatedResponse<Work>;
+  worksPaginatedResponse: PaginatedResponse<Work>;
+  favoritesPaginatedResponse: PaginatedResponse<Work>;
+  collectionsPaginatedResponse: PaginatedResponse<Collection>;
   favorited: boolean;
   flash?: FlashMessages;
   searchState?: {

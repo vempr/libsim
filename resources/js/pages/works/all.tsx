@@ -15,7 +15,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function All() {
-  const { worksPagiationResponse, favoritesPagiationResponse, searchState } = usePage<InertiaProps>().props;
+  const { worksPaginatedResponse, favoritesPaginatedResponse, searchState } = usePage<InertiaProps>().props;
   const { ls, updateLs } = useLocalStorage('tabsTrigger');
   const [value, setValue] = useState<string>(ls ? 'favorited-works' : 'own-works');
 
@@ -52,24 +52,24 @@ export default function All() {
         <TabsContent value="own-works">
           <ul>
             OWN WORKS
-            {worksPagiationResponse.data.map((work) => (
+            {worksPaginatedResponse.data.map((work) => (
               <li>
                 <Link href={`/works/${work.id}`}>{JSON.stringify(work)}</Link>
               </li>
             ))}
           </ul>
-          <InertiaPagination paginateItems={worksPagiationResponse} />
+          <InertiaPagination paginateItems={worksPaginatedResponse} />
         </TabsContent>
         <TabsContent value="favorited-works">
           <ul>
             FAVORITED WORKS
-            {favoritesPagiationResponse.data.map((favorite) => (
+            {favoritesPaginatedResponse.data.map((favorite) => (
               <li>
                 <Link href={`/works/${favorite.id}`}>{JSON.stringify(favorite)}</Link>
               </li>
             ))}
           </ul>
-          <InertiaPagination paginateItems={favoritesPagiationResponse} />
+          <InertiaPagination paginateItems={favoritesPaginatedResponse} />
         </TabsContent>
       </Tabs>
     </AppLayout>
