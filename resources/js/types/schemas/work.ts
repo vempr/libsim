@@ -26,7 +26,7 @@ export const publicationStatuses = ['unknown', 'ongoing', 'completed', 'hiatus',
 export const readingStatuses = ['reading', 'completed', 'on hold', 'dropped'] as const;
 
 export const dbWorkSchema = z.object({
-  id: z.number(),
+  id: z.string(),
   user_id: z.number(),
   title: z.string(),
   description: z.string().nullable(),
@@ -41,6 +41,14 @@ export const dbWorkSchema = z.object({
   links: z.string().nullable(),
   created_at: z.string().datetime(),
   updated_at: z.string().datetime(),
+  collections: z
+    .array(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+      }),
+    )
+    .optional(),
 });
 
 export const workFormSchema = z.object({

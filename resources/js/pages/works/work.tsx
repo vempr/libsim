@@ -1,79 +1,40 @@
+import { FavoriteForm } from '@/components/favorite-form';
+import { MultiSelect } from '@/components/multi-select';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import useDebounce from '@/hooks/use-debounce';
+import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import AppLayout from '@/layouts/app-layout';
 import { InertiaProps, SharedData, type BreadcrumbItem } from '@/types';
-import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
-import { Star } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Head, Link, router, useForm as useInertiaForm, usePage } from '@inertiajs/react';
+import { Controller, useForm } from 'react-hook-form';
+import { z } from 'zod';
+
+const collectionSchema = z.object({
+  selectedCollections: z.string().array(),
+});
+
+type CollectionForm = z.infer<typeof collectionSchema>;
 
 export default function Work() {
-  const { post, delete: destroy, processing } = useForm();
-  const { auth, work, profile, favorited } = usePage<InertiaProps & SharedData>().props;
+  const { auth, work, profile, favorited, collections } = usePage<InertiaProps & SharedData>().props;
+
+  const { control, handleSubmit } = useForm<CollectionForm>({
+    resolver: zodResolver(collectionSchema),
+    defaultValues: {
+      selectedCollections: work.collections?.map((collection) => collection.id) ?? [],
+    },
+  });
+  const { put, processing } = useInertiaForm();
+
   const isOwnWork = work.user_id === auth.user.id;
 
-  const [favorite, setFavorite] = useState(favorited);
-  const favoriteDebounced = useDebounce(favorite, 300);
-  const isFirstRender = useRef(true);
-
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-    if (favoriteDebounced === true) post(route('favorite.store', work.id));
-    if (favoriteDebounced === false) destroy(route('favorite.destroy', work.id));
-  }, [favoriteDebounced, post, destroy, work.id]);
-
-  const breadcrumbs: BreadcrumbItem[] =
-    isOwnWork || favorited
-      ? [
-          {
-            title: 'Saved works',
-            href: '/works',
-          },
-          {
-            title: work.title,
-            href: `/works/${work.id}`,
-          },
-        ]
-      : [
-          {
-            title: 'Members',
-            href: '/users',
-          },
-          {
-            title: profile.name,
-            href: `/users/${work.user_id}`,
-          },
-          {
-            title: work.title,
-            href: `/works/${work.id}`,
-          },
-        ];
-
-  const favoriteWork = (
-    <button
-      onClick={() => setFavorite(!favorite)}
-      className="bg-secondary hover:bg-secondary/90 w-min rounded-md p-1 shadow-xs hover:cursor-pointer disabled:pointer-events-none disabled:opacity-50"
-      disabled={processing}
-    >
-      <Star
-        className={`absolute transition-opacity ${favorite ? 'opacity-100' : 'opacity-0'}`}
-        fill="#ffff00"
-        stroke="#ffff00"
-        size={35}
-        strokeWidth={1}
-      />
-      <Star
-        className={`transition-opacity ${favorite ? 'opacity-0' : 'opacity-100'}`}
-        stroke="#ffffff"
-        size={35}
-        strokeWidth={1}
-        strokeOpacity={favorite ? 0.9 : 0.6}
-      />
-    </button>
-  );
+  const breadcrumbs: BreadcrumbItem[] = [
+    {
+      title: work.title,
+      href: `/works/${work.id}`,
+    },
+  ];
 
   const editWork = <Link href={`/works/${work.id}/edit`}>Edit</Link>;
 
@@ -101,6 +62,15 @@ export default function Work() {
     </Dialog>
   );
 
+  function onSubmit(data: CollectionForm) {
+    put(
+      route('collection.entry.update', {
+        work_id: work.id,
+        collection_ids: data.selectedCollections,
+      }),
+    );
+  }
+
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={work.title} />
@@ -108,7 +78,56 @@ export default function Work() {
       {!isOwnWork && <h1 className="max-w-96 overflow-scroll">{JSON.stringify(profile)}</h1>}
       <p className="max-w-96 overflow-scroll">{JSON.stringify(work)}</p>
 
-      {!isOwnWork && favoriteWork}
+      {isOwnWork && (
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button variant="outline">Collections</Button>
+          </SheetTrigger>
+
+          <SheetContent>
+            <SheetHeader>
+              <SheetTitle>Edit work's collections</SheetTitle>
+              <SheetDescription>Update which collections belongs to your work.</SheetDescription>
+            </SheetHeader>
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <Controller
+                name="selectedCollections"
+                control={control}
+                defaultValue={work.collections?.map((collection) => collection.id)}
+                render={({ field }) => (
+                  <MultiSelect
+                    options={collections.map((collection) => ({
+                      value: collection.id,
+                      label: collection.name,
+                    }))}
+                    selected={field.value}
+                    onChange={field.onChange}
+                    placeholder="Select collections..."
+                    emptyText="No collections found."
+                  />
+                )}
+              />
+              <SheetFooter>
+                <Button
+                  type="submit"
+                  disabled={processing}
+                >
+                  Update work's collections
+                </Button>
+                <SheetClose asChild>
+                  <Button variant="outline">Close</Button>
+                </SheetClose>
+              </SheetFooter>
+            </form>
+          </SheetContent>
+        </Sheet>
+      )}
+      {!isOwnWork && (
+        <FavoriteForm
+          favorited={favorited}
+          workId={work.id}
+        />
+      )}
       {isOwnWork && editWork}
       {isOwnWork && deleteWork}
     </AppLayout>

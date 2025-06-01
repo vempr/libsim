@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreWorkRequest;
 use App\Http\Requests\UpdateWorkRequest;
+use App\Models\Collection;
 use App\Models\User;
 use App\Models\Work;
 use Illuminate\Support\Facades\Auth;
@@ -121,9 +122,13 @@ class WorkController extends Controller {
 		$user = User::find($work->user_id);
 
 		return Inertia::render('works/work', [
-			'work' => $work,
+			'work' => [
+				...$work->toArray(),
+				'collections' => $work->collections->map->only(['id', 'name']),
+			],
 			'profile' => $user->only(['id', 'name', 'avatar', 'introduction', 'description']),
 			'favorited' => Auth::user()->favoriteWorks()->where('work_id', $work->id)->exists(),
+			'collections' => $user->collections->map->only(['id', 'name']),
 		]);
 	}
 

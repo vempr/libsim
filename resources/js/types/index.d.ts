@@ -108,6 +108,7 @@ export interface InertiaProps extends Page<PageProps> {
   user: User;
 
   collection: Collection;
+  collections: Collection[];
 
   profile: ProfileUser;
   friendRequestStatus?: FriendRequestStatus;

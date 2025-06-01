@@ -31,6 +31,10 @@ class Work extends Model {
 		return $this->belongsTo(User::class);
 	}
 
+	public function collections() {
+		return $this->belongsToMany(Collection::class, 'collection_entries');
+	}
+
 	public function originalLanguage() {
 		return $this->belongsTo(Language::class, 'language_original', 'code');
 	}

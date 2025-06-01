@@ -14,6 +14,8 @@ class Collection extends Model {
 		'name',
 	];
 
+	protected $hidden = ['pivot'];
+
 	public function works(): BelongsToMany {
 		return $this->belongsToMany(Work::class, 'collection_entries', 'collection_id', 'work_id')
 			->withTimestamps();
