@@ -3,17 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Models\Collection;
-use App\Models\Work;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class CollectionController extends Controller {
 	public function index() {
-		$collections = Collection::select(['id', 'name'])
+		$collections = Collection::select(['collections.id', 'collections.name', 'collections.created_at'])
 			->where('user_id', Auth::id())
 			->withCount(['works as works_count'])
+			->leftJoin('collection_entries', 'collections.id', '=', 'collection_entries.collection_id')
+			->selectRaw('MAX(collection_entries.created_at) as updated_at')
+			->groupBy('collections.id', 'collections.name')
 			->paginate(15);
 
 		return Inertia::render('collections/all', [

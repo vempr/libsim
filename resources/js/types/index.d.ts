@@ -103,6 +103,12 @@ interface Collection {
   name: string;
 }
 
+interface CollectionList extends Collection {
+  works_count: number;
+  created_at: string;
+  updated_at: string | null;
+}
+
 export interface InertiaProps extends Page<PageProps> {
   flash?: FlashMessages;
   user: User;
@@ -125,7 +131,7 @@ export interface InertiaProps extends Page<PageProps> {
   friendsPaginatedResponse: PaginatedResponse<ListUser>;
   worksPaginatedResponse: PaginatedResponse<Work>;
   favoritesPaginatedResponse: PaginatedResponse<Work>;
-  collectionsPaginatedResponse: PaginatedResponse<Collection & { works_count: number }>;
+  collectionsPaginatedResponse: PaginatedResponse<CollectionList>;
 
   [key: string]: unknown;
 }
