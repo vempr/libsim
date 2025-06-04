@@ -17,7 +17,7 @@ const collectionSchema = z.object({
 type CollectionForm = z.infer<typeof collectionSchema>;
 
 export default function Work() {
-  const { auth, work, profile, favorited, collections } = usePage<InertiaProps & SharedData>().props;
+  const { auth, work, profile, favorited, collections, breadcrumbs: bc } = usePage<InertiaProps & SharedData>().props;
 
   const { control, handleSubmit } = useForm<CollectionForm>({
     resolver: zodResolver(collectionSchema),
@@ -30,6 +30,7 @@ export default function Work() {
   const isOwnWork = work.user_id === auth.user.id;
 
   const breadcrumbs: BreadcrumbItem[] = [
+    ...bc,
     {
       title: work.title,
       href: `/works/${work.id}`,

@@ -135,7 +135,7 @@ export default function Collection() {
 
       {worksPaginatedResponse.data.map((work) => (
         <li>
-          <Link href={`/works/${work.id}`}>{JSON.stringify(work)}</Link>
+          <Link href={`/works/${work.id}?collection=${collection.id}`}>{JSON.stringify(work)}</Link>
         </li>
       ))}
     </AppLayout>

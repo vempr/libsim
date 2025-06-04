@@ -65,7 +65,7 @@ export default function All() {
             FAVORITED WORKS
             {favoritesPaginatedResponse.data.map((favorite) => (
               <li>
-                <Link href={`/works/${favorite.id}`}>{JSON.stringify(favorite)}</Link>
+                <Link href={`/works/${favorite.id}?favorite=true`}>{JSON.stringify(favorite)}</Link>
               </li>
             ))}
           </ul>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ShowWorkRequest;
 use App\Http\Requests\StoreWorkRequest;
 use App\Http\Requests\UpdateWorkRequest;
 use App\Models\Collection;
@@ -57,11 +58,68 @@ function search(Builder | Relation $query, array $state): Builder | Relation {
 	return $query;
 }
 
+function getBreadcrumbs(ShowWorkRequest $request, Work $work): array {
+	$defaultBreadcrumbs = [[
+		'title' => 'Saved works',
+		'href' => '/works',
+	]];
+
+	$validated = $request->validated();
+	$collectionId = $validated['collection'] ?? null;
+	$userId = $validated['user'] ?? null;
+	$favorite = $validated['favorite'] ?? null;
+
+	$authUser = Auth::user();
+
+	if ($collectionId) {
+		$collection = Collection::find($collectionId);
+
+		if (!$collection || $collection->user_id !== $authUser->id) {
+			return $defaultBreadcrumbs;
+		}
+
+		return [[
+			'title' => 'Collections',
+			'href' => '/collections',
+		], [
+			'title' => $collection->name,
+			'href' => "/collections/$collectionId",
+		]];
+	}
+
+	if ($userId) {
+		$user = User::find($userId);
+
+		if (!$authUser->allFriends()->contains($user)) {
+			return $defaultBreadcrumbs;
+		}
+
+		return [[
+			'title' => 'Members',
+			'href' => '/users',
+		], [
+			'title' => $user->name,
+			'href' => "/users/$userId",
+		]];
+	}
+
+	if ($favorite) {
+		if (!$authUser->favoriteWorks()->where('work_id', $work->id)->exists()) {
+			return $defaultBreadcrumbs;
+		}
+
+		return [[
+			'title' => 'Favorited works',
+			'href' => '/works',
+		]];
+	}
+
+	return $defaultBreadcrumbs;
+}
+
 class WorkController extends Controller {
 	use AuthorizesRequests;
-	/**
-	 * Display a listing of the resource.
-	 */
+
 	public function index(Request $request) {
 		$state = [
 			'searchIncludeFavorites' => $request->input('searchIncludeFavorites'),
@@ -94,16 +152,10 @@ class WorkController extends Controller {
 		]);
 	}
 
-	/**
-	 * Show the form for creating a new resource.
-	 */
 	public function create() {
 		return Inertia::render('works/new');
 	}
 
-	/**
-	 * Store a newly created resource in storage.
-	 */
 	public function store(StoreWorkRequest $request): RedirectResponse {
 		$requestWork = $request->validated();
 		$requestWork['user_id'] = Auth::id();
@@ -113,29 +165,31 @@ class WorkController extends Controller {
 		return redirect('works/' . $work->id)->with('success', 'Your work "' . $work->title . '" has been created.');
 	}
 
-	/**
-	 * Display the specified resource.
-	 */
-	public function show(Work $work) {
+	public function show(ShowWorkRequest $request, Work $work) {
 		$this->authorize('view', $work);
 
 		$user = User::find($work->user_id);
 		$authUser = Auth::user();
+
+		$profile = null;
+		if ($user->id === $authUser->id) {
+			$profile = $user->only(['id', 'name', 'avatar', 'introduction', 'description']);
+		}
+
+		$breadcrumbs = getBreadcrumbs($request, $work);
 
 		return Inertia::render('works/work', [
 			'work' => [
 				...$work->toArray(),
 				'collections' => $work->collections->map->only(['id', 'name']),
 			],
-			'profile' => $user->only(['id', 'name', 'avatar', 'introduction', 'description']),
+			'profile' => $profile,
 			'favorited' => $authUser->favoriteWorks()->where('work_id', $work->id)->exists(),
 			'collections' => $authUser->collections->map->only(['id', 'name']),
+			'breadcrumbs' => $breadcrumbs,
 		]);
 	}
 
-	/**
-	 * Show the form for editing the specified resource.
-	 */
 	public function edit(Work $work) {
 		$this->authorize('edit', $work);
 
@@ -144,9 +198,6 @@ class WorkController extends Controller {
 		]);
 	}
 
-	/**
-	 * Update the specified resource in storage.
-	 */
 	public function update(UpdateWorkRequest $request, Work $work) {
 		$this->authorize('update', $work);
 
@@ -155,9 +206,6 @@ class WorkController extends Controller {
 		return redirect('works/' . $work->id)->with('success', 'Your work "' . $work->title . '" has been updated.');
 	}
 
-	/**
-	 * Remove the specified resource from storage.
-	 */
 	public function destroy(Work $work) {
 		$this->authorize('delete', $work);
 

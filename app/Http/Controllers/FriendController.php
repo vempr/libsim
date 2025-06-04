@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\FriendRequest;
 use App\Models\Notification;
 use App\Models\User;
+use App\Models\Work;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -118,13 +119,13 @@ class FriendController extends Controller {
 
 
 		if ($status === 'mutual' && $user->private_works === 0) {
-			$works = $user->works;
+			$works = Work::query()->where('user_id', $user->id)->paginate(15);
 		}
 
 
 		return Inertia::render('users/user', [
 			'profile' => $user->only(['id', 'name', 'avatar', 'introduction', 'description']),
-			'works' => $works,
+			'worksPaginatedResponse' => $works,
 			'friendRequestStatus' => $status,
 		]);
 	}

@@ -112,6 +112,7 @@ interface CollectionList extends Collection {
 export interface InertiaProps extends Page<PageProps> {
   flash?: FlashMessages;
   user: User;
+  breadcrumbs: BreadcrumbItem[];
 
   collection: Collection;
   collections: Collection[];

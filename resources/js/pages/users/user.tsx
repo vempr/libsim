@@ -45,8 +45,8 @@ function FriendButton({ friendRequestStatus, processing }: FriendButtonProps) {
 }
 
 export default function Work() {
-  const { profile, friendRequestStatus, works } = usePage<InertiaProps>().props;
-  const loadWorks = works && friendRequestStatus === 'mutual';
+  const { profile, friendRequestStatus, worksPaginatedResponse } = usePage<InertiaProps>().props;
+  const loadWorks = friendRequestStatus === 'mutual';
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -131,9 +131,9 @@ export default function Work() {
 
       {loadWorks && (
         <ul>
-          {works.map((work) => (
+          {worksPaginatedResponse.data.map((work) => (
             <li>
-              <Link href={`/works/${work.id}`}>{JSON.stringify(work)}</Link>
+              <Link href={`/works/${work.id}?user=${work.user_id}`}>{JSON.stringify(work)}</Link>
             </li>
           ))}
         </ul>
