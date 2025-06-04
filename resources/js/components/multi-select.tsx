@@ -2,8 +2,10 @@ import { Button } from '@/components/ui/button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
-import { Check, ChevronsUpDown } from 'lucide-react';
+import { Check, ChevronsUpDown, DiamondPlus } from 'lucide-react';
 import * as React from 'react';
+
+import NewCollectionSheet from './new-collection-sheet';
 
 export type Option = {
   value: string;
@@ -56,7 +58,7 @@ export function MultiSelect({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className={cn('w-full justify-between', className)}
+          className={cn('ml-4 justify-between sm:w-88', className)}
         >
           <span className="truncate">{selected.length > 0 ? selectedLabels : placeholder}</span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -76,11 +78,28 @@ export function MultiSelect({
                   key={option.value}
                   value={option.label}
                   onSelect={() => handleSelect(option.value)}
+                  className="mb-1"
                 >
                   {option.label}
                   <Check className={cn('ml-auto h-4 w-4', selected.includes(option.value) ? 'opacity-100' : 'opacity-0')} />
                 </CommandItem>
               ))}
+              <CommandItem
+                onSelect={() => console.log('hi')}
+                className="p-0"
+              >
+                <NewCollectionSheet>
+                  <Button
+                    onClick={() => console.log('hi')}
+                    className="m-0 flex w-full items-center"
+                    variant="outline"
+                    type="button"
+                  >
+                    <DiamondPlus />
+                    <p className="sr-only">New collection</p>
+                  </Button>
+                </NewCollectionSheet>
+              </CommandItem>
             </CommandGroup>
           </CommandList>
         </Command>
