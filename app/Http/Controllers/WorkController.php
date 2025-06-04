@@ -120,6 +120,7 @@ class WorkController extends Controller {
 		$this->authorize('view', $work);
 
 		$user = User::find($work->user_id);
+		$authUser = Auth::user();
 
 		return Inertia::render('works/work', [
 			'work' => [
@@ -127,8 +128,8 @@ class WorkController extends Controller {
 				'collections' => $work->collections->map->only(['id', 'name']),
 			],
 			'profile' => $user->only(['id', 'name', 'avatar', 'introduction', 'description']),
-			'favorited' => Auth::user()->favoriteWorks()->where('work_id', $work->id)->exists(),
-			'collections' => $user->collections->map->only(['id', 'name']),
+			'favorited' => $authUser->favoriteWorks()->where('work_id', $work->id)->exists(),
+			'collections' => $authUser->collections->map->only(['id', 'name']),
 		]);
 	}
 

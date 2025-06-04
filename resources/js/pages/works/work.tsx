@@ -78,7 +78,7 @@ export default function Work() {
       {!isOwnWork && <h1 className="max-w-96 overflow-scroll">{JSON.stringify(profile)}</h1>}
       <p className="max-w-96 overflow-scroll">{JSON.stringify(work)}</p>
 
-      {isOwnWork && (
+      {favorited && (
         <Sheet>
           <SheetTrigger asChild>
             <Button variant="outline">Collections</Button>
@@ -122,12 +122,14 @@ export default function Work() {
           </SheetContent>
         </Sheet>
       )}
+
       {!isOwnWork && (
         <FavoriteForm
           favorited={favorited}
           workId={work.id}
         />
       )}
+
       {isOwnWork && editWork}
       {isOwnWork && deleteWork}
     </AppLayout>
