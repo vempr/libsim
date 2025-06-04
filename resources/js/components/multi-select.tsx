@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
-import { Check, ChevronsUpDown, DiamondPlus } from 'lucide-react';
+import { Check, ChevronsUpDown, CirclePlus } from 'lucide-react';
 import * as React from 'react';
 
 import NewCollectionSheet from './new-collection-sheet';
@@ -95,7 +95,7 @@ export function MultiSelect({
                     variant="outline"
                     type="button"
                   >
-                    <DiamondPlus />
+                    <CirclePlus />
                     <p className="sr-only">New collection</p>
                   </Button>
                 </NewCollectionSheet>

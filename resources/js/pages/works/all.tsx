@@ -9,7 +9,7 @@ import { useEffect, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
-    title: 'Saved works',
+    title: 'Personal works',
     href: '/works',
   },
 ];

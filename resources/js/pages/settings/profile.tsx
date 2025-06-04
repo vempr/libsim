@@ -1,3 +1,4 @@
+import AvatarProfile from '@/components/avatar-profile';
 import DeleteUser from '@/components/delete-user';
 import HeadingSmall from '@/components/heading-small';
 import InputError from '@/components/input-error';
@@ -46,10 +47,16 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
 
       <SettingsLayout>
         <div className="space-y-6">
-          <HeadingSmall
-            title="Profile information"
-            description="Update your username and email address"
-          />
+          <div className="-mb-6 flex justify-between">
+            <HeadingSmall
+              title="Profile information"
+              description="Update your username and email address"
+            />
+            <div>
+              <Label className="sr-only">Avatar</Label>
+              <AvatarProfile />
+            </div>
+          </div>
 
           <form
             onSubmit={submit}

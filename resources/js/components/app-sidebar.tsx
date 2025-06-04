@@ -15,7 +15,7 @@ const mainNavItems: NavItem[] = [
     icon: LayoutGrid,
   },
   {
-    title: 'Saved works',
+    title: 'Personal works',
     href: '/works',
     icon: Sparkles,
   },

@@ -79,7 +79,7 @@ export default function Work() {
       {!isOwnWork && <h1 className="max-w-96 overflow-scroll">{JSON.stringify(profile)}</h1>}
       <p className="max-w-96 overflow-scroll">{JSON.stringify(work)}</p>
 
-      {favorited && (
+      {(favorited || isOwnWork) && (
         <Sheet>
           <SheetTrigger asChild>
             <Button variant="outline">Collections</Button>
