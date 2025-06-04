@@ -3,15 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Collection;
+use App\Models\CollectionEntry;
 use App\Models\User;
 use App\Models\Work;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
-function allowWork(String $id): bool {
+function allowWork(string $id): bool {
 	$work = Work::find($id);
-
 	$creator = User::find($work->user_id);
 	$authUser = Auth::user();
 
@@ -42,8 +41,7 @@ class CollectionEntryController extends Controller {
 			return back()->with('error', 'Some collections were not found or don\'t belong to you.');
 		}
 
-		$existingEntries = DB::table('collection_entries')
-			->where('work_id', $workId)
+		$existingEntries = CollectionEntry::where('work_id', $workId)
 			->whereIn('collection_id', array_keys($allUserCollections))
 			->pluck('collection_id')
 			->toArray();
@@ -52,22 +50,23 @@ class CollectionEntryController extends Controller {
 		$collectionsToRemove = array_diff($existingEntries, $collectionIds);
 
 		if (!empty($collectionsToRemove)) {
-			DB::table('collection_entries')
-				->where('work_id', $workId)
+			CollectionEntry::where('work_id', $workId)
 				->whereIn('collection_id', $collectionsToRemove)
 				->delete();
 		}
 
 		$addedCollectionNames = [];
 		if (!empty($newCollectionIds)) {
-			$dataToInsert = array_map(function ($collectionId) use ($workId) {
-				return [
+			$entries = [];
+			foreach ($newCollectionIds as $collectionId) {
+				$entries[] = [
 					'collection_id' => $collectionId,
 					'work_id' => $workId,
+					'created_at' => now(),
+					'updated_at' => now(),
 				];
-			}, $newCollectionIds);
-
-			DB::table('collection_entries')->insert($dataToInsert);
+			}
+			CollectionEntry::insert($entries);
 			$addedCollectionNames = array_intersect_key($allUserCollections, array_flip($newCollectionIds));
 		}
 
