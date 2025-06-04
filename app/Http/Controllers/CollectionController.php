@@ -9,12 +9,16 @@ use Inertia\Inertia;
 
 class CollectionController extends Controller {
 	public function index() {
-		$collections = Collection::select(['collections.id', 'collections.name', 'collections.created_at'])
+		$collections = Collection::select([
+			'collections.id',
+			'collections.name',
+			'collections.created_at',
+		])
 			->where('user_id', Auth::id())
-			->withCount(['works as works_count'])
+			->withCount('activeWorks as works_count')
 			->leftJoin('collection_entries', 'collections.id', '=', 'collection_entries.collection_id')
 			->selectRaw('MAX(collection_entries.created_at) as updated_at')
-			->groupBy('collections.id', 'collections.name')
+			->groupBy('collections.id', 'collections.name', 'collections.created_at')
 			->paginate(15);
 
 		return Inertia::render('collections/all', [
@@ -27,7 +31,10 @@ class CollectionController extends Controller {
 			abort(404);
 		}
 
-		$works = $collection->works()->paginate(15);
+		$works = $collection
+			->works()
+			->wherePivot('removed_from_favorites', false)
+			->paginate(15);
 
 		return Inertia::render('collections/collection', [
 			'collection' => $collection->only(['id', 'name']),

@@ -18,6 +18,14 @@ class Collection extends Model {
 
 	public function works(): BelongsToMany {
 		return $this->belongsToMany(Work::class, 'collection_entries', 'collection_id', 'work_id')
+			->withPivot('removed_from_favorites')
+			->withTimestamps();
+	}
+
+	public function activeWorks(): BelongsToMany {
+		return $this->belongsToMany(Work::class, 'collection_entries', 'collection_id', 'work_id')
+			->wherePivot('removed_from_favorites', false)
+			->withPivot('removed_from_favorites')
 			->withTimestamps();
 	}
 }

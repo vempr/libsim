@@ -26,10 +26,10 @@ class DatabaseSeeder extends Seeder {
 			'email' => 'static2@example.com',
 		]);
 
-		$randomUsers = User::factory(48)->create();
+		$randomUsers = User::factory(18)->create();
 		$friends = $randomUsers
 			->whereNotIn('id', [$staticUser1->id])
-			->random(35);
+			->random(10);
 
 		$staticUser1->friends()->attach($friends->pluck('id'));
 

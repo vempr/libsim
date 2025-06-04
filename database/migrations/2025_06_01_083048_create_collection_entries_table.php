@@ -9,6 +9,7 @@ return new class extends Migration {
 		Schema::create('collection_entries', function (Blueprint $table) {
 			$table->foreignUuid('collection_id')->constrained()->cascadeOnDelete();
 			$table->foreignUuid('work_id')->constrained()->cascadeOnDelete();
+			$table->boolean('removed_from_favorites')->default(false);
 			$table->timestamps();
 
 			$table->primary(['collection_id', 'work_id']);

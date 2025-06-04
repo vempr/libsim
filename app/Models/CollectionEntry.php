@@ -10,5 +10,6 @@ class CollectionEntry extends Model {
 	protected $fillable = [
 		'collection_id',
 		'work_id',
+		'removed_from_favorites',
 	];
 }
