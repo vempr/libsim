@@ -7,11 +7,19 @@ use Cloudinary\Cloudinary;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+function fileIsAllowed(string $image): bool {
+	return str_starts_with($image, 'data:image/avif') || str_starts_with($image, 'data:image/jpeg') || str_starts_with($image, 'data:image/png') || str_starts_with($image, 'data:image/webp');
+}
+
 class AvatarController extends Controller {
 	public function update(Request $request) {
 		$image = $request->validate([
 			'file' => 'required|string|max:16777216'
 		])['file'];
+
+		if (!fileIsAllowed($image)) {
+			return back()->with('error', 'File data type not allowed.');
+		}
 
 		$cloudinary = new Cloudinary([
 			'cloud' => [

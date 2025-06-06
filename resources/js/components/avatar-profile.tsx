@@ -44,7 +44,6 @@ export default function AvatarProfile() {
       'image/avif': [],
       'image/jpeg': [],
       'image/png': [],
-      'image/svg': [],
       'image/webp': [],
     },
   });
@@ -69,7 +68,6 @@ export default function AvatarProfile() {
         <DialogTitle>Edit your avatar</DialogTitle>
         <DialogDescription>You can preview and crop your image before upload. Please select a file to view the file preview.</DialogDescription>
 
-        {/** preview + crop here */}
         {image && (
           <div className="flex flex-col items-center justify-center gap-y-4">
             <AvatarEditor
@@ -94,11 +92,11 @@ export default function AvatarProfile() {
 
         <div
           {...getRootProps()}
-          className="flex h-40 w-full flex-col items-center justify-center border-4 border-dashed"
+          className="flex h-40 w-full flex-col items-center justify-center border-4 border-dashed p-10"
         >
           <input {...getInputProps()} />
-          {isDragActive ? <p>Drop the file here ...</p> : <p>Drag 'n' drop your file here, or click to select files</p>}
-          <em className="text-muted-foreground text-xs">Accepted formats: AVIF, JPEG, PNG, SVG, WEBP. Max file size: 16MB.</em>
+          {isDragActive ? <p>Drop the file here ...</p> : <p className="text-sm">Drag 'n' drop your file here, or click to select files</p>}
+          <em className="text-muted-foreground text-xs">Accepted formats: AVIF, JPEG, PNG, WEBP. Max file size: 16MB.</em>
         </div>
 
         <DialogFooter className="gap-2">

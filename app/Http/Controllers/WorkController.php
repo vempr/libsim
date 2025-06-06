@@ -160,6 +160,8 @@ class WorkController extends Controller {
 		$requestWork = $request->validated();
 		$requestWork['user_id'] = Auth::id();
 
+		return back()->with('success', $requestWork['image']);
+
 		$work = Work::create($requestWork);
 
 		return redirect('works/' . $work->id)->with('success', 'Your work "' . $work->title . '" has been created.');

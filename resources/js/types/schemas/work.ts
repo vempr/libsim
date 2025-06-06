@@ -64,7 +64,7 @@ export const workFormSchema = z.object({
     .min(-5000, 'Publication year cannot be earlier than 5000 BCE')
     .max(5000, 'Publication year cannot be later than 5000 CE')
     .optional(),
-  image: z.string().max(255, 'Image URL cannot exceed 255 characters').optional(),
+  image_self: z.string().max(255, 'Image URL cannot exceed 255 characters').optional(),
   tags: z.string().max(1000, 'Tags cannot exceed 1000 characters').optional(),
   links: z.string().max(3000, 'Links cannot exceed 3000 characters').optional(),
 });

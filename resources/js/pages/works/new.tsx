@@ -4,18 +4,57 @@ import { Button } from '@/components/ui/button';
 import { Form, FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { languages, PublicationStatus, publicationStatuses, ReadingStatus, readingStatuses, workFormSchema } from '@/types/schemas/work';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Head, router } from '@inertiajs/react';
+import { Head, useForm as useInertiaForm } from '@inertiajs/react';
+import { useCallback, useRef, useState } from 'react';
+import AvatarEditor from 'react-avatar-editor';
+import { useDropzone } from 'react-dropzone';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+const MAX_FILE_SIZE = 16777216;
+
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Create entry', href: '/works/create' }];
 
+function fileSizeValidator(file: File) {
+  if (file.size > MAX_FILE_SIZE) {
+    return {
+      code: 'file-too-large',
+      message: `File size is larger than 16MB`,
+    };
+  }
+
+  return null;
+}
+
 export default function New() {
+  const { post } = useInertiaForm();
+  const editor = useRef<AvatarEditor>(null);
+  const [image, setImage] = useState<File>();
+  const [scale, setScale] = useState<number>(1);
+
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    setImage(acceptedFiles[0]);
+  }, []);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    validator: fileSizeValidator,
+    maxFiles: 1,
+    accept: {
+      'image/avif': [],
+      'image/jpeg': [],
+      'image/png': [],
+      'image/webp': [],
+    },
+  });
+
   const form = useForm<z.infer<typeof workFormSchema>>({
     resolver: zodResolver(workFormSchema),
     defaultValues: {
@@ -24,7 +63,16 @@ export default function New() {
   });
 
   function onSubmit(values: z.infer<typeof workFormSchema>) {
-    router.post('/works/new', values);
+    let f: string | undefined = editor.current?.getImageScaledToCanvas().toDataURL();
+    console.log(f);
+    console.log('Image state:', image);
+
+    post(
+      route('work.store', {
+        ...values,
+        image: f,
+      }),
+    );
   }
 
   return (
@@ -231,26 +279,6 @@ export default function New() {
 
           <FormField
             control={form.control}
-            name="image"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Image (URL)</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    {...form.register('image', {
-                      required: false,
-                    })}
-                  />
-                </FormControl>
-                <FormDescription>URL for the cover image of the work, optional, up to 255 characters</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
             name="tags"
             render={({ field }) => (
               <FormItem>
@@ -287,6 +315,72 @@ export default function New() {
               </FormItem>
             )}
           />
+
+          <Tabs
+            defaultValue="url"
+            className="w-full"
+          >
+            <TabsList>
+              <TabsTrigger value="url">Image URL</TabsTrigger>
+              <TabsTrigger value="upload">Upload Image</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="url">
+              <FormField
+                control={form.control}
+                name="image_self"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Image (URL)</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        {...form.register('image_self', {
+                          required: false,
+                        })}
+                      />
+                    </FormControl>
+                    <FormDescription>URL for the cover image of the work, optional, up to 255 characters</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </TabsContent>
+
+            <TabsContent value="upload">
+              <div className="flex flex-col gap-y-3 sm:flex-row sm:gap-x-3">
+                <div
+                  {...getRootProps()}
+                  className="flex flex-1 flex-col items-center justify-center border-4 border-dashed p-6"
+                >
+                  <input {...getInputProps()} />
+                  {isDragActive ? <p>Drop the file here ...</p> : <p className="text-sm">Drag 'n' drop your file here, or click to select files</p>}
+                  <em className="text-muted-foreground text-xs">Accepted formats: AVIF, JPEG, PNG, WEBP. Max file size: 16MB.</em>
+                </div>
+                {image && (
+                  <div className="flex flex-col items-center justify-center gap-y-4">
+                    <AvatarEditor
+                      ref={editor}
+                      image={image}
+                      width={200}
+                      height={284.383}
+                      border={[4, 4]}
+                      color={[255, 255, 255, 0.7]} // RGBA
+                      scale={scale}
+                      borderRadius={4}
+                      className="rounded-sm"
+                    />
+                    <Slider
+                      defaultValue={[0]}
+                      onValueChange={(s) => setScale(1 + s[0] / 25)}
+                      max={100}
+                      step={1}
+                    />
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+          </Tabs>
 
           <Button type="submit">Submit</Button>
         </form>
