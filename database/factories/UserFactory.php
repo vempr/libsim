@@ -19,7 +19,6 @@ class UserFactory extends Factory {
 			'hide_profile' => false,
 			'private_works' => false,
 			'name' => fake()->name(),
-			'avatar' => fake()->url(),
 			'email' => fake()->unique()->safeEmail(),
 			'email_verified_at' => now(),
 			'password' => 'password',

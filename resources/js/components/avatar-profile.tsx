@@ -2,11 +2,13 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useInitials } from '@/hooks/use-initials';
 import { SharedData } from '@/types';
-import { usePage } from '@inertiajs/react';
-import { useCallback } from 'react';
+import { useForm, usePage } from '@inertiajs/react';
+import { useCallback, useRef, useState } from 'react';
+import AvatarEditor from 'react-avatar-editor';
 import { useDropzone } from 'react-dropzone';
 
 import { Button } from './ui/button';
+import { Slider } from './ui/slider';
 
 const MAX_FILE_SIZE = 16777216;
 
@@ -23,10 +25,15 @@ function fileSizeValidator(file: File) {
 
 export default function AvatarProfile() {
   const { auth } = usePage<SharedData>().props;
+  const { put, delete: destroy } = useForm();
   const getInitials = useInitials();
 
+  const editor = useRef<AvatarEditor>(null);
+  const [image, setImage] = useState<File>();
+  const [scale, setScale] = useState<number>(1);
+
   const onDrop = useCallback((acceptedFiles: File[]) => {
-    console.log(acceptedFiles);
+    setImage(acceptedFiles[0]);
   }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -59,13 +66,31 @@ export default function AvatarProfile() {
         </button>
       </DialogTrigger>
       <DialogContent>
-        <DialogTitle>Are you sure you want to delete your account?</DialogTitle>
-        <DialogDescription>
-          Once your account is deleted, all of its resources and data will also be permanently deleted. Please enter your password to confirm you
-          would like to permanently delete your account.
-        </DialogDescription>
+        <DialogTitle>Edit your avatar</DialogTitle>
+        <DialogDescription>You can preview and crop your image before upload. Please select a file to view the file preview.</DialogDescription>
 
         {/** preview + crop here */}
+        {image && (
+          <div className="flex flex-col items-center justify-center gap-y-4">
+            <AvatarEditor
+              ref={editor}
+              image={image}
+              width={150}
+              height={150}
+              border={6}
+              color={[255, 255, 255, 0.7]} // RGBA
+              scale={scale}
+              borderRadius={125}
+              className="rounded-full"
+            />
+            <Slider
+              defaultValue={[0]}
+              onValueChange={(s) => setScale(1 + s[0] / 25)}
+              max={100}
+              step={1}
+            />
+          </div>
+        )}
 
         <div
           {...getRootProps()}
@@ -78,11 +103,44 @@ export default function AvatarProfile() {
 
         <DialogFooter className="gap-2">
           <DialogClose asChild>
-            <Button variant="secondary">Cancel</Button>
+            <Button
+              className="hover:cursor-pointer"
+              variant="secondary"
+            >
+              Cancel
+            </Button>
           </DialogClose>
 
+          <Button
+            asChild
+            variant="destructive"
+          >
+            <button
+              className="hover:cursor-pointer"
+              type="button"
+              onClick={() => destroy(route('profile.avatar.update'))}
+            >
+              Delete current avatar
+            </button>
+          </Button>
+
           <Button asChild>
-            <button type="submit">Delete account</button>
+            <button
+              className="hover:cursor-pointer"
+              type="button"
+              onClick={() => {
+                if (editor.current) {
+                  const canvasScaled = editor.current.getImageScaledToCanvas().toDataURL();
+                  put(
+                    route('profile.avatar.update', {
+                      file: canvasScaled,
+                    }),
+                  );
+                }
+              }}
+            >
+              Update avatar
+            </button>
           </Button>
         </DialogFooter>
       </DialogContent>

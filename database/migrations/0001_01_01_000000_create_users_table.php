@@ -14,8 +14,10 @@ return new class extends Migration {
 			$table->boolean('hide_profile');
 			$table->boolean('private_works');
 
-			$table->string('name')->unique();
 			$table->string('avatar')->nullable();
+			$table->string('avatar_public_id')->nullable();
+
+			$table->string('name')->unique();
 			$table->string('email')->unique();
 			$table->timestamp('email_verified_at')->nullable();
 			$table->string('password');
