@@ -21,3 +21,4 @@ require __DIR__ . '/notification.php';
 require __DIR__ . '/favorite.php';
 require __DIR__ . '/collection.php';
 require __DIR__ . '/chat.php';
+require __DIR__ . '/channels.php';

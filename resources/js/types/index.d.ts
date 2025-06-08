@@ -26,7 +26,7 @@ export interface NavItem {
 }
 
 export interface ChatUser {
-  id: number;
+  id: string;
   name: string;
   avatar?: string;
 }
@@ -111,7 +111,6 @@ interface Message {
   receiver_id: string;
   text: string;
   created_at: string;
-  updated_at: string | null;
 }
 
 export interface InertiaProps extends Page<PageProps> {
