@@ -12,6 +12,21 @@ function fileIsAllowed(string $image): bool {
 }
 
 class AvatarController extends Controller {
+	private Cloudinary $cloudinary;
+
+	public function __construct() {
+		$this->cloudinary = new Cloudinary([
+			'cloud' => [
+				'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+				'api_key'  => env('CLOUDINARY_API_KEY'),
+				'api_secret' => env('CLOUDINARY_API_SECRET'),
+				'url' => [
+					'secure' => true
+				]
+			]
+		]);
+	}
+
 	public function update(Request $request) {
 		$image = $request->validate([
 			'file' => 'required|string|max:16777216'
@@ -23,23 +38,16 @@ class AvatarController extends Controller {
 
 		$user = Auth::user();
 
-		if ($user->avatar) {
-			$this->deleteExistingAvatar($user);
-		}
-
-		$cloudinary = new Cloudinary([
-			'cloud' => [
-				'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
-				'api_key'  => env('CLOUDINARY_API_KEY'),
-				'api_secret' => env('CLOUDINARY_API_SECRET'),
-				'url' => [
-					'secure' => true
-				]
-			]
-		]);
-
 		try {
-			$result = $cloudinary->uploadApi()->upload($image);
+			if ($user->avatar) {
+				$this->cloudinary->uploadApi()->destroy($user->avatar_public_id);
+
+				$user->avatar = null;
+				$user->avatar_public_id = null;
+				$user->update();
+			}
+
+			$result = $this->cloudinary->uploadApi()->upload($image);
 
 			$user->avatar = $result['secure_url'];
 			$user->avatar_public_id = $result['public_id'];
@@ -59,29 +67,15 @@ class AvatarController extends Controller {
 		}
 
 		try {
-			$this->deleteExistingAvatar($user);
+			$this->cloudinary->uploadApi()->destroy($user->avatar_public_id);
+
+			$user->avatar = null;
+			$user->avatar_public_id = null;
+			$user->update();
+
 			return back()->with('success', 'Avatar successfully deleted.');
 		} catch (\Exception $e) {
 			return back()->with('error', 'An error occurred while deleting your avatar: \'' . $e->getMessage() . '\'.');
 		}
-	}
-
-	private function deleteExistingAvatar($user) {
-		$cloudinary = new Cloudinary([
-			'cloud' => [
-				'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
-				'api_key'  => env('CLOUDINARY_API_KEY'),
-				'api_secret' => env('CLOUDINARY_API_SECRET'),
-				'url' => [
-					'secure' => true
-				]
-			]
-		]);
-
-		$cloudinary->uploadApi()->destroy($user->avatar_public_id);
-
-		$user->avatar = null;
-		$user->avatar_public_id = null;
-		$user->update();
 	}
 }

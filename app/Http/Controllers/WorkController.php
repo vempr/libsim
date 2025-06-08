@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateWorkRequest;
 use App\Models\Collection;
 use App\Models\User;
 use App\Models\Work;
+use Cloudinary\Cloudinary;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -117,8 +118,27 @@ function getBreadcrumbs(ShowWorkRequest $request, Work $work): array {
 	return $defaultBreadcrumbs;
 }
 
+function fileIsAllowed(string $image): bool {
+	return str_starts_with($image, 'data:image/avif') || str_starts_with($image, 'data:image/jpeg') || str_starts_with($image, 'data:image/png') || str_starts_with($image, 'data:image/webp');
+}
+
 class WorkController extends Controller {
 	use AuthorizesRequests;
+
+	private Cloudinary $cloudinary;
+
+	public function __construct() {
+		$this->cloudinary = new Cloudinary([
+			'cloud' => [
+				'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+				'api_key'  => env('CLOUDINARY_API_KEY'),
+				'api_secret' => env('CLOUDINARY_API_SECRET'),
+				'url' => [
+					'secure' => true
+				]
+			]
+		]);
+	}
 
 	public function index(Request $request) {
 		$state = [
@@ -158,13 +178,27 @@ class WorkController extends Controller {
 
 	public function store(StoreWorkRequest $request): RedirectResponse {
 		$requestWork = $request->validated();
-		$requestWork['user_id'] = Auth::id();
 
-		return back()->with('success', $requestWork['image']);
+		$user = Auth::user();
+		$requestWork['user_id'] = $user->id;
+		$image = $requestWork['image'] ?? null;
 
-		$work = Work::create($requestWork);
+		if ($image && !fileIsAllowed($image)) {
+			return back()->with('error', 'File data type not allowed.');
+		}
 
-		return redirect('works/' . $work->id)->with('success', 'Your work "' . $work->title . '" has been created.');
+		try {
+			if ($image) {
+				$result = $this->cloudinary->uploadApi()->upload($image);
+				$requestWork['image'] = $result['secure_url'];
+				$requestWork['image_public_id'] = $result['public_id'];
+			}
+
+			$work = Work::create($requestWork);
+			return redirect('works/' . $work->id)->with('success', 'Your work "' . $work->title . '" has been created.');
+		} catch (\Exception $e) {
+			return back()->with('error', 'An error occurred while creating your work: \'' . $e->getMessage() . '\'.');
+		}
 	}
 
 	public function show(ShowWorkRequest $request, Work $work) {
@@ -203,16 +237,45 @@ class WorkController extends Controller {
 	public function update(UpdateWorkRequest $request, Work $work) {
 		$this->authorize('update', $work);
 
-		$work->update($request->validated());
+		$requestWork = $request->validated();
+		$image = $requestWork['image'] ?? null;
 
-		return redirect('works/' . $work->id)->with('success', 'Your work "' . $work->title . '" has been updated.');
+		if ($image && !fileIsAllowed($image)) {
+			return back()->with('error', 'File data type not allowed.');
+		}
+
+		try {
+			if ($work->image_public_id) {
+				$this->cloudinary->uploadApi()->destroy($work->image_public_id);
+				$requestWork['image'] = null;
+				$requestWork['image_public_id'] = null;
+			}
+
+			if ($image) {
+				$result = $this->cloudinary->uploadApi()->upload($image);
+				$requestWork['image'] = $result['secure_url'];
+				$requestWork['image_public_id'] = $result['public_id'];
+			}
+
+			$work->update($requestWork);
+			return redirect('works/' . $work->id)->with('success', 'Your work "' . $work->title . '" has been updated.');
+		} catch (\Exception $e) {
+			return back()->with('error', 'An error occurred while creating your work: \'' . $e->getMessage() . '\'.');
+		}
 	}
 
 	public function destroy(Work $work) {
 		$this->authorize('delete', $work);
 
-		$work->delete();
+		try {
+			if ($work->image_public_id) {
+				$this->cloudinary->uploadApi()->destroy($work->image_public_id);
+			}
 
-		return redirect('works')->with('success', 'Your work "' . $work->title . '" has been deleted.');
+			$work->delete();
+			return redirect('works')->with('success', 'Your work "' . $work->title . '" has been deleted.');
+		} catch (\Exception $e) {
+			return back()->with('error', 'An error occurred while deleting your work: \'' . $e->getMessage() . '\'.');
+		}
 	}
 }

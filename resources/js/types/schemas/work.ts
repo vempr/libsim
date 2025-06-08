@@ -36,6 +36,7 @@ export const dbWorkSchema = z.object({
   language_original: languageSchema.nullable(),
   language_translated: languageSchema.nullable(),
   publication_year: z.number().nullable(),
+  image_self: z.string().nullable(),
   image: z.string().nullable(),
   tags: z.string().nullable(),
   links: z.string().nullable(),

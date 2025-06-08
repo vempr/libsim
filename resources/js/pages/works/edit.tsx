@@ -4,14 +4,32 @@ import { Button } from '@/components/ui/button';
 import { Form, FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { type InertiaProps, type BreadcrumbItem } from '@/types/index';
 import { languages, PublicationStatus, publicationStatuses, ReadingStatus, readingStatuses, workFormSchema } from '@/types/schemas/work';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, router, usePage } from '@inertiajs/react';
+import { useCallback, useRef, useState } from 'react';
+import AvatarEditor from 'react-avatar-editor';
+import { useDropzone } from 'react-dropzone';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+
+const MAX_FILE_SIZE = 16777216;
+
+function fileSizeValidator(file: File) {
+  if (file.size > MAX_FILE_SIZE) {
+    return {
+      code: 'file-too-large',
+      message: `File size is larger than 16MB`,
+    };
+  }
+
+  return null;
+}
 
 export default function Edit() {
   const { work } = usePage<InertiaProps>().props;
@@ -30,6 +48,26 @@ export default function Edit() {
     },
   ];
 
+  const editor = useRef<AvatarEditor>(null);
+  const [image, setImage] = useState<File | string | null>(work.image);
+  const [scale, setScale] = useState<number>(1);
+
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    setImage(acceptedFiles[0]);
+  }, []);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    validator: fileSizeValidator,
+    maxFiles: 1,
+    accept: {
+      'image/avif': [],
+      'image/jpeg': [],
+      'image/png': [],
+      'image/webp': [],
+    },
+  });
+
   const form = useForm<z.infer<typeof workFormSchema>>({
     resolver: zodResolver(workFormSchema),
     defaultValues: {
@@ -41,7 +79,7 @@ export default function Edit() {
       language_original: work.language_original || undefined,
       language_translated: work.language_translated || undefined,
       publication_year: work.publication_year || undefined,
-      image: work.image || '',
+      image_self: work.image_self || '',
       tags: work.tags || '',
       links: work.links || '',
     },
@@ -50,8 +88,18 @@ export default function Edit() {
   const isDirty = form.formState.isDirty;
 
   function onSubmit(values: z.infer<typeof workFormSchema>) {
-    if (isDirty) {
-      router.put(route('work.update', work.id), values);
+    const fileIsDirty = work.image !== image;
+
+    if (isDirty || fileIsDirty) {
+      let i = null;
+      if (fileIsDirty) {
+        i = editor.current?.getImageScaledToCanvas().toDataURL();
+      }
+
+      router.put(route('work.update', work.id), {
+        ...values,
+        image: i,
+      });
     } else {
       router.get(route('work', work.id));
     }
@@ -267,26 +315,6 @@ export default function Edit() {
 
           <FormField
             control={form.control}
-            name="image"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Image (URL)</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    {...form.register('image', {
-                      required: false,
-                    })}
-                  />
-                </FormControl>
-                <FormDescription>URL for the cover image of the work, optional, up to 255 characters</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
             name="tags"
             render={({ field }) => (
               <FormItem>
@@ -325,6 +353,72 @@ export default function Edit() {
               </FormItem>
             )}
           />
+
+          <Tabs
+            defaultValue={work.image ? 'upload' : 'url'}
+            className="w-full"
+          >
+            <TabsList>
+              <TabsTrigger value="url">Image URL</TabsTrigger>
+              <TabsTrigger value="upload">Upload Image</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="url">
+              <FormField
+                control={form.control}
+                name="image_self"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Image (URL)</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        {...form.register('image_self', {
+                          required: false,
+                        })}
+                      />
+                    </FormControl>
+                    <FormDescription>URL for the cover image of the work, optional, up to 255 characters</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </TabsContent>
+
+            <TabsContent value="upload">
+              <div className="flex flex-col gap-y-3 sm:flex-row sm:gap-x-3">
+                <div
+                  {...getRootProps()}
+                  className="flex flex-1 flex-col items-center justify-center border-4 border-dashed p-6"
+                >
+                  <input {...getInputProps()} />
+                  {isDragActive ? <p>Drop the file here ...</p> : <p className="text-sm">Drag 'n' drop your file here, or click to select files</p>}
+                  <em className="text-muted-foreground text-xs">Accepted formats: AVIF, JPEG, PNG, WEBP. Max file size: 16MB.</em>
+                </div>
+                {image && (
+                  <div className="flex flex-col items-center justify-center gap-y-4">
+                    <AvatarEditor
+                      ref={editor}
+                      image={image}
+                      width={200}
+                      height={284.383}
+                      border={[4, 4]}
+                      color={[255, 255, 255, 0.7]} // RGBA
+                      scale={scale}
+                      borderRadius={4}
+                      className="rounded-sm"
+                    />
+                    <Slider
+                      defaultValue={[0]}
+                      onValueChange={(s) => setScale(1 + s[0] / 25)}
+                      max={100}
+                      step={1}
+                    />
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+          </Tabs>
 
           <Button type="submit">Submit</Button>
         </form>

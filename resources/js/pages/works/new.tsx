@@ -63,14 +63,10 @@ export default function New() {
   });
 
   function onSubmit(values: z.infer<typeof workFormSchema>) {
-    let f: string | undefined = editor.current?.getImageScaledToCanvas().toDataURL();
-    console.log(f);
-    console.log('Image state:', image);
-
     post(
       route('work.store', {
         ...values,
-        image: f,
+        image: editor.current?.getImageScaledToCanvas().toDataURL(),
       }),
     );
   }

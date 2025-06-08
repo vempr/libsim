@@ -20,7 +20,9 @@ class Work extends Model {
 		'language_original',
 		'language_translated',
 		'publication_year',
+		'image_self',
 		'image',
+		'image_public_id',
 		'tags',
 		'links',
 	];
