@@ -10,10 +10,11 @@ return new class extends Migration {
 	 */
 	public function up(): void {
 		Schema::create('chat_messages', function (Blueprint $table) {
-			$table->id();
-			$table->foreignId('receiver_id');
-			$table->foreignId('sender_id');
-			$table->text('text');
+			$table->uuid('id')->primary();
+			$table->foreignUuid('sender_id')->constrained('users')->onDelete('cascade');
+			$table->foreignUuid('receiver_id')->constrained('users')->onDelete('cascade');
+			$table->text('text')->nullable();
+
 			$table->timestamps();
 		});
 	}

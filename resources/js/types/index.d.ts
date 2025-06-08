@@ -25,29 +25,25 @@ export interface NavItem {
   isActive?: boolean;
 }
 
-export interface User {
+export interface ChatUser {
   id: number;
   name: string;
   avatar?: string;
+}
+
+export interface ListUser extends ChatUser {
+  introduction?: string;
+}
+
+export interface ProfileUser extends ListUser {
+  description?: string;
+}
+
+export interface User extends ProfileUser {
   email: string;
   email_verified_at: string | null;
   hide_profile: boolean;
   private_works: boolean;
-}
-
-export interface ProfileUser {
-  id: number;
-  name: string;
-  avatar?: string;
-  introduction?: string;
-  description?: string;
-}
-
-export interface ListUser {
-  id: number;
-  name: string;
-  avatar?: string;
-  introduction?: string;
 }
 
 export interface FlashMessages {
@@ -109,6 +105,15 @@ interface CollectionList extends Collection {
   updated_at: string | null;
 }
 
+interface Message {
+  id: string;
+  sender_id: string;
+  receiver_id: string;
+  text: string;
+  created_at: string;
+  updated_at: string | null;
+}
+
 export interface InertiaProps extends Page<PageProps> {
   flash?: FlashMessages;
   user: User;
@@ -127,6 +132,10 @@ export interface InertiaProps extends Page<PageProps> {
   searchState?: SearchState;
 
   notifications?: Notification[] | null;
+
+  friends: ChatUser[];
+  friend: ChatUser;
+  messages: Message[];
 
   usersPaginatedResponse: PaginatedResponse<ListUser & { is_friend: number }>;
   friendsPaginatedResponse: PaginatedResponse<ListUser>;

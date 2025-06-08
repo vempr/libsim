@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CollectionEntry;
 use App\Models\Work;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
