@@ -21,6 +21,12 @@ class AvatarController extends Controller {
 			return back()->with('error', 'File data type not allowed.');
 		}
 
+		$user = Auth::user();
+
+		if ($user->avatar) {
+			$this->deleteExistingAvatar($user);
+		}
+
 		$cloudinary = new Cloudinary([
 			'cloud' => [
 				'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
@@ -35,18 +41,32 @@ class AvatarController extends Controller {
 		try {
 			$result = $cloudinary->uploadApi()->upload($image);
 
-			$user = Auth::user();
 			$user->avatar = $result['secure_url'];
 			$user->avatar_public_id = $result['public_id'];
 			$user->update();
 
 			return back()->with('success', 'Avatar successfully updated.');
 		} catch (\Exception $e) {
-			return back()->with('error', 'An error occured while updating your avatar: \'' . $e->getMessage() . '\'.');
+			return back()->with('error', 'An error occurred while updating your avatar: \'' . $e->getMessage() . '\'.');
 		}
 	}
 
 	public function destroy() {
+		$user = Auth::user();
+
+		if ($user->avatar === null) {
+			return back()->with('error', 'There is no avatar to delete.');
+		}
+
+		try {
+			$this->deleteExistingAvatar($user);
+			return back()->with('success', 'Avatar successfully deleted.');
+		} catch (\Exception $e) {
+			return back()->with('error', 'An error occurred while deleting your avatar: \'' . $e->getMessage() . '\'.');
+		}
+	}
+
+	private function deleteExistingAvatar($user) {
 		$cloudinary = new Cloudinary([
 			'cloud' => [
 				'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
@@ -58,22 +78,10 @@ class AvatarController extends Controller {
 			]
 		]);
 
-		$user = Auth::user();
+		$cloudinary->uploadApi()->destroy($user->avatar_public_id);
 
-		if ($user->avatar === null) {
-			return back()->with('error', 'There is no avatar to delete.');
-		}
-
-		try {
-			$cloudinary->uploadApi()->destroy(Auth::user()->avatar_public_id);
-
-			$user->avatar = null;
-			$user->avatar_public_id = null;
-			$user->update();
-
-			return back()->with('success', 'Avatar successfully deleted.');
-		} catch (\Exception $e) {
-			return back()->with('error', 'An error occured while deleting your avatar: \'' . $e->getMessage() . '\'.');
-		}
+		$user->avatar = null;
+		$user->avatar_public_id = null;
+		$user->update();
 	}
 }
