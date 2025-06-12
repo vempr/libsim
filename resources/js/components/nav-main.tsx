@@ -5,8 +5,8 @@ import { Link, usePage } from '@inertiajs/react';
 export function NavMain({ items = [] }: { items: NavItem[] }) {
   const page = usePage();
   const dashboardItems = items.slice(0, 3);
-  const memberItems = items.slice(3, 6);
-  const createItems = items.slice(6, 7);
+  const memberItems = items.slice(3, 7);
+  const createItems = items.slice(7, 8);
 
   return (
     <SidebarGroup className="px-2 py-0">

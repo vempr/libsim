@@ -11,16 +11,32 @@ use Inertia\Inertia;
 
 class ChatController extends Controller {
 	public function index() {
-		$friends = User::where(function ($query) {
-			$query->whereHas('friendsOf', function ($q) {
-				$q->where('user_id', Auth::id());
+		$userId = Auth::id();
+
+		$friends = User::where(function ($query) use ($userId) {
+			$query->whereHas('friendsOf', function ($q) use ($userId) {
+				$q->where('user_id', $userId);
 			})
-				->orWhereHas('friends', function ($q) {
-					$q->where('friend_id', Auth::id());
+				->orWhereHas('friends', function ($q) use ($userId) {
+					$q->where('friend_id', $userId);
 				});
 		})
 			->select(['id', 'name', 'avatar'])
-			->get();
+			->get()
+			->map(function ($friend) use ($userId) {
+				$friend->latest_message = ChatMessage::where(function ($query) use ($userId, $friend) {
+					$query->where('sender_id', $userId)
+						->where('receiver_id', $friend->id);
+				})
+					->orWhere(function ($query) use ($userId, $friend) {
+						$query->where('sender_id', $friend->id)
+							->where('receiver_id', $userId);
+					})
+					->orderBy('created_at', 'desc')
+					->first();
+
+				return $friend;
+			});
 
 		return Inertia::render('chat/all', [
 			'friends' => $friends,

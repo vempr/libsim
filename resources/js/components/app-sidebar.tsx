@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { Bell, CircleUser, Folder, LayoutGrid, LibraryBig, ListPlus, Sparkles, Users } from 'lucide-react';
+import { Bell, CircleUser, Folder, LayoutGrid, LibraryBig, ListPlus, MessageSquareText, Sparkles, Users } from 'lucide-react';
 
 import AppLogo from './app-logo';
 
@@ -25,14 +25,19 @@ const mainNavItems: NavItem[] = [
     icon: LibraryBig,
   },
   {
+    title: 'Your profile',
+    href: '/u',
+    icon: CircleUser,
+  },
+  {
     title: 'Members',
     href: '/users',
     icon: Users,
   },
   {
-    title: 'Your profile',
-    href: '/u',
-    icon: CircleUser,
+    title: 'Messages',
+    href: '/chat',
+    icon: MessageSquareText,
   },
   {
     title: 'Notifications',
