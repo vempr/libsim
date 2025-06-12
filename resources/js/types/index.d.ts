@@ -111,11 +111,7 @@ interface MessageEager {
   text: string;
   created_at: string;
   is_deleted: boolean;
-  sender: {
-    id: string;
-    name: string;
-    avatar: string;
-  };
+  sender: ChatUser;
 }
 
 interface Message {
@@ -146,9 +142,9 @@ export interface InertiaProps extends Page<PageProps> {
 
   notifications?: Notification[] | null;
 
-  friends: ChatUser[];
+  friends: (ChatUser & { latest_message: Message })[];
   friend: ChatUser;
-  messages: Message[];
+  messages: MessageEager[];
 
   usersPaginatedResponse: PaginatedResponse<ListUser & { is_friend: number }>;
   friendsPaginatedResponse: PaginatedResponse<ListUser>;

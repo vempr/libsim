@@ -2,7 +2,7 @@ import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
-import { type InertiaProps, type BreadcrumbItem, SharedData, Message } from '@/types';
+import { type InertiaProps, type BreadcrumbItem, SharedData, MessageEager } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, Link, useForm as useInertiaForm, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
@@ -33,7 +33,7 @@ type Chat = z.infer<typeof chatForm>;
 
 export default function All() {
   const { friend, messages: initialMessages, auth } = usePage<InertiaProps & SharedData>().props;
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const [messages, setMessages] = useState<MessageEager[]>(initialMessages);
 
   const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Messages', href: '/chat' },
@@ -65,10 +65,14 @@ export default function All() {
     let tempMessage = {
       id: tempId,
       receiver_id: friend.id,
-      sender_id: auth.user.id,
       text,
       is_deleted: false,
       created_at: getCurrentDateTime(),
+      sender: {
+        id: auth.user.id,
+        name: auth.user.name,
+        avatar: auth.user.avatar,
+      },
     };
 
     setMessages((prev) => [...prev, tempMessage]);
@@ -76,7 +80,7 @@ export default function All() {
     post(route('chat.store', { friend: friend.id, text }), {
       preserveScroll: true,
       onSuccess: (page) => {
-        const messages = page.props.messages as Message[];
+        const messages = page.props.messages as MessageEager[];
         setMessages(messages.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()));
       },
     });
@@ -86,11 +90,11 @@ export default function All() {
     const channel = window.Echo.private(`chat.${auth.user.id}`);
 
     channel.listen('MessageSent', (e: any) => {
-      const incoming = e.message as Message;
+      const incoming = e.message as MessageEager;
 
       const isRelevant =
-        (incoming.sender_id === friend.id && incoming.receiver_id === auth.user.id) ||
-        (incoming.receiver_id === friend.id && incoming.sender_id === auth.user.id);
+        (incoming.sender.id === friend.id && incoming.receiver_id === auth.user.id) ||
+        (incoming.receiver_id === friend.id && incoming.sender.id === auth.user.id);
 
       if (!isRelevant) return;
 
@@ -139,12 +143,12 @@ export default function All() {
         {messages.map((message) => (
           <li key={`${message.id}-${new Date(message.created_at).getTime()}`}>
             {message.is_deleted ? (
-              <span className={message.sender_id === auth.user.id ? 'text-red-500' : 'text-red-800'}>[deleted] (ID: {message.id})</span>
+              <span className={message.sender.id === auth.user.id ? 'text-red-500' : 'text-red-800'}>[deleted] (ID: {message.id})</span>
             ) : (
-              <span className={message.sender_id === auth.user.id ? 'text-blue-600' : 'text-gray-700'}>{JSON.stringify(message)}</span>
+              <span className={message.sender.id === auth.user.id ? 'text-blue-600' : 'text-gray-700'}>{JSON.stringify(message)}</span>
             )}
 
-            {message.sender_id === auth.user.id && !message.is_deleted && (
+            {message.sender.id === auth.user.id && !message.is_deleted && (
               <Button
                 variant="destructive"
                 onClick={() => {
