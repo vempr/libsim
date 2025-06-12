@@ -141,9 +141,7 @@ export default function All() {
             {message.is_deleted ? (
               <span className={message.sender_id === auth.user.id ? 'text-red-500' : 'text-red-800'}>[deleted] (ID: {message.id})</span>
             ) : (
-              <span className={message.sender_id === auth.user.id ? 'text-blue-600' : 'text-gray-700'}>
-                {message.text} (ID: {message.id})
-              </span>
+              <span className={message.sender_id === auth.user.id ? 'text-blue-600' : 'text-gray-700'}>{JSON.stringify(message)}</span>
             )}
 
             {message.sender_id === auth.user.id && !message.is_deleted && (

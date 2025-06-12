@@ -53,9 +53,13 @@ class ChatController extends Controller {
 				$query->where('sender_id', $friend->id)
 					->where('receiver_id', Auth::id());
 			})
-			->with(['sender', 'receiver'])
+
+			->with(['sender' => function ($query) {
+				$query->select('id', 'avatar', 'name');
+			}])
 			->orderBy('created_at', 'asc')
-			->get();
+			->get()
+			->makeHidden(['sender_id']);
 
 		return Inertia::render('chat/chat', [
 			'messages' => $messages,

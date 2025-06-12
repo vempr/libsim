@@ -105,6 +105,19 @@ interface CollectionList extends Collection {
   updated_at: string | null;
 }
 
+interface MessageEager {
+  id: string;
+  receiver_id: string;
+  text: string;
+  created_at: string;
+  is_deleted: boolean;
+  sender: {
+    id: string;
+    name: string;
+    avatar: string;
+  };
+}
+
 interface Message {
   id: string;
   sender_id: string;
