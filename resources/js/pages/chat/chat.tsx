@@ -9,8 +9,6 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-const TEMP_MESSAGE_ID = 'VrPVHDtUG6';
-
 function getCurrentDateTime() {
   const now = new Date();
 
@@ -42,7 +40,10 @@ export default function All() {
     { title: friend.name, href: `/chat/${friend.id}` },
   ];
 
-  const { post } = useInertiaForm();
+  const [isFriendTyping, setIsFriendTyping] = useState(false);
+  let typingTimeout: NodeJS.Timeout;
+
+  const { post, delete: destroy } = useInertiaForm();
   const {
     register,
     handleSubmit,
@@ -59,11 +60,14 @@ export default function All() {
 
     reset();
 
+    const tempId = `temp-${Date.now()}`;
+
     let tempMessage = {
-      id: TEMP_MESSAGE_ID,
+      id: tempId,
       receiver_id: friend.id,
       sender_id: auth.user.id,
       text,
+      is_deleted: false,
       created_at: getCurrentDateTime(),
     };
 
@@ -71,6 +75,10 @@ export default function All() {
 
     post(route('chat.store', { friend: friend.id, text }), {
       preserveScroll: true,
+      onSuccess: (page) => {
+        const messages = page.props.messages as Message[];
+        setMessages(messages.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()));
+      },
     });
   };
 
@@ -78,7 +86,7 @@ export default function All() {
     const channel = window.Echo.private(`chat.${auth.user.id}`);
 
     channel.listen('MessageSent', (e: any) => {
-      const incoming = e.message;
+      const incoming = e.message as Message;
 
       const isRelevant =
         (incoming.sender_id === friend.id && incoming.receiver_id === auth.user.id) ||
@@ -87,13 +95,37 @@ export default function All() {
       if (!isRelevant) return;
 
       setMessages((prev) => {
-        const filtered = prev.filter((m) => m.id !== TEMP_MESSAGE_ID);
-        return [...filtered, incoming];
+        const existingIndex = prev.findIndex((m) => m.id === incoming.id);
+
+        if (existingIndex >= 0) {
+          const newMessages = [...prev];
+          newMessages[existingIndex] = incoming;
+
+          return newMessages;
+        } else {
+          return [...prev, incoming].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+        }
       });
+    });
+
+    channel.listenForWhisper('typing', (e: any) => {
+      if (e.user_id === friend.id) {
+        setIsFriendTyping(true);
+
+        if (typingTimeout) {
+          clearTimeout(typingTimeout);
+        }
+
+        typingTimeout = setTimeout(() => {
+          setIsFriendTyping(false);
+        }, 1000);
+      }
     });
 
     return () => {
       channel.stopListening('MessageSent');
+      channel.stopListeningForWhisper('typing');
+      if (typingTimeout) clearTimeout(typingTimeout);
     };
   }, [friend.id, auth.user.id]);
 
@@ -103,13 +135,41 @@ export default function All() {
 
       <Link href={`/users/${friend.id}`}>{friend.name}</Link>
 
-      <ul>
+      <ul className="space-y-2">
         {messages.map((message) => (
-          <li key={message.id}>
-            <span className={message.sender_id === auth.user.id ? 'text-blue-600' : 'text-gray-700'}>{message.text}</span>
+          <li key={`${message.id}-${new Date(message.created_at).getTime()}`}>
+            {message.is_deleted ? (
+              <span className={message.sender_id === auth.user.id ? 'text-red-500' : 'text-red-800'}>[deleted] (ID: {message.id})</span>
+            ) : (
+              <span className={message.sender_id === auth.user.id ? 'text-blue-600' : 'text-gray-700'}>
+                {message.text} (ID: {message.id})
+              </span>
+            )}
+
+            {message.sender_id === auth.user.id && !message.is_deleted && (
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  setMessages((prev) => prev.map((m) => (m.id === message.id ? { ...m, is_deleted: true } : m)));
+
+                  destroy(
+                    route('chat.destroy', {
+                      message: message.id,
+                    }),
+                    {
+                      preserveScroll: true,
+                    },
+                  );
+                }}
+              >
+                delete
+              </Button>
+            )}
           </li>
         ))}
       </ul>
+
+      {isFriendTyping && <p className="text-sm text-gray-500">{friend.name} is typing...</p>}
 
       <form
         onSubmit={handleSubmit(onSubmit)}
@@ -117,6 +177,15 @@ export default function All() {
       >
         <Input
           {...register('text')}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              handleSubmit(onSubmit);
+            } else {
+              window.Echo.private(`chat.${friend.id}`).whisper('typing', {
+                user_id: auth.user.id,
+              });
+            }
+          }}
           placeholder="Type a message..."
         />
         {errors.text && <InputError message={errors.text.message} />}

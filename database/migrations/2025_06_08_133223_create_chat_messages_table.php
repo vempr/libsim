@@ -14,6 +14,7 @@ return new class extends Migration {
 			$table->foreignUuid('sender_id')->constrained('users')->onDelete('cascade');
 			$table->foreignUuid('receiver_id')->constrained('users')->onDelete('cascade');
 			$table->text('text')->nullable();
+			$table->boolean('is_deleted')->default(false);
 
 			$table->timestamps();
 		});

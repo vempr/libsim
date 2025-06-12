@@ -111,6 +111,7 @@ interface Message {
   receiver_id: string;
   text: string;
   created_at: string;
+  is_deleted: boolean;
 }
 
 export interface InertiaProps extends Page<PageProps> {

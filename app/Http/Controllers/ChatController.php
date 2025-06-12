@@ -66,13 +66,16 @@ class ChatController extends Controller {
 		return back();
 	}
 
-	public function destroy(ChatMessage $chatMessage) {
-		if ($chatMessage->sender_id !== Auth::id()) {
+	public function destroy(ChatMessage $message) {
+		if ($message->sender_id !== Auth::id()) {
 			return redirect(route('chat.index'));
 		}
 
-		$chatMessage->text = null;
-		$chatMessage->update();
+		$message->text = '';
+		$message->is_deleted = true;
+		$message->save();
+
+		broadcast(new MessageSent($message));
 
 		return back();
 	}
