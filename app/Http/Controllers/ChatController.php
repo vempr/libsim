@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\MessageSent;
 use App\Models\ChatMessage;
 use App\Models\User;
+use App\Models\Work;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -32,6 +33,9 @@ class ChatController extends Controller {
 						$query->where('sender_id', $friend->id)
 							->where('receiver_id', $userId);
 					})
+					->with(['work' => function ($query) {
+						$query->select('id', 'title', 'description', 'image_self', 'image');
+					}])
 					->orderBy('created_at', 'desc')
 					->first();
 
@@ -54,35 +58,64 @@ class ChatController extends Controller {
 					->where('receiver_id', Auth::id());
 			})
 
-			->with(['sender' => function ($query) {
-				$query->select('id', 'avatar', 'name');
-			}])
+			->with([
+				'sender' => function ($query) {
+					$query->select('id', 'avatar', 'name');
+				},
+				'work' => function ($query) {
+					$query->select('id', 'title', 'description', 'image_self', 'image');
+				},
+			])
 			->orderBy('created_at', 'asc')
 			->get()
 			->makeHidden(['sender_id']);
 
+		$works = Work::query()->where('user_id', Auth::id())->select('id', 'title', 'description', 'image_self', 'image')->get();
+
 		return Inertia::render('chat/chat', [
 			'messages' => $messages,
+			'works' => $works,
 			'friend' => $friend->only(['id', 'name', 'avatar']),
 		]);
 	}
 
 	public function store(Request $request, User $friend) {
-		$text = $request->validate(['text' => 'required|min:1|max:1000'])['text'];
-		$user = Auth::user();
+		$validated = $request->validate(['text' => 'max:1000', 'work_id' => 'exists:works,id']);
+		$text = $validated['text'] ?? null;
+		$workId = $validated['work_id'] ?? null;
 
+		if ($workId && $text) {
+			return back();
+		}
+
+		$user = Auth::user();
 		if (!$user->allFriends()->contains($friend)) {
 			return redirect(route('chat.index'));
 		}
 
-		$message = ChatMessage::create([
-			'sender_id' => Auth::id(),
-			'receiver_id' => $friend->id,
-			'text' => $text,
-		]);
+		$message = null;
+
+		if ($workId) {
+			if (Auth::id() !== Work::find($workId)->user_id) {
+				return back();
+			}
+
+			$message = ChatMessage::create([
+				'sender_id' => Auth::id(),
+				'receiver_id' => $friend->id,
+				'work_id' => $workId,
+			]);
+		}
+
+		if ($text) {
+			$message = ChatMessage::create([
+				'sender_id' => Auth::id(),
+				'receiver_id' => $friend->id,
+				'text' => $text,
+			]);
+		}
 
 		broadcast(new MessageSent($message));
-
 		return back();
 	}
 
@@ -91,7 +124,8 @@ class ChatController extends Controller {
 			return redirect(route('chat.index'));
 		}
 
-		$message->text = '';
+		$message->text = null;
+		$message->workId = null;
 		$message->is_deleted = true;
 		$message->save();
 

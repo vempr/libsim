@@ -1,10 +1,13 @@
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Input } from '@/components/ui/input';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import AppLayout from '@/layouts/app-layout';
-import { type InertiaProps, type BreadcrumbItem, SharedData, MessageEager } from '@/types';
+import { type InertiaProps, type BreadcrumbItem, SharedData, MessageEager, ChatWork } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, Link, useForm as useInertiaForm, usePage } from '@inertiajs/react';
+import { ChevronsUpDown } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -32,8 +35,9 @@ const chatForm = z.object({
 type Chat = z.infer<typeof chatForm>;
 
 export default function All() {
-  const { friend, messages: initialMessages, auth } = usePage<InertiaProps & SharedData>().props;
+  const { friend, messages: initialMessages, works, auth } = usePage<InertiaProps & SharedData>().props;
   const [messages, setMessages] = useState<MessageEager[]>(initialMessages);
+  const [open, setOpen] = useState(false);
 
   const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Messages', href: '/chat' },
@@ -66,6 +70,7 @@ export default function All() {
       id: tempId,
       receiver_id: friend.id,
       text,
+      work: null,
       is_deleted: false,
       created_at: getCurrentDateTime(),
       sender: {
@@ -190,9 +195,76 @@ export default function All() {
           }}
           placeholder="Type a message..."
         />
+
         {errors.text && <InputError message={errors.text.message} />}
         <Button type="submit">Send</Button>
       </form>
+
+      <Popover
+        open={open}
+        onOpenChange={setOpen}
+      >
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className="w-[200px] justify-between"
+          >
+            Share personal work...
+            <ChevronsUpDown className="opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-[200px] p-0">
+          <Command>
+            <CommandInput
+              placeholder="Search work..."
+              className="h-9"
+            />
+            <CommandList>
+              <CommandEmpty>No work found.</CommandEmpty>
+              <CommandGroup>
+                {works.map((work) => (
+                  <CommandItem
+                    key={work.id}
+                    value={work.id}
+                    onSelect={(workId) => {
+                      const work = works.find((w) => w.id === workId) as ChatWork;
+
+                      const tempMessage = {
+                        id: `temp-${Date.now()}`,
+                        receiver_id: friend.id,
+                        text: null,
+                        work,
+                        is_deleted: false,
+                        created_at: getCurrentDateTime(),
+                        sender: {
+                          id: auth.user.id,
+                          name: auth.user.name,
+                          avatar: auth.user.avatar,
+                        },
+                      };
+
+                      setMessages((prev) => [...prev, tempMessage]);
+
+                      setOpen(false);
+                      post(route('chat.store', { friend: friend.id, work_id: workId }), {
+                        preserveScroll: true,
+                        onSuccess: (page) => {
+                          const messages = page.props.messages as MessageEager[];
+                          setMessages(messages.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()));
+                        },
+                      });
+                    }}
+                  >
+                    {work.title}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
     </AppLayout>
   );
 }

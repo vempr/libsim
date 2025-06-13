@@ -12,7 +12,8 @@ class ChatMessage extends Model {
 	protected $fillable = [
 		'sender_id',
 		'receiver_id',
-		'text'
+		'text',
+		'work_id',
 	];
 
 	public function sender() {
@@ -21,5 +22,9 @@ class ChatMessage extends Model {
 
 	public function receiver() {
 		return $this->belongsTo(User::class, 'receiver_id');
+	}
+
+	public function work() {
+		return $this->belongsTo(Work::class, 'work_id');
 	}
 }
