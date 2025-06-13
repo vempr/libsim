@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use App\Models\Work;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Profile;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder {
@@ -33,8 +33,13 @@ class DatabaseSeeder extends Seeder {
 
 		$staticUser1->friends()->attach($friends->pluck('id'));
 
+		$allUsers = collect([$staticUser1, $staticUser2])->merge($randomUsers);
+		$allUsers->each(function ($user) {
+			$user->profile()->create(Profile::factory()->make()->toArray());
+		});
+
 		Work::factory(500)
-			->recycle(array_merge([$staticUser1, $staticUser2], $randomUsers->all()))
+			->recycle($allUsers->all())
 			->create();
 	}
 }

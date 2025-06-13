@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\FriendRequest;
 use App\Models\Notification;
+use App\Models\Profile;
 use App\Models\User;
 use App\Models\Work;
 use Illuminate\Support\Facades\Auth;
@@ -32,7 +33,10 @@ class FriendController extends Controller {
 
 	public function me() {
 		return Inertia::render('users/me', [
-			'user' => Auth::user()->only(['id', 'name', 'avatar', 'introduction', 'description']),
+			'user' => [
+				...Auth::user()->only(['id', 'name', 'avatar']),
+				'info' => Profile::where('user_id', Auth::id())->select(Profile::$profileFields)->first(),
+			],
 		]);
 	}
 
@@ -56,7 +60,7 @@ class FriendController extends Controller {
 		$users = $query
 			->where('id', '!=', Auth::id())
 			->where('hide_profile', '=', 0)
-			->select(['id', 'name', 'avatar', 'introduction'])
+			->select(['id', 'name', 'avatar'])
 			->addSelect([
 				'is_friend' => function ($query) {
 					$query->selectRaw('COUNT(*) > 0')
@@ -73,6 +77,9 @@ class FriendController extends Controller {
 						});
 				}
 			])
+			->with(['profile' => function ($query) {
+				$query->select(Profile::$indexFields);
+			}])
 			->paginate(15, ['*'], 'users');
 
 		$friends = User::where(function ($query) {
@@ -83,7 +90,10 @@ class FriendController extends Controller {
 					$q->where('friend_id', Auth::id());
 				});
 		})
-			->select(['id', 'name', 'avatar', 'introduction'])
+			->select(['id', 'name', 'avatar'])
+			->with(['profile' => function ($query) {
+				$query->select(Profile::$indexFields);
+			}])
 			->paginate(15, ['*'], 'saved');
 
 		return Inertia::render('users/all', [
@@ -124,7 +134,10 @@ class FriendController extends Controller {
 
 
 		return Inertia::render('users/user', [
-			'profile' => $user->only(['id', 'name', 'avatar', 'introduction', 'description']),
+			'user' => [
+				...$user->only(['id', 'name', 'avatar']),
+				'info' => Profile::where('user_id', $user->id)->select(Profile::$profileFields)->first(),
+			],
 			'worksPaginatedResponse' => $works,
 			'friendRequestStatus' => $status,
 		]);
