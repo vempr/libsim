@@ -69,6 +69,7 @@ function getBreadcrumbs(ShowWorkRequest $request, Work $work): array {
 	$collectionId = $validated['collection'] ?? null;
 	$userId = $validated['user'] ?? null;
 	$favorite = $validated['favorite'] ?? null;
+	$chat = $validated['chat'] ?? null;
 
 	$authUser = Auth::user();
 
@@ -112,6 +113,23 @@ function getBreadcrumbs(ShowWorkRequest $request, Work $work): array {
 		return [[
 			'title' => 'Favorited works',
 			'href' => '/works',
+		]];
+	}
+
+	if ($chat) {
+		$user = User::find($chat);
+
+		if (!$authUser->allFriends()->contains($user) && $user->id !== $authUser->id) {
+			dd('hello');
+			return $defaultBreadcrumbs;
+		}
+
+		return [[
+			'title' => 'Messages',
+			'href' => '/chat',
+		], [
+			'title' => $user->name,
+			'href' => "/chat/$user->id",
 		]];
 	}
 

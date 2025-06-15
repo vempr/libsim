@@ -146,7 +146,18 @@ export default function All() {
       <ul className="space-y-2">
         {messages.map((message) => (
           <li key={`${message.id}-${new Date(message.created_at).getTime()}`}>
-            {message.is_deleted ? (
+            {message.work?.id ? (
+              message.is_deleted ? (
+                <span className={message.sender.id === auth.user.id ? 'text-red-500' : 'text-red-800'}>[deleted] (ID: {message.id})</span>
+              ) : (
+                <Link
+                  href={`/works/${message.work.id}?chat=${friend.id}`}
+                  className={message.sender.id === auth.user.id ? 'text-blue-600' : 'text-gray-700'}
+                >
+                  {JSON.stringify(message)}
+                </Link>
+              )
+            ) : message.is_deleted ? (
               <span className={message.sender.id === auth.user.id ? 'text-red-500' : 'text-red-800'}>[deleted] (ID: {message.id})</span>
             ) : (
               <span className={message.sender.id === auth.user.id ? 'text-blue-600' : 'text-gray-700'}>{JSON.stringify(message)}</span>

@@ -22,6 +22,7 @@ class ShowWorkRequest extends FormRequest {
 			'collection' => 'nullable|uuid',
 			'user' => 'nullable|uuid',
 			'favorite' => 'nullable|in:true',
+			'chat' => 'nullable|uuid',
 		];
 	}
 }

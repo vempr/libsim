@@ -116,10 +116,6 @@ class ChatController extends Controller {
 		}
 
 		broadcast(new MessageSent($message));
-		// $message->load([
-		// 	'sender:id,name,avatar',
-		// 	'work:id,title,description,image,image_self',
-		// ]);
 
 		return back();
 	}
