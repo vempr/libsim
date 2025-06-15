@@ -75,6 +75,8 @@ export default function All() {
       created_at: getCurrentDateTime(),
       sender: {
         id: auth.user.id,
+        name: auth.user.name,
+        avatar: auth.user.avatar,
       },
     };
 

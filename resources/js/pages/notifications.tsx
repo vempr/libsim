@@ -1,7 +1,8 @@
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { type InertiaProps, type BreadcrumbItem, SharedData, Notification } from '@/types';
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, router, useForm, usePage } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -9,6 +10,8 @@ const breadcrumbs: BreadcrumbItem[] = [
     href: '/notifications',
   },
 ];
+
+const handleNotificationsReload = () => router.reload({ only: ['notifications'] });
 
 const NotificationFriend = ({ notification }: { notification: Notification }) => {
   const { post, processing, delete: destroy } = useForm();
@@ -22,6 +25,9 @@ const NotificationFriend = ({ notification }: { notification: Notification }) =>
             route('users.store', {
               receiver_id: notification.sender_id,
             }),
+            {
+              onSuccess: handleNotificationsReload,
+            },
           );
         }}
       >
@@ -40,6 +46,9 @@ const NotificationFriend = ({ notification }: { notification: Notification }) =>
             route('users.destroy', {
               receiver_id: notification.sender_id,
             }),
+            {
+              onSuccess: handleNotificationsReload,
+            },
           );
         }}
       >
@@ -67,6 +76,9 @@ const NotificationReminder = ({ notification }: { notification: Notification }) 
               route('notification.destroy', {
                 notification: notification.id,
               }),
+              {
+                onSuccess: handleNotificationsReload,
+              },
             );
           }}
         >
@@ -83,7 +95,29 @@ const NotificationReminder = ({ notification }: { notification: Notification }) 
 };
 
 export default function Notifications() {
-  const { notifications } = usePage<InertiaProps & SharedData>().props;
+  const { notifications: initialNotifications, auth } = usePage<InertiaProps & SharedData>().props;
+
+  const [notifications, setNotifications] = useState(initialNotifications);
+
+  useEffect(() => {
+    const channel = window.Echo.private(`notification.${auth.user.id}`);
+
+    channel.listen('NotificationSent', (e: any) => {
+      const incoming = e.notification as Notification;
+
+      if (incoming.receiver_id !== auth.user.id) return;
+
+      setNotifications((prev) => (prev ? [...prev, incoming] : [incoming]));
+    });
+
+    return () => {
+      channel.stopListening('NotificationSent');
+    };
+  }, []);
+
+  useEffect(() => {
+    setNotifications(initialNotifications);
+  }, [initialNotifications]);
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>

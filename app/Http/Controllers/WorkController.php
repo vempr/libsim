@@ -226,7 +226,7 @@ class WorkController extends Controller {
 		$authUser = Auth::user();
 
 		$profile = null;
-		if ($user->id === $authUser->id) {
+		if ($user->id !== $authUser->id) {
 			$profile = $user->only(['id', 'name', 'avatar', 'introduction', 'description']);
 		}
 

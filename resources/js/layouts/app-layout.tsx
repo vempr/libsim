@@ -1,5 +1,5 @@
 import AppLayoutTemplate from '@/layouts/app/app-sidebar-layout';
-import { InertiaProps, MessageEager, SharedData, type BreadcrumbItem } from '@/types';
+import { InertiaProps, MessageEager, Notification, SharedData, type BreadcrumbItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { useEffect, type ReactNode } from 'react';
 import { toast, Toaster } from 'sonner';
@@ -16,7 +16,9 @@ export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => {
   useEffect(() => {
     if (flash?.success) toast(flash.success);
     if (flash?.error) toast(flash.error);
+  }, [flash?.success, flash?.error]);
 
+  useEffect(() => {
     const channel = window.Echo.private(`chat.${auth.user.id}`);
     channel.listen('MessageSent', (e: any) => {
       const message = e.message as MessageEager;
@@ -25,7 +27,7 @@ export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => {
         toast('', {
           action: (
             <Link href={route('chat.show', { friend: message.sender.id })}>
-              {message.sender.name}: {message.text} View messages
+              {message.sender.name}: {message.text} View messages {JSON.stringify(message)}
             </Link>
           ),
         });
@@ -35,7 +37,24 @@ export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => {
     return () => {
       channel.stopListening('MessageSent');
     };
-  }, [flash?.success, flash?.error, currentRoute]);
+  }, [currentRoute]);
+
+  useEffect(() => {
+    const channel = window.Echo.private(`notification.${auth.user.id}`);
+    channel.listen('NotificationSent', (e: any) => {
+      const notification = e.notification as Notification;
+
+      if (currentRoute !== 'notification.index') {
+        toast('', {
+          action: <Link href={route('notification.index')}>{JSON.stringify(notification)}</Link>,
+        });
+      }
+    });
+
+    return () => {
+      channel.stopListening('NotificationSent');
+    };
+  }, [currentRoute]);
 
   return (
     <AppLayoutTemplate

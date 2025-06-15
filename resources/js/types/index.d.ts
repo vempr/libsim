@@ -60,8 +60,8 @@ export type FriendRequestStatus = 'mutual' | 'pending' | 'expecting' | null;
 export interface Notification {
   id: number;
   type: 'friend_request' | 'reminder';
-  sender_id: number;
-  receiver_id: number;
+  sender_id: string;
+  receiver_id: string;
   mood: 'positive' | 'negative' | 'neutral';
   title: string;
   description: string;
@@ -124,7 +124,7 @@ interface MessageEager {
   work: ChatWork | null;
   created_at: string;
   is_deleted: boolean;
-  sender: { id: string };
+  sender: ChatUser;
 }
 
 interface Message {
@@ -155,7 +155,7 @@ export interface InertiaProps extends Page<PageProps> {
   userQuery?: string | null;
   searchState?: SearchState;
 
-  notifications?: Notification[] | null;
+  notifications: Notification[] | null;
 
   friends: (ChatUser & { latest_message: Message })[];
   friend: ChatUser;

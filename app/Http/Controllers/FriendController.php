@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NotificationSent;
 use App\Models\FriendRequest;
 use App\Models\Notification;
 use App\Models\Profile;
@@ -170,7 +171,7 @@ class FriendController extends Controller {
 			User::find($receiverId)->friends()->attach($senderId);
 			$acceptRequest->delete();
 
-			Notification::create([
+			$notification = Notification::create([
 				'type' => 'reminder',
 				'sender_id' => $senderId,
 				'receiver_id' => $receiverId,
@@ -179,6 +180,8 @@ class FriendController extends Controller {
 				'description' => $sender->name . " and you are now friends. You can both see each other's works.",
 				'image' => $sender->avatar,
 			]);
+
+			broadcast(new NotificationSent($notification));
 
 			Notification::where('type', 'friend_request')
 				->where('sender_id', $receiverId)
@@ -193,7 +196,7 @@ class FriendController extends Controller {
 			'receiver_id' => $receiverId,
 		]);
 
-		Notification::create([
+		$notification = Notification::create([
 			'type' => 'friend_request',
 			'sender_id' => $senderId,
 			'receiver_id' => $receiverId,
@@ -202,6 +205,8 @@ class FriendController extends Controller {
 			'description' => $sender->name . " has sent you a friend request. They have 'share works' enabled.",
 			'image' => $sender->avatar,
 		]);
+
+		broadcast(new NotificationSent($notification));
 
 		return back()->with('success', 'Friend request sent.');
 	}
@@ -236,7 +241,7 @@ class FriendController extends Controller {
 		if ($pendingRequest) {
 			$pendingRequest->delete();
 
-			Notification::create([
+			$notification = Notification::create([
 				'type' => 'reminder',
 				'sender_id' => $authUser->id,
 				'receiver_id' => $receiverId,
@@ -245,6 +250,8 @@ class FriendController extends Controller {
 				'description' => $user->name . " has declined your friend request. You can not see each other's works.",
 				'image' => $user->avatar,
 			]);
+
+			broadcast(new NotificationSent($notification));
 
 			Notification::where('type', 'friend_request')
 				->where('sender_id', $receiverId)
@@ -257,7 +264,7 @@ class FriendController extends Controller {
 		$authUser->friends()->detach($user->id);
 		$user->friends()->detach($authUser->id);
 
-		Notification::create([
+		$notification = Notification::create([
 			'type' => 'reminder',
 			'sender_id' => $authUser->id,
 			'receiver_id' => $receiverId,
@@ -266,6 +273,8 @@ class FriendController extends Controller {
 			'description' => $user->name . " has unfriended you. You can no longer see each other's works.",
 			'image' => $user->avatar,
 		]);
+
+		broadcast(new NotificationSent($notification));
 
 		return back()->with('success', 'You have unfriended ' . $user->name . '.');
 	}
