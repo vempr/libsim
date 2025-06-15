@@ -24,7 +24,16 @@ const InputTags = React.forwardRef<HTMLInputElement, InputTagsProps>(
       () =>
         value
           .split(separator)
-          .map((tag) => (lowercase ? tag.trim().toLowerCase() : tag.trim()))
+          .map((tag) => {
+            tag = tag.trim();
+            if (uppercase) {
+              return tag[0].toUpperCase() + tag.slice(1);
+            }
+            if (lowercase) {
+              return tag.toLowerCase();
+            }
+            return tag;
+          })
           .filter((tag) => tag !== ''),
       [value, lowercase, uppercase, separator],
     );

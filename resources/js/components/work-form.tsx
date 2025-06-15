@@ -37,9 +37,12 @@ function fileSizeValidator(file: File) {
 export default function WorkForm({ image, setImage, form, onSubmit, editor }: WorkFormProps) {
   const [scale, setScale] = useState<number>(1);
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    setImage(acceptedFiles[0]);
-  }, []);
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      setImage(acceptedFiles[0]);
+    },
+    [setImage],
+  );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,

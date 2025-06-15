@@ -5,10 +5,11 @@ import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import AppLayout from '@/layouts/app-layout';
 import { type InertiaProps, type BreadcrumbItem, SharedData, MessageEager, ChatWork } from '@/types';
+import { MessageEvent } from '@/types/event';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, Link, useForm as useInertiaForm, usePage } from '@inertiajs/react';
 import { ChevronsUpDown } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -45,7 +46,6 @@ export default function All() {
   ];
 
   const [isFriendTyping, setIsFriendTyping] = useState(false);
-  let typingTimeout: NodeJS.Timeout;
 
   const { post, delete: destroy } = useInertiaForm();
   const {
@@ -92,11 +92,13 @@ export default function All() {
     });
   };
 
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   useEffect(() => {
     const channel = window.Echo.private(`chat.${auth.user.id}`);
 
-    channel.listen('MessageSent', (e: any) => {
-      const incoming = e.message as MessageEager;
+    channel.listen('MessageSent', (e: MessageEvent) => {
+      const incoming = e.message;
 
       const isRelevant =
         (incoming.sender.id === friend.id && incoming.receiver_id === auth.user.id) ||
@@ -106,27 +108,22 @@ export default function All() {
 
       setMessages((prev) => {
         const existingIndex = prev.findIndex((m) => m.id === incoming.id);
-
         if (existingIndex >= 0) {
           const newMessages = [...prev];
           newMessages[existingIndex] = incoming;
-
           return newMessages;
-        } else {
-          return [...prev, incoming].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
         }
+        return [...prev, incoming].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
       });
     });
 
-    channel.listenForWhisper('typing', (e: any) => {
+    channel.listenForWhisper('typing', (e: { user_id: string }) => {
       if (e.user_id === friend.id) {
         setIsFriendTyping(true);
-
-        if (typingTimeout) {
-          clearTimeout(typingTimeout);
+        if (typingTimeoutRef.current) {
+          clearTimeout(typingTimeoutRef.current);
         }
-
-        typingTimeout = setTimeout(() => {
+        typingTimeoutRef.current = setTimeout(() => {
           setIsFriendTyping(false);
         }, 1000);
       }
@@ -135,7 +132,7 @@ export default function All() {
     return () => {
       channel.stopListening('MessageSent');
       channel.stopListeningForWhisper('typing');
-      if (typingTimeout) clearTimeout(typingTimeout);
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
     };
   }, [friend.id, auth.user.id]);
 

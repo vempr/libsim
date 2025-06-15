@@ -1,5 +1,6 @@
 import AppLayoutTemplate from '@/layouts/app/app-sidebar-layout';
-import { InertiaProps, MessageEager, Notification, SharedData, type BreadcrumbItem } from '@/types';
+import { InertiaProps, SharedData, type BreadcrumbItem } from '@/types';
+import { MessageEvent, NotificationEvent } from '@/types/event';
 import { Link, usePage } from '@inertiajs/react';
 import { useEffect, type ReactNode } from 'react';
 import { toast, Toaster } from 'sonner';
@@ -20,8 +21,8 @@ export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => {
 
   useEffect(() => {
     const channel = window.Echo.private(`chat.${auth.user.id}`);
-    channel.listen('MessageSent', (e: any) => {
-      const message = e.message as MessageEager;
+    channel.listen('MessageSent', (e: MessageEvent) => {
+      const message = e.message;
 
       if (currentRoute !== 'chat.show') {
         toast('', {
@@ -37,12 +38,12 @@ export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => {
     return () => {
       channel.stopListening('MessageSent');
     };
-  }, [currentRoute]);
+  }, [currentRoute, auth.user.id]);
 
   useEffect(() => {
     const channel = window.Echo.private(`notification.${auth.user.id}`);
-    channel.listen('NotificationSent', (e: any) => {
-      const notification = e.notification as Notification;
+    channel.listen('NotificationSent', (e: NotificationEvent) => {
+      const notification = e.notification;
 
       if (currentRoute !== 'notification.index') {
         toast('', {
@@ -54,7 +55,7 @@ export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => {
     return () => {
       channel.stopListening('NotificationSent');
     };
-  }, [currentRoute]);
+  }, [currentRoute, auth.user.id]);
 
   return (
     <AppLayoutTemplate

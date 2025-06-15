@@ -2,6 +2,7 @@ import InertiaPagination from '@/components/inertia-pagination';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { type InertiaProps, type BreadcrumbItem, SharedData, Notification } from '@/types';
+import { NotificationEvent } from '@/types/event';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
@@ -103,8 +104,8 @@ export default function Notifications() {
   useEffect(() => {
     const channel = window.Echo.private(`notification.${auth.user.id}`);
 
-    channel.listen('NotificationSent', (e: any) => {
-      const incoming = e.notification as Notification;
+    channel.listen('NotificationSent', (e: NotificationEvent) => {
+      const incoming = e.notification;
 
       if (incoming.receiver_id !== auth.user.id) return;
 
@@ -114,7 +115,7 @@ export default function Notifications() {
     return () => {
       channel.stopListening('NotificationSent');
     };
-  }, []);
+  }, [auth.user.id]);
 
   useEffect(() => {
     setNotifications(notificationsPaginatedResponse.data);
