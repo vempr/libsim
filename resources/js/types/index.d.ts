@@ -124,7 +124,7 @@ interface MessageEager {
   work: ChatWork | null;
   created_at: string;
   is_deleted: boolean;
-  sender: ChatUser;
+  sender: { id: string };
 }
 
 interface Message {

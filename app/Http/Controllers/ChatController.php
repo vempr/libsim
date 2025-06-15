@@ -60,7 +60,7 @@ class ChatController extends Controller {
 
 			->with([
 				'sender' => function ($query) {
-					$query->select('id', 'avatar', 'name');
+					$query->select('id');
 				},
 				'work' => function ($query) {
 					$query->select('id', 'title', 'description', 'image_self', 'image');
@@ -116,6 +116,11 @@ class ChatController extends Controller {
 		}
 
 		broadcast(new MessageSent($message));
+		// $message->load([
+		// 	'sender:id,name,avatar',
+		// 	'work:id,title,description,image,image_self',
+		// ]);
+
 		return back();
 	}
 
@@ -125,7 +130,7 @@ class ChatController extends Controller {
 		}
 
 		$message->text = null;
-		$message->workId = null;
+		$message->work_id = null;
 		$message->is_deleted = true;
 		$message->save();
 

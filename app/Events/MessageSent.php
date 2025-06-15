@@ -36,12 +36,20 @@ class MessageSent implements ShouldBroadcastNow {
 				'id' => $this->message->id,
 				'receiver_id' => $this->message->receiver_id,
 				'text' => $this->message->text,
+				'work_id' => $this->message->work_id,
 				'created_at' => $this->message->created_at,
 				'is_deleted' => $this->message->is_deleted,
 				'sender' => [
 					'id' => $this->message->sender->id,
 					'name' => $this->message->sender->name,
 					'avatar' => $this->message->sender->avatar,
+				],
+				'work' => [
+					'id' => $this->message->work->id ?? null,
+					'title' => $this->message->work->title ?? null,
+					'description' => $this->message->work->description ?? null,
+					'image' => $this->message->work->image ?? null,
+					'image_self' => $this->message->work->image_self ?? null,
 				],
 			],
 		];

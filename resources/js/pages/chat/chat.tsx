@@ -75,8 +75,6 @@ export default function All() {
       created_at: getCurrentDateTime(),
       sender: {
         id: auth.user.id,
-        name: auth.user.name,
-        avatar: auth.user.avatar,
       },
     };
 
@@ -85,6 +83,7 @@ export default function All() {
     post(route('chat.store', { friend: friend.id, text }), {
       preserveScroll: true,
       onSuccess: (page) => {
+        console.log(page);
         const messages = page.props.messages as MessageEager[];
         setMessages(messages.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()));
       },
