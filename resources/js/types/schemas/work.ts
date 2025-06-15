@@ -27,7 +27,7 @@ export const readingStatuses = ['reading', 'completed', 'on hold', 'dropped'] as
 
 export const dbWorkSchema = z.object({
   id: z.string(),
-  user_id: z.number(),
+  user_id: z.string(),
   title: z.string(),
   description: z.string().nullable(),
   status_publication: z.enum(publicationStatuses).nullable(),
