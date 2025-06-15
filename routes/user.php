@@ -3,10 +3,6 @@
 use App\Http\Controllers\FriendController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/u', [FriendController::class, 'me'])
-	->middleware(['auth', 'verified'])
-	->name('users.me');
-
 Route::middleware(['auth', 'verified'])
 	->controller(FriendController::class)
 	->prefix('users')

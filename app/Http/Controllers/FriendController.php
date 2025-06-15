@@ -31,15 +31,6 @@ function getAcceptRequest(string $senderId, string $receiverId): FriendRequest|n
 class FriendController extends Controller {
 	use AuthorizesRequests;
 
-	public function me() {
-		return Inertia::render('users/me', [
-			'user' => [
-				...Auth::user()->only(['id', 'name', 'avatar']),
-				'info' => Profile::where('user_id', Auth::id())->select(Profile::$profileFields)->first(),
-			],
-		]);
-	}
-
 	public function index(Request $request) {
 		$validated = $request->validate([
 			'userQuery' => [
@@ -134,7 +125,7 @@ class FriendController extends Controller {
 
 
 		return Inertia::render('users/user', [
-			'user' => [
+			'profile' => [
 				...$user->only(['id', 'name', 'avatar']),
 				'info' => Profile::where('user_id', $user->id)->select(Profile::$profileFields)->first(),
 			],

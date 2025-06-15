@@ -158,10 +158,7 @@ export default function WorkForm({ image, setImage, form, onSubmit, editor }: Wo
             <FormItem>
               <FormLabel>Author</FormLabel>
               <FormControl>
-                <InputTags
-                  value={field.value ?? ''}
-                  onChange={(e) => field.onChange(e.target.value)}
-                />
+                <Input {...field} />
               </FormControl>
               <FormDescription>Use commas as separator for multiple names, optional, up to 255 characters.</FormDescription>
               <FormMessage />
@@ -290,7 +287,6 @@ export default function WorkForm({ image, setImage, form, onSubmit, editor }: Wo
                   pipeAsSeperator
                   {...field}
                   value={field.value ?? ''}
-                  onChange={(e) => field.onChange(e.target.value)}
                   children={<FormDescription>Enter links separated by pipe symbols |, optional, up to 3000 characters</FormDescription>}
                 />
               </FormControl>

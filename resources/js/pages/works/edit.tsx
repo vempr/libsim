@@ -47,9 +47,10 @@ export default function Edit() {
   });
 
   function onSubmit(values: z.infer<typeof workFormSchema>) {
+    const isDirty = form.formState.isDirty || work.tags !== values.tags || work.links !== values.links;
     const fileIsDirty = work.image !== image;
 
-    if (form.formState.isDirty || fileIsDirty) {
+    if (isDirty || fileIsDirty) {
       let i = null;
       if (fileIsDirty) {
         i = editor.current?.getImageScaledToCanvas().toDataURL();

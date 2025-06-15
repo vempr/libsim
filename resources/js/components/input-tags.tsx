@@ -6,6 +6,7 @@ import * as React from 'react';
 
 type InputTagsProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange'> & {
   lowercase?: boolean;
+  uppercase?: boolean;
   value: string;
   onChange: React.ChangeEventHandler<HTMLInputElement>;
   displayAsList?: boolean;
@@ -14,7 +15,7 @@ type InputTagsProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value' 
 };
 
 const InputTags = React.forwardRef<HTMLInputElement, InputTagsProps>(
-  ({ className, value = '', lowercase, onChange, displayAsList, children, pipeAsSeperator }, ref) => {
+  ({ className, value = '', lowercase, uppercase, onChange, displayAsList, children, pipeAsSeperator }, ref) => {
     const [pendingDataPoint, setPendingDataPoint] = React.useState('');
 
     const separator = pipeAsSeperator ? '|' : ',';
@@ -25,7 +26,7 @@ const InputTags = React.forwardRef<HTMLInputElement, InputTagsProps>(
           .split(separator)
           .map((tag) => (lowercase ? tag.trim().toLowerCase() : tag.trim()))
           .filter((tag) => tag !== ''),
-      [value, lowercase, separator],
+      [value, lowercase, uppercase, separator],
     );
 
     const updateTags = React.useCallback(
@@ -46,11 +47,21 @@ const InputTags = React.forwardRef<HTMLInputElement, InputTagsProps>(
 
     const addPendingDataPoint = React.useCallback(() => {
       if (pendingDataPoint.trim() !== '') {
-        const newTag = lowercase ? pendingDataPoint.trim().toLowerCase() : pendingDataPoint.trim();
+        let newTag;
+        const trimmedPendingDataPoint = pendingDataPoint.trim();
+
+        if (uppercase) {
+          newTag = trimmedPendingDataPoint[0].toUpperCase() + trimmedPendingDataPoint.slice(1);
+        } else if (lowercase) {
+          newTag = trimmedPendingDataPoint.toLowerCase();
+        } else {
+          newTag = trimmedPendingDataPoint;
+        }
+
         updateTags([...tags, newTag]);
         setPendingDataPoint('');
       }
-    }, [pendingDataPoint, tags, lowercase, updateTags]);
+    }, [pendingDataPoint, tags, lowercase, uppercase, updateTags]);
 
     React.useEffect(() => {
       if (pendingDataPoint.includes(separator)) {
@@ -58,13 +69,22 @@ const InputTags = React.forwardRef<HTMLInputElement, InputTagsProps>(
           ...tags,
           ...pendingDataPoint
             .split(separator)
-            .map((chunk) => (lowercase ? chunk.trim().toLowerCase() : chunk.trim()))
+            .map((chunk) => {
+              const trimmedChunk = chunk.trim();
+              if (uppercase) {
+                return trimmedChunk[0].toUpperCase() + trimmedChunk.slice(1);
+              }
+              if (lowercase) {
+                return trimmedChunk.toLowerCase();
+              }
+              return trimmedChunk;
+            })
             .filter(Boolean),
         ];
         updateTags(newTags);
         setPendingDataPoint('');
       }
-    }, [pendingDataPoint, tags, lowercase, separator, updateTags]);
+    }, [pendingDataPoint, tags, lowercase, uppercase, separator, updateTags]);
 
     const handleRemoveTag = (tagToRemove: string) => {
       updateTags(tags.filter((t) => t !== tagToRemove));

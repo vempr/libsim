@@ -2,6 +2,7 @@ import type { Page, PageProps } from '@inertiajs/inertia';
 import { LucideIcon } from 'lucide-react';
 import type { Config } from 'ziggy-js';
 
+import { ProfileFormInput } from './schemas/profile.js';
 import { Work } from './schemas/work.ts';
 
 export interface Auth {
@@ -28,22 +29,25 @@ export interface NavItem {
 export interface ChatUser {
   id: string;
   name: string;
-  avatar?: string;
+  avatar: string | null;
 }
 
-export interface ListUser extends ChatUser {
-  introduction?: string;
-}
-
-export interface ProfileUser extends ListUser {
-  description?: string;
-}
-
-export interface User extends ProfileUser {
+export interface User extends ChatUser {
   email: string;
   email_verified_at: string | null;
   hide_profile: boolean;
   private_works: boolean;
+}
+
+export interface ListUser extends ChatUser {
+  profile: {
+    introduction: string | null;
+    good_tags: string | null;
+  };
+}
+
+export interface ProfileUser extends ChatUser {
+  info: ProfileFormInput;
 }
 
 export interface FlashMessages {
@@ -135,12 +139,14 @@ interface Message {
 export interface InertiaProps extends Page<PageProps> {
   flash?: FlashMessages;
   user: User;
+  profile: ProfileUser;
   breadcrumbs: BreadcrumbItem[];
 
   collection: Collection;
   collections: Collection[];
 
   profile: ProfileUser;
+  info: ProfileFormInput;
   friendRequestStatus?: FriendRequestStatus;
 
   work: Work;
