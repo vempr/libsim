@@ -46,8 +46,5 @@ jobs:
       - name: Generate Application Key
         run: php artisan key:generate
 
-      - name: Start Reverb Server
-        run: php artisan reverb:start
-
       - name: Tests
         run: ./vendor/bin/pest

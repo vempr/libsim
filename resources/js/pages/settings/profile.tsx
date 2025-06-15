@@ -49,7 +49,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
         <div className="space-y-6">
           <div className="-mb-6 flex justify-between">
             <HeadingSmall
-              title="Profile information"
+              title="Account information"
               description="Update your username and email address"
             />
             <div>
@@ -116,7 +116,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
             )}
 
             <div className="flex items-center gap-4">
-              <Button disabled={processing}>Save profile information</Button>
+              <Button disabled={processing}>Save account information</Button>
 
               <Transition
                 show={recentlySuccessful}

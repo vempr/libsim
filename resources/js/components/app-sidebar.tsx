@@ -15,6 +15,11 @@ const mainNavItems: NavItem[] = [
     icon: LayoutGrid,
   },
   {
+    title: 'New entry',
+    href: '/works/new',
+    icon: ListPlus,
+  },
+  {
     title: 'Personal works',
     href: '/works',
     icon: Sparkles,
@@ -25,14 +30,14 @@ const mainNavItems: NavItem[] = [
     icon: LibraryBig,
   },
   {
-    title: 'Your profile',
-    href: '/u',
-    icon: CircleUser,
-  },
-  {
     title: 'Members',
     href: '/users',
     icon: Users,
+  },
+  {
+    title: 'Your profile',
+    href: '/u',
+    icon: CircleUser,
   },
   {
     title: 'Messages',
@@ -43,11 +48,6 @@ const mainNavItems: NavItem[] = [
     title: 'Notifications',
     href: '/notifications',
     icon: Bell,
-  },
-  {
-    title: 'New entry',
-    href: '/works/new',
-    icon: ListPlus,
   },
 ];
 
@@ -63,7 +63,7 @@ export function AppSidebar() {
   return (
     <Sidebar
       collapsible="icon"
-      variant="inset"
+      variant="floating"
     >
       <SidebarHeader>
         <SidebarMenu>
