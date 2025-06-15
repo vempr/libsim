@@ -155,7 +155,7 @@ export interface InertiaProps extends Page<PageProps> {
   userQuery?: string | null;
   searchState?: SearchState;
 
-  notifications: Notification[] | null;
+  notificationsPaginatedResponse: PaginatedResponse<Notification>;
 
   friends: (ChatUser & { latest_message: Message })[];
   friend: ChatUser;

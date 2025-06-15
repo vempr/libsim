@@ -1,3 +1,4 @@
+import InertiaPagination from '@/components/inertia-pagination';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { type InertiaProps, type BreadcrumbItem, SharedData, Notification } from '@/types';
@@ -95,9 +96,9 @@ const NotificationReminder = ({ notification }: { notification: Notification }) 
 };
 
 export default function Notifications() {
-  const { notifications: initialNotifications, auth } = usePage<InertiaProps & SharedData>().props;
+  const { notificationsPaginatedResponse, auth } = usePage<InertiaProps & SharedData>().props;
 
-  const [notifications, setNotifications] = useState(initialNotifications);
+  const [notifications, setNotifications] = useState(notificationsPaginatedResponse.data);
 
   useEffect(() => {
     const channel = window.Echo.private(`notification.${auth.user.id}`);
@@ -107,7 +108,7 @@ export default function Notifications() {
 
       if (incoming.receiver_id !== auth.user.id) return;
 
-      setNotifications((prev) => (prev ? [...prev, incoming] : [incoming]));
+      setNotifications((prev) => [...prev, incoming]);
     });
 
     return () => {
@@ -116,8 +117,10 @@ export default function Notifications() {
   }, []);
 
   useEffect(() => {
-    setNotifications(initialNotifications);
-  }, [initialNotifications]);
+    setNotifications(notificationsPaginatedResponse.data);
+  }, [notificationsPaginatedResponse]);
+
+  console.log(notificationsPaginatedResponse);
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
@@ -133,6 +136,8 @@ export default function Notifications() {
           </li>
         ))}
       </ul>
+
+      <InertiaPagination paginateItems={notificationsPaginatedResponse} />
     </AppLayout>
   );
 }

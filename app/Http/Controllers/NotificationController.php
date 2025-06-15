@@ -3,16 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Notification;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class NotificationController extends Controller {
 	public function index() {
-		$user = Auth::user();
+		$notifications = Notification::where('receiver_id', Auth::id())->paginate(20);
 
 		return Inertia::render('notifications', [
-			'notifications' => $user->notifications,
+			'notificationsPaginatedResponse' => $notifications,
 		]);
 	}
 
