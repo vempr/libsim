@@ -236,9 +236,9 @@ export default function All() {
                 {works.map((work) => (
                   <CommandItem
                     key={work.id}
-                    value={work.id}
-                    onSelect={(workId) => {
-                      const work = works.find((w) => w.id === workId) as ChatWork;
+                    value={work.title}
+                    onSelect={(workTitle) => {
+                      const work = works.find((w) => w.title === workTitle) as ChatWork;
 
                       const tempMessage = {
                         id: `temp-${Date.now()}`,
@@ -257,7 +257,7 @@ export default function All() {
                       setMessages((prev) => [...prev, tempMessage]);
 
                       setOpen(false);
-                      post(route('chat.store', { friend: friend.id, work_id: workId }), {
+                      post(route('chat.store', { friend: friend.id, work_id: work.id }), {
                         preserveScroll: true,
                         onSuccess: (page) => {
                           const messages = page.props.messages as MessageEager[];

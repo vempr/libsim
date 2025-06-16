@@ -18,6 +18,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
             asChild
             isActive={dashboard.href === page.url}
             tooltip={{ children: dashboard.title }}
+            size="sm"
           >
             <Link
               href={dashboard.href}
@@ -38,6 +39,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
               asChild
               isActive={item.href === page.url}
               tooltip={{ children: item.title }}
+              size="sm"
             >
               <Link
                 href={item.href}
@@ -59,6 +61,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
               asChild
               isActive={item.href === page.url}
               tooltip={{ children: item.title }}
+              size="sm"
             >
               <Link
                 href={item.href}
@@ -80,6 +83,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
               asChild
               isActive={item.href === page.url}
               tooltip={{ children: item.title }}
+              size="sm"
             >
               <Link
                 href={item.href}

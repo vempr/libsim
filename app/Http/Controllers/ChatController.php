@@ -22,33 +22,48 @@ class ChatController extends Controller {
 					$q->where('friend_id', $userId);
 				});
 		})
-			->select(['id', 'name', 'avatar'])
-			->get()
-			->map(function ($friend) use ($userId) {
-				$friend->latest_message = ChatMessage::where(function ($query) use ($userId, $friend) {
-					$query->where('sender_id', $userId)
-						->where('receiver_id', $friend->id);
-				})
-					->orWhere(function ($query) use ($userId, $friend) {
-						$query->where('sender_id', $friend->id)
-							->where('receiver_id', $userId);
-					})
-					->with(['work' => function ($query) {
-						$query->select('id', 'title', 'description', 'image_self', 'image');
-					}])
-					->orderBy('created_at', 'desc')
-					->first();
+			->select(['id', 'name', 'avatar', 'private_works'])
+			->get();
 
-				return $friend;
+		$friendIds = $friends->pluck('id');
+
+		$messages = ChatMessage::where(function ($q) use ($userId, $friendIds) {
+			$q->where('sender_id', $userId)
+				->whereIn('receiver_id', $friendIds);
+		})
+			->orWhere(function ($q) use ($userId, $friendIds) {
+				$q->whereIn('sender_id', $friendIds)
+					->where('receiver_id', $userId);
+			})
+			->orderBy('created_at', 'desc')
+			->with([
+				'work' => function ($query) {
+					$query->select('id', 'title', 'description', 'image_self', 'image');
+				}
+			])
+			->get()
+			->groupBy(function ($message) use ($userId) {
+				return $message->sender_id === $userId ? $message->receiver_id : $message->sender_id;
 			});
+
+		$friends->transform(function ($friend) use ($messages) {
+			$latestMessage = $messages->get($friend->id)?->first();
+
+			if ($latestMessage && $friend->private_works) {
+				$latestMessage->unsetRelation('work');
+			}
+
+			$friend->latest_message = $latestMessage;
+
+			return $friend;
+		});
 
 		return Inertia::render('chat/all', [
 			'friends' => $friends,
 		]);
 	}
-
 	public function show(User $friend) {
-		$messages = ChatMessage::query()
+		$query = ChatMessage::query()
 			->where(function ($query) use ($friend) {
 				$query->where('sender_id', Auth::id())
 					->where('receiver_id', $friend->id);
@@ -57,16 +72,19 @@ class ChatController extends Controller {
 				$query->where('sender_id', $friend->id)
 					->where('receiver_id', Auth::id());
 			})
-
 			->with([
-				'sender' => function ($query) {
-					$query->select('id');
-				},
+				'sender:id',
+			]);
+
+		if (!$friend->private_works) {
+			$query->with([
 				'work' => function ($query) {
 					$query->select('id', 'title', 'description', 'image_self', 'image');
-				},
-			])
-			->orderBy('created_at', 'asc')
+				}
+			]);
+		}
+
+		$messages = $query->orderBy('created_at', 'asc')
 			->get()
 			->makeHidden(['sender_id']);
 
@@ -75,7 +93,7 @@ class ChatController extends Controller {
 		return Inertia::render('chat/chat', [
 			'messages' => $messages,
 			'works' => $works,
-			'friend' => $friend->only(['id', 'name', 'avatar']),
+			'friend' => $friend->only(['id', 'name', 'avatar', 'private_works']),
 		]);
 	}
 
