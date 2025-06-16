@@ -1,3 +1,5 @@
+import AddWorksToCollection from '@/components/add-works-to-collection';
+import InertiaPagination from '@/components/inertia-pagination';
 import InputError from '@/components/input-error';
 import {
   AlertDialog,
@@ -27,7 +29,7 @@ const nameSchema = z.object({
 });
 
 export default function Collection() {
-  const { worksPaginatedResponse, collection } = usePage<InertiaProps>().props;
+  const { worksPaginatedResponse, collection, works } = usePage<InertiaProps>().props;
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -133,11 +135,18 @@ export default function Collection() {
         </AlertDialogContent>
       </AlertDialog>
 
+      <AddWorksToCollection
+        works={works}
+        collection={collection}
+      />
+
       {worksPaginatedResponse.data.map((work) => (
         <li>
           <Link href={`/works/${work.id}?collection=${collection.id}`}>{JSON.stringify(work)}</Link>
         </li>
       ))}
+
+      <InertiaPagination paginateItems={worksPaginatedResponse} />
     </AppLayout>
   );
 }

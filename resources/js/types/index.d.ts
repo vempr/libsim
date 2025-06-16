@@ -136,6 +136,13 @@ interface Message {
   is_deleted: boolean;
 }
 
+interface SimpleWork {
+  id: string;
+  title: string;
+  author: string;
+  collections: Collection[];
+}
+
 export interface InertiaProps extends Page<PageProps> {
   flash?: FlashMessages;
   user: User;
@@ -143,6 +150,7 @@ export interface InertiaProps extends Page<PageProps> {
   breadcrumbs: BreadcrumbItem[];
 
   collection: Collection;
+  works: SimpleWork[];
   collections: Collection[];
 
   profile: ProfileUser;

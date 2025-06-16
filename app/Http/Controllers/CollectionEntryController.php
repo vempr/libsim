@@ -4,84 +4,96 @@ namespace App\Http\Controllers;
 
 use App\Models\Collection;
 use App\Models\CollectionEntry;
-use App\Models\User;
 use App\Models\Work;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-function allowWork(string $id): bool {
-	$work = Work::find($id);
-	$creator = User::find($work->user_id);
-	$authUser = Auth::user();
-
-	return $creator->id === $authUser->id || $authUser->allFriends()->contains($creator);
-}
-
 class CollectionEntryController extends Controller {
-	public function __invoke(Request $request) {
+	public function updateMultiple(Request $request, Collection $collection) {
+		if ($collection->user_id !== Auth::id()) {
+			return back()->with('error', 'You do not own this collection.');
+		}
+
 		$validated = $request->validate([
-			'collection_ids' => 'array',
-			'collection_ids.*' => 'exists:collections,id',
-			'work_id' => 'required|exists:works,id',
+			'work_ids' => 'required|array',
+			'work_ids.*' => 'exists:works,id',
 		]);
 
-		$collectionIds = $validated['collection_ids'] ?? [];
-		$workId = $validated['work_id'];
-		$userId = Auth::id();
+		$workIds = $validated['work_ids'];
 
-		if (!allowWork($workId)) {
-			return back()->with('error', 'You don\'t have collection access to this work.');
-		}
-
-		$allUserCollections = Collection::where('user_id', $userId)
-			->pluck('name', 'id')
+		$existingWorkIds = CollectionEntry::where('collection_id', $collection->id)
+			->pluck('work_id')
 			->toArray();
 
-		if (count(array_intersect_key($allUserCollections, array_flip($collectionIds))) !== count($collectionIds)) {
-			return back()->with('error', 'Some collections were not found or don\'t belong to you.');
+		$toAdd = array_diff($workIds, $existingWorkIds);
+		$toRemove = array_diff($existingWorkIds, $workIds);
+
+		if ($toAdd) {
+			foreach ($toAdd as $workId) {
+				CollectionEntry::create([
+					'collection_id' => $collection->id,
+					'work_id' => $workId,
+				]);
+			}
 		}
 
-		$existingEntries = CollectionEntry::where('work_id', $workId)
-			->whereIn('collection_id', array_keys($allUserCollections))
-			->pluck('collection_id')
-			->toArray();
-
-		$newCollectionIds = array_diff($collectionIds, $existingEntries);
-		$collectionsToRemove = array_diff($existingEntries, $collectionIds);
-
-		if (!empty($collectionsToRemove)) {
-			CollectionEntry::where('work_id', $workId)
-				->whereIn('collection_id', $collectionsToRemove)
+		if ($toRemove) {
+			CollectionEntry::where('collection_id', $collection->id)
+				->whereIn('work_id', $toRemove)
 				->delete();
 		}
 
-		$addedCollectionNames = [];
-		if (!empty($newCollectionIds)) {
-			$entries = [];
-			foreach ($newCollectionIds as $collectionId) {
-				$entries[] = [
-					'collection_id' => $collectionId,
-					'work_id' => $workId,
-					'created_at' => now(),
-					'updated_at' => now(),
-				];
-			}
-			CollectionEntry::insert($entries);
-			$addedCollectionNames = array_intersect_key($allUserCollections, array_flip($newCollectionIds));
+		return back()->with('success', 'Collection successfully updated.');
+	}
+
+	public function updateSingle(Request $request, Work $work) {
+		if ($work->user_id !== Auth::id()) {
+			return back()->with('error', 'You do not have permission to update this work.');
 		}
 
-		$message = [];
-		if (!empty($collectionsToRemove)) {
-			$removedNames = array_intersect_key($allUserCollections, array_flip($collectionsToRemove));
-			$message[] = 'Removed from: "' . implode('", "', $removedNames) . '"';
-		}
-		if (!empty($addedCollectionNames)) {
-			$message[] = 'Added to: "' . implode('", "', $addedCollectionNames) . '"';
+		$validated = $request->validate([
+			'collection_ids' => 'nullable|array',
+			'collection_ids.*' => 'exists:collections,id',
+		]);
+
+		$collectionIds = $validated['collection_ids'] ?? null;
+		$userCollectionIds = Collection::where('user_id', Auth::id())
+			->pluck('id')
+			->toArray();
+
+		if (!$collectionIds) {
+			CollectionEntry::where('work_id', $work->id)->delete();
+			return back()->with('success', 'Collections successfully updated.');
 		}
 
-		return back()->with(
-			'success',
-			$message ? implode('. ', $message) : 'No changes made.'
+		$toAdd = array_diff($collectionIds, CollectionEntry::where('work_id', $work->id)
+			->pluck('collection_id')->toArray());
+
+		$toRemove = array_diff(
+			CollectionEntry::where('work_id', $work->id)
+				->whereIn('collection_id', $userCollectionIds)
+				->pluck('collection_id')
+				->toArray(),
+			$collectionIds
 		);
+
+		if ($toAdd) {
+			foreach ($toAdd as $collectionId) {
+				if (in_array($collectionId, $userCollectionIds)) {
+					CollectionEntry::create([
+						'collection_id' => $collectionId,
+						'work_id' => $work->id,
+					]);
+				}
+			}
+		}
+
+		if ($toRemove) {
+			CollectionEntry::where('work_id', $work->id)
+				->whereIn('collection_id', $toRemove)
+				->delete();
+		}
+
+		return back()->with('success', 'Collections successfully updated.');
 	}
 }

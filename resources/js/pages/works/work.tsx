@@ -65,8 +65,8 @@ export default function Work() {
 
   function onSubmit(data: CollectionForm) {
     put(
-      route('collection.entry.update', {
-        work_id: work.id,
+      route('collection.entry.update.single', {
+        work: work.id,
         collection_ids: data.selectedCollections,
       }),
     );

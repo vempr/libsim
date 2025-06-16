@@ -39,6 +39,7 @@ class CollectionController extends Controller {
 		return Inertia::render('collections/collection', [
 			'collection' => $collection->only(['id', 'name']),
 			'worksPaginatedResponse' => $works,
+			'works' => Auth::user()->works()->select('id', 'title', 'author')->with('collections:id,name')->get(),
 		]);
 	}
 

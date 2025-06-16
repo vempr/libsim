@@ -19,6 +19,7 @@ interface MultiSelectProps {
   placeholder?: string;
   emptyText?: string;
   className?: string;
+  hideNewCollectionSheet?: boolean;
 }
 
 export function MultiSelect({
@@ -27,6 +28,7 @@ export function MultiSelect({
   onChange,
   placeholder = 'Select options...',
   emptyText = 'No options found.',
+  hideNewCollectionSheet,
   className,
 }: MultiSelectProps) {
   const [open, setOpen] = React.useState(false);
@@ -88,17 +90,19 @@ export function MultiSelect({
                 onSelect={() => console.log('hi')}
                 className="p-0"
               >
-                <NewCollectionSheet>
-                  <Button
-                    onClick={() => console.log('hi')}
-                    className="m-0 flex w-full items-center"
-                    variant="outline"
-                    type="button"
-                  >
-                    <CirclePlus />
-                    <p className="sr-only">New collection</p>
-                  </Button>
-                </NewCollectionSheet>
+                {!hideNewCollectionSheet && (
+                  <NewCollectionSheet>
+                    <Button
+                      onClick={() => console.log('hi')}
+                      className="m-0 flex w-full items-center"
+                      variant="outline"
+                      type="button"
+                    >
+                      <CirclePlus />
+                      <p className="sr-only">New collection</p>
+                    </Button>
+                  </NewCollectionSheet>
+                )}
               </CommandItem>
             </CommandGroup>
           </CommandList>

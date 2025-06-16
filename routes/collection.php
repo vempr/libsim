@@ -4,9 +4,13 @@ use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\CollectionEntryController;
 use Illuminate\Support\Facades\Route;
 
-Route::put('/collections/work-update', CollectionEntryController::class)
-	->middleware(['auth', 'verified'])
-	->name('collection.entry.update');
+Route::middleware(['auth', 'verified'])
+	->controller(CollectionEntryController::class)
+	->prefix('collections-entries')
+	->group(function () {
+		Route::put('{collection}', 'updateMultiple')->name('collection.entry.update.multiple');
+		Route::put('/works/{work}', 'updateSingle')->name('collection.entry.update.single');
+	});
 
 Route::middleware(['auth', 'verified'])
 	->controller(CollectionController::class)
