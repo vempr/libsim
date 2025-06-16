@@ -1,6 +1,7 @@
 import { Icon } from '@/components/icon';
 import { SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
+import { ExternalLink } from 'lucide-react';
 import { type ComponentPropsWithoutRef } from 'react';
 
 export function NavFooter({
@@ -28,6 +29,7 @@ export function NavFooter({
                   href={item.href}
                   target="_blank"
                   rel="noopener noreferrer"
+                  className="flex gap-x-2"
                 >
                   {item.icon && (
                     <Icon
@@ -36,6 +38,7 @@ export function NavFooter({
                     />
                   )}
                   <span>{item.title}</span>
+                  <ExternalLink className="inline h-4 w-4" />
                 </a>
               </SidebarMenuButton>
             </SidebarMenuItem>

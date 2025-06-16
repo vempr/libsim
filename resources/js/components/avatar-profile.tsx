@@ -52,12 +52,12 @@ export default function AvatarProfile() {
     <Dialog>
       <DialogTrigger asChild>
         <button className="flex flex-col items-center hover:cursor-pointer hover:opacity-85 active:opacity-75">
-          <Avatar className="flex h-30 w-30 items-center overflow-hidden rounded-full">
+          <Avatar className="border-border flex h-30 w-30 items-center overflow-hidden rounded-full border">
             <AvatarImage
-              src={auth.user.avatar}
+              src={auth.user.avatar ?? undefined}
               alt={auth.user.name}
             />
-            <AvatarFallback className="rounded-lg bg-white text-red-600/80">
+            <AvatarFallback className="text-primary rounded-lg bg-white">
               <span className="text-5xl select-none">{getInitials(auth.user.name)}</span>
             </AvatarFallback>
           </Avatar>
