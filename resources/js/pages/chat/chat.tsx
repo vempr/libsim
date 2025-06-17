@@ -36,7 +36,7 @@ const chatForm = z.object({
 type Chat = z.infer<typeof chatForm>;
 
 export default function All() {
-  const { friend, messages: initialMessages, works, auth } = usePage<InertiaProps & SharedData>().props;
+  const { friend, messages: initialMessages, worksForChat, auth } = usePage<InertiaProps & SharedData>().props;
   const [messages, setMessages] = useState<MessageEager[]>(initialMessages);
   const [open, setOpen] = useState(false);
 
@@ -233,12 +233,12 @@ export default function All() {
             <CommandList>
               <CommandEmpty>No work found.</CommandEmpty>
               <CommandGroup>
-                {works.map((work) => (
+                {worksForChat.map((work) => (
                   <CommandItem
                     key={work.id}
                     value={work.title}
                     onSelect={(workTitle) => {
-                      const work = works.find((w) => w.title === workTitle) as ChatWork;
+                      const work = worksForChat.find((w) => w.title === workTitle) as ChatWork;
 
                       const tempMessage = {
                         id: `temp-${Date.now()}`,

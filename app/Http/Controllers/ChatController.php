@@ -92,7 +92,7 @@ class ChatController extends Controller {
 
 		return Inertia::render('chat/chat', [
 			'messages' => $messages,
-			'works' => $works,
+			'worksForChat' => $works,
 			'friend' => $friend->only(['id', 'name', 'avatar', 'private_works']),
 		]);
 	}
