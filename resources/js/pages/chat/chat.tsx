@@ -1,3 +1,4 @@
+import { AppSidebarHeader } from '@/components/app-sidebar-header';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
@@ -52,10 +53,21 @@ export default function All() {
   const [scrollPage, setScrollPage] = useState(2);
   const [scrollPageUrl, setScrollPageUrl] = useState(messagesPaginatedResponse.links[2].url);
   const [loadingNewMessages, setLoadingNewMessages] = useState(false);
+  const reachedFirstMessage = scrollPage + 1 !== messagesPaginatedResponse.links.length;
+  const [scrollToBottom, setScrollToBottom] = useState(true);
 
   useEffect(() => {
     setScrollPageUrl(messagesPaginatedResponse.links[scrollPage].url);
   }, [scrollPage]);
+
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (scrollToBottom && scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      setScrollToBottom(false);
+    }
+  }, [messages]);
 
   const { post, delete: destroy } = useInertiaForm();
   const {
@@ -90,6 +102,7 @@ export default function All() {
       },
     };
 
+    setScrollToBottom(true);
     setMessages((prev) => [...prev, tempMessage]);
 
     post(route('chat.store', { friend: friend.id, text }), {
@@ -121,6 +134,8 @@ export default function All() {
           newMessages[existingIndex] = incoming;
           return newMessages;
         }
+
+        setScrollToBottom(true);
         return [...prev, incoming].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
       });
     });
@@ -160,148 +175,163 @@ export default function All() {
   };
 
   return (
-    <AppLayout breadcrumbs={breadcrumbs}>
+    <AppLayout
+      breadcrumbs={breadcrumbs}
+      excludeAppSidebarHeader
+    >
       <Head title="Messages" />
 
-      {loadingNewMessages && <Spinner />}
-      {scrollPage + 1 !== messagesPaginatedResponse.links.length && !loadingNewMessages && (
-        <form onSubmit={onScrollSubmit}>
-          <Button type="submit">Load more messages</Button>
-        </form>
-      )}
+      <div className="flex h-screen flex-col">
+        <AppSidebarHeader breadcrumbs={breadcrumbs} />
 
-      <ul className="space-y-2">
-        {messages.map((message) => (
-          <li key={`${message.id}-${new Date(message.created_at).getTime()}`}>
-            {message.work?.id ? (
-              message.is_deleted ? (
-                <span className={message.sender.id === auth.user.id ? 'text-red-500' : 'text-red-800'}>[deleted] (ID: {message.id})</span>
-              ) : (
-                <Link
-                  href={`/works/${message.work.id}?chat=${friend.id}`}
-                  className={message.sender.id === auth.user.id ? 'text-blue-600' : 'text-gray-700'}
-                >
-                  {JSON.stringify(message)}
-                </Link>
-              )
-            ) : message.is_deleted ? (
-              <span className={message.sender.id === auth.user.id ? 'text-red-500' : 'text-red-800'}>[deleted] (ID: {message.id})</span>
-            ) : (
-              <span className={message.sender.id === auth.user.id ? 'text-blue-600' : 'text-gray-700'}>{JSON.stringify(message)}</span>
-            )}
+        <div
+          className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-track]:bg-neutral-700"
+          ref={scrollRef}
+        >
+          {loadingNewMessages && <Spinner />}
+          {reachedFirstMessage && !loadingNewMessages && (
+            <form onSubmit={onScrollSubmit}>
+              <Button type="submit">Load more messages</Button>
+            </form>
+          )}
 
-            {message.sender.id === auth.user.id && !message.is_deleted && (
-              <Button
-                variant="destructive"
-                onClick={() => {
-                  setMessages((prev) => prev.map((m) => (m.id === message.id ? { ...m, is_deleted: true } : m)));
+          <ul className="w-[40rem] space-y-2 overflow-scroll">
+            {messages.map((message) => (
+              <li key={`${message.id}-${new Date(message.created_at).getTime()}`}>
+                {message.work?.id ? (
+                  message.is_deleted ? (
+                    <span className={message.sender.id === auth.user.id ? 'text-red-500' : 'text-red-800'}>[deleted] (ID: {message.id})</span>
+                  ) : (
+                    <Link
+                      href={`/works/${message.work.id}?chat=${friend.id}`}
+                      className={message.sender.id === auth.user.id ? 'text-blue-600' : 'text-gray-700'}
+                    >
+                      {JSON.stringify(message)}
+                    </Link>
+                  )
+                ) : message.is_deleted ? (
+                  <span className={message.sender.id === auth.user.id ? 'text-red-500' : 'text-red-800'}>[deleted] (ID: {message.id})</span>
+                ) : (
+                  <span className={message.sender.id === auth.user.id ? 'text-blue-600' : 'text-gray-700'}>{JSON.stringify(message)}</span>
+                )}
 
-                  destroy(
-                    route('chat.destroy', {
-                      message: message.id,
-                    }),
-                    {
-                      preserveScroll: true,
-                    },
-                  );
-                }}
-              >
-                delete
-              </Button>
-            )}
-          </li>
-        ))}
-      </ul>
+                {message.sender.id === auth.user.id && !message.is_deleted && (
+                  <Button
+                    variant="destructive"
+                    onClick={() => {
+                      setMessages((prev) => prev.map((m) => (m.id === message.id ? { ...m, is_deleted: true } : m)));
 
-      {isFriendTyping && <p className="text-sm text-gray-500">{friend.name} is typing...</p>}
-
-      <form
-        onSubmit={handleSubmit(onChatSubmit)}
-        className="mt-4 space-y-2"
-      >
-        <Input
-          {...register('text')}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              handleSubmit(onChatSubmit);
-            } else {
-              window.Echo.private(`chat.${friend.id}`).whisper('typing', {
-                user_id: auth.user.id,
-              });
-            }
-          }}
-          placeholder="Type a message..."
-        />
-
-        {errors.text && <InputError message={errors.text.message} />}
-        <Button type="submit">Send</Button>
-      </form>
-
-      <Popover
-        open={open}
-        onOpenChange={setOpen}
-      >
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            role="combobox"
-            aria-expanded={open}
-            className="w-[200px] justify-between"
-          >
-            Share personal work...
-            <ChevronsUpDown className="opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-[200px] p-0">
-          <Command>
-            <CommandInput
-              placeholder="Search work..."
-              className="h-9"
-            />
-            <CommandList>
-              <CommandEmpty>No work found.</CommandEmpty>
-              <CommandGroup>
-                {worksForChat.map((work) => (
-                  <CommandItem
-                    key={work.id}
-                    value={work.title}
-                    onSelect={(workTitle) => {
-                      const work = worksForChat.find((w) => w.title === workTitle) as ChatWork;
-
-                      const tempMessage = {
-                        id: `temp-${Date.now()}`,
-                        receiver_id: friend.id,
-                        text: null,
-                        work,
-                        is_deleted: false,
-                        created_at: getCurrentDateTime(),
-                        sender: {
-                          id: auth.user.id,
-                          name: auth.user.name,
-                          avatar: auth.user.avatar,
+                      destroy(
+                        route('chat.destroy', {
+                          message: message.id,
+                        }),
+                        {
+                          preserveScroll: true,
                         },
-                      };
-
-                      setMessages((prev) => [...prev, tempMessage]);
-
-                      setOpen(false);
-                      post(route('chat.store', { friend: friend.id, work_id: work.id }), {
-                        preserveScroll: true,
-                        onSuccess: (page) => {
-                          const messages = page.props.messages as MessageEager[];
-                          setMessages(messages.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()));
-                        },
-                      });
+                      );
                     }}
                   >
-                    {work.title}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
+                    delete
+                  </Button>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div>
+          {isFriendTyping && <p className="text-sm text-gray-500">{friend.name} is typing...</p>}
+
+          <form
+            onSubmit={handleSubmit(onChatSubmit)}
+            className="mt-4 space-y-2"
+          >
+            <Input
+              {...register('text')}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleSubmit(onChatSubmit);
+                } else {
+                  window.Echo.private(`chat.${friend.id}`).whisper('typing', {
+                    user_id: auth.user.id,
+                  });
+                }
+              }}
+              placeholder="Type a message..."
+            />
+
+            {errors.text && <InputError message={errors.text.message} />}
+            <Button type="submit">Send</Button>
+          </form>
+
+          <Popover
+            open={open}
+            onOpenChange={setOpen}
+          >
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                role="combobox"
+                aria-expanded={open}
+                className="w-[200px] justify-between"
+              >
+                Share personal work...
+                <ChevronsUpDown className="opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[200px] p-0">
+              <Command>
+                <CommandInput
+                  placeholder="Search work..."
+                  className="h-9"
+                />
+                <CommandList>
+                  <CommandEmpty>No work found.</CommandEmpty>
+                  <CommandGroup>
+                    {worksForChat.map((work) => (
+                      <CommandItem
+                        key={work.id}
+                        value={work.title}
+                        onSelect={(workTitle) => {
+                          const work = worksForChat.find((w) => w.title === workTitle) as ChatWork;
+
+                          const tempMessage = {
+                            id: `temp-${Date.now()}`,
+                            receiver_id: friend.id,
+                            text: null,
+                            work,
+                            is_deleted: false,
+                            created_at: getCurrentDateTime(),
+                            sender: {
+                              id: auth.user.id,
+                              name: auth.user.name,
+                              avatar: auth.user.avatar,
+                            },
+                          };
+
+                          setScrollToBottom(true);
+                          setMessages((prev) => [...prev, tempMessage]);
+
+                          setOpen(false);
+                          post(route('chat.store', { friend: friend.id, work_id: work.id }), {
+                            preserveScroll: true,
+                            onSuccess: (page) => {
+                              const messages = page.props.messages as MessageEager[];
+                              setMessages(messages.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()));
+                            },
+                          });
+                        }}
+                      >
+                        {work.title}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
+        </div>
+      </div>
     </AppLayout>
   );
 }

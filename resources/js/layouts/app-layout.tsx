@@ -8,9 +8,10 @@ import { toast, Toaster } from 'sonner';
 interface AppLayoutProps {
   children: ReactNode;
   breadcrumbs?: BreadcrumbItem[];
+  excludeAppSidebarHeader?: boolean;
 }
 
-export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => {
+export default ({ children, breadcrumbs, excludeAppSidebarHeader, ...props }: AppLayoutProps) => {
   const { flash, auth } = usePage<InertiaProps & SharedData>().props;
   const currentRoute = route().current();
 
@@ -60,6 +61,7 @@ export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => {
   return (
     <AppLayoutTemplate
       breadcrumbs={breadcrumbs}
+      excludeAppSidebarHeader={excludeAppSidebarHeader}
       {...props}
     >
       {children}
