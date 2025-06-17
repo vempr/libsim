@@ -1,9 +1,12 @@
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
+import { shortenBreadcrumbs } from '@/lib/shorten';
 import { type BreadcrumbItem as BreadcrumbItemType } from '@/types';
 import { Link } from '@inertiajs/react';
 import { Fragment } from 'react';
 
 export function Breadcrumbs({ breadcrumbs }: { breadcrumbs: BreadcrumbItemType[] }) {
+  breadcrumbs = shortenBreadcrumbs(breadcrumbs);
+
   return (
     <>
       {breadcrumbs.length > 0 && (

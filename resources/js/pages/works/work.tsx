@@ -3,6 +3,7 @@ import { MultiSelect } from '@/components/multi-select';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { useIsMobile } from '@/hooks/use-mobile';
 import AppLayout from '@/layouts/app-layout';
 import { InertiaProps, SharedData, type BreadcrumbItem } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -29,13 +30,16 @@ export default function Work() {
 
   const isOwnWork = work.user_id === auth.user.id;
 
-  const breadcrumbs: BreadcrumbItem[] = [
-    ...bc,
-    {
-      title: work.title,
-      href: `/works/${work.id}`,
-    },
-  ];
+  const isMobile = useIsMobile();
+  const breadcrumbs: BreadcrumbItem[] = isMobile
+    ? bc
+    : [
+        ...bc,
+        {
+          title: work.title,
+          href: `/works/${work.id}`,
+        },
+      ];
 
   const editWork = <Link href={`/works/${work.id}/edit`}>Edit</Link>;
 
