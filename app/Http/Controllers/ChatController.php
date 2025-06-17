@@ -62,7 +62,12 @@ class ChatController extends Controller {
 			'friends' => $friends,
 		]);
 	}
-	public function show(User $friend) {
+
+	public function show(User $friend, Request $request) {
+		if (!Auth::user()->allFriends()->contains($friend)) {
+			return redirect(route('chat.index'));
+		}
+
 		$query = ChatMessage::query()
 			->where(function ($query) use ($friend) {
 				$query->where('sender_id', Auth::id())
@@ -84,31 +89,38 @@ class ChatController extends Controller {
 			]);
 		}
 
-		$messages = $query->orderBy('created_at', 'asc')
-			->get()
-			->makeHidden(['sender_id']);
+		$messages = $query->orderBy('created_at', 'desc')
+			->paginate(20)
+			->through(function ($message) {
+				return $message->makeHidden(['sender_id']);
+			});
+		$messages->setCollection($messages->getCollection()->reverse()->values());
+
+		if ($request->get('only_works')) {
+			return ['messagesPaginatedResponse' => $messages];
+		}
 
 		$works = Work::query()->where('user_id', Auth::id())->select('id', 'title', 'description', 'image_self', 'image')->get();
 
 		return Inertia::render('chat/chat', [
-			'messages' => $messages,
+			'messagesPaginatedResponse' => $messages,
 			'worksForChat' => $works,
 			'friend' => $friend->only(['id', 'name', 'avatar', 'private_works']),
 		]);
 	}
 
 	public function store(Request $request, User $friend) {
+		$user = Auth::user();
+		if (!$user->allFriends()->contains($friend)) {
+			return redirect(route('chat.index'));
+		}
+
 		$validated = $request->validate(['text' => 'max:1000', 'work_id' => 'exists:works,id']);
 		$text = $validated['text'] ?? null;
 		$workId = $validated['work_id'] ?? null;
 
 		if ($workId && $text) {
 			return back();
-		}
-
-		$user = Auth::user();
-		if (!$user->allFriends()->contains($friend)) {
-			return redirect(route('chat.index'));
 		}
 
 		$message = null;
@@ -141,6 +153,10 @@ class ChatController extends Controller {
 	public function destroy(ChatMessage $message) {
 		if ($message->sender_id !== Auth::id()) {
 			return redirect(route('chat.index'));
+		}
+
+		if ($message->is_deleted === true) {
+			return back()->with('error', 'Message already deleted.');
 		}
 
 		$message->text = null;

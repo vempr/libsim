@@ -29,7 +29,7 @@ const nameSchema = z.object({
 });
 
 export default function Collection() {
-  const { worksPaginatedResponse, collection, works } = usePage<InertiaProps>().props;
+  const { worksPaginatedResponse, collection, worksForCollection } = usePage<InertiaProps>().props;
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -136,7 +136,7 @@ export default function Collection() {
       </AlertDialog>
 
       <AddWorksToCollection
-        works={works}
+        works={worksForCollection}
         collection={collection}
       />
 

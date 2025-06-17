@@ -150,7 +150,7 @@ export interface InertiaProps extends Page<PageProps> {
   breadcrumbs: BreadcrumbItem[];
 
   collection: Collection;
-  works: SimpleWork[];
+  worksForCollection: SimpleWork[];
   collections: Collection[];
 
   profile: ProfileUser;
@@ -167,8 +167,8 @@ export interface InertiaProps extends Page<PageProps> {
 
   friends: (ChatUser & { latest_message: Message })[];
   friend: ChatUser;
-  messages: MessageEager[];
-  works: ChatWork[];
+  messagesPaginatedResponse: PaginatedResponse<MessageEager>;
+  worksForChat: ChatWork[];
 
   usersPaginatedResponse: PaginatedResponse<ListUser & { is_friend: number }>;
   friendsPaginatedResponse: PaginatedResponse<ListUser>;

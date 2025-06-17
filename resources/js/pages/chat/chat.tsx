@@ -3,11 +3,13 @@ import { Button } from '@/components/ui/button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import Spinner from '@/components/ui/spinner';
 import AppLayout from '@/layouts/app-layout';
-import { type InertiaProps, type BreadcrumbItem, SharedData, MessageEager, ChatWork } from '@/types';
+import { type InertiaProps, type BreadcrumbItem, SharedData, MessageEager, ChatWork, PaginatedResponse } from '@/types';
 import { MessageEvent } from '@/types/event';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, Link, useForm as useInertiaForm, usePage } from '@inertiajs/react';
+import axios from 'axios';
 import { ChevronsUpDown } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -36,16 +38,24 @@ const chatForm = z.object({
 type Chat = z.infer<typeof chatForm>;
 
 export default function All() {
-  const { friend, messages: initialMessages, worksForChat, auth } = usePage<InertiaProps & SharedData>().props;
-  const [messages, setMessages] = useState<MessageEager[]>(initialMessages);
-  const [open, setOpen] = useState(false);
+  const { friend, messagesPaginatedResponse, worksForChat, auth } = usePage<InertiaProps & SharedData>().props;
+  const [messages, setMessages] = useState<MessageEager[]>(messagesPaginatedResponse.data);
 
   const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Messages', href: '/chat' },
     { title: friend.name, href: `/chat/${friend.id}` },
   ];
 
+  const [open, setOpen] = useState(false);
   const [isFriendTyping, setIsFriendTyping] = useState(false);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [scrollPage, setScrollPage] = useState(2);
+  const [scrollPageUrl, setScrollPageUrl] = useState(messagesPaginatedResponse.links[2].url);
+  const [loadingNewMessages, setLoadingNewMessages] = useState(false);
+
+  useEffect(() => {
+    setScrollPageUrl(messagesPaginatedResponse.links[scrollPage].url);
+  }, [scrollPage]);
 
   const { post, delete: destroy } = useInertiaForm();
   const {
@@ -58,7 +68,7 @@ export default function All() {
     defaultValues: { text: '' },
   });
 
-  const onSubmit = (values: Chat) => {
+  const onChatSubmit = (values: Chat) => {
     const text = values.text.trim();
     if (!text.length) return;
 
@@ -91,8 +101,6 @@ export default function All() {
       },
     });
   };
-
-  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const channel = window.Echo.private(`chat.${auth.user.id}`);
@@ -136,11 +144,31 @@ export default function All() {
     };
   }, [friend.id, auth.user.id]);
 
+  const onScrollSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoadingNewMessages(true);
+
+    if (scrollPageUrl !== null) {
+      const response: {
+        data: { messagesPaginatedResponse: PaginatedResponse<MessageEager> };
+      } = await axios.get(scrollPageUrl, { params: { only_works: true } });
+
+      setLoadingNewMessages(false);
+      setMessages((prev) => [...response.data.messagesPaginatedResponse.data, ...prev]);
+      setScrollPage(scrollPage + 1);
+    }
+  };
+
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Messages" />
 
-      <Link href={`/users/${friend.id}`}>{friend.name}</Link>
+      {loadingNewMessages && <Spinner />}
+      {scrollPage + 1 !== messagesPaginatedResponse.links.length && !loadingNewMessages && (
+        <form onSubmit={onScrollSubmit}>
+          <Button type="submit">Load more messages</Button>
+        </form>
+      )}
 
       <ul className="space-y-2">
         {messages.map((message) => (
@@ -188,14 +216,14 @@ export default function All() {
       {isFriendTyping && <p className="text-sm text-gray-500">{friend.name} is typing...</p>}
 
       <form
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleSubmit(onChatSubmit)}
         className="mt-4 space-y-2"
       >
         <Input
           {...register('text')}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
-              handleSubmit(onSubmit);
+              handleSubmit(onChatSubmit);
             } else {
               window.Echo.private(`chat.${friend.id}`).whisper('typing', {
                 user_id: auth.user.id,
