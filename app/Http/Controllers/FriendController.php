@@ -95,7 +95,7 @@ class FriendController extends Controller {
 		]);
 	}
 
-	public function create(User $user) {
+	public function create(User $user, Request $request) {
 		if (Auth::id() === $user->id) {
 			return redirect('u');
 		}
@@ -119,15 +119,19 @@ class FriendController extends Controller {
 			$status = 'expecting';
 		}
 
-
 		if ($status === 'mutual' && $user->private_works === 0) {
 			$works = Work::query()->where('user_id', $user->id)->paginate(15);
 		}
 
+		if ($request->get('only_works')) {
+			return [
+				'worksPaginatedResponse' => $works,
+			];
+		}
 
 		return Inertia::render('users/user', [
 			'profile' => [
-				...$user->only(['id', 'name', 'avatar']),
+				...$user->only(['id', 'name', 'avatar', 'private_works']),
 				'info' => Profile::where('user_id', $user->id)->select(Profile::$profileFields)->first(),
 			],
 			'worksPaginatedResponse' => $works,
@@ -172,7 +176,7 @@ class FriendController extends Controller {
 			$acceptRequest->delete();
 
 			$notification = Notification::create([
-				'type' => 'reminder',
+				'type' => 'friend_request_response',
 				'sender_id' => $senderId,
 				'receiver_id' => $receiverId,
 				'mood' => 'positive',
@@ -242,7 +246,7 @@ class FriendController extends Controller {
 			$pendingRequest->delete();
 
 			$notification = Notification::create([
-				'type' => 'reminder',
+				'type' => 'friend_request_response',
 				'sender_id' => $authUser->id,
 				'receiver_id' => $receiverId,
 				'mood' => 'negative',
@@ -265,7 +269,7 @@ class FriendController extends Controller {
 		$user->friends()->detach($authUser->id);
 
 		$notification = Notification::create([
-			'type' => 'reminder',
+			'type' => 'friend_request_response',
 			'sender_id' => $authUser->id,
 			'receiver_id' => $receiverId,
 			'mood' => 'negative',

@@ -13,13 +13,14 @@ const breadcrumbs: BreadcrumbItem[] = [
   },
 ];
 
-const handleNotificationsReload = () => router.reload({ only: ['notifications'] });
+const handleNotificationsReload = () => router.reload({ only: ['notificationsPaginatedResponse'] });
 
 const NotificationFriend = ({ notification }: { notification: Notification }) => {
   const { post, processing, delete: destroy } = useForm();
 
   return (
     <div>
+      {JSON.stringify(notification)}
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -29,6 +30,7 @@ const NotificationFriend = ({ notification }: { notification: Notification }) =>
             }),
             {
               onSuccess: handleNotificationsReload,
+              preserveScroll: true,
             },
           );
         }}
@@ -50,6 +52,7 @@ const NotificationFriend = ({ notification }: { notification: Notification }) =>
             }),
             {
               onSuccess: handleNotificationsReload,
+              preserveScroll: true,
             },
           );
         }}
@@ -67,19 +70,23 @@ const NotificationFriend = ({ notification }: { notification: Notification }) =>
 
 const NotificationReminder = ({ notification }: { notification: Notification }) => {
   const { delete: destroy, processing } = useForm();
+  const [hide, setHide] = useState(false);
 
-  return (
-    <div>
-      {notification.type === 'reminder' && (
+  if (!hide)
+    return (
+      <div>
+        {JSON.stringify(notification)}
         <form
           onSubmit={(e) => {
             e.preventDefault();
+            setHide(true);
             destroy(
               route('notification.destroy', {
                 notification: notification.id,
               }),
               {
                 onSuccess: handleNotificationsReload,
+                preserveScroll: true,
               },
             );
           }}
@@ -91,9 +98,8 @@ const NotificationReminder = ({ notification }: { notification: Notification }) 
             Dismiss
           </Button>
         </form>
-      )}
-    </div>
-  );
+      </div>
+    );
 };
 
 export default function Notifications() {
@@ -109,7 +115,7 @@ export default function Notifications() {
 
       if (incoming.receiver_id !== auth.user.id) return;
 
-      setNotifications((prev) => [...prev, incoming]);
+      setNotifications((prev) => [incoming, ...prev]);
     });
 
     return () => {
@@ -121,8 +127,6 @@ export default function Notifications() {
     setNotifications(notificationsPaginatedResponse.data);
   }, [notificationsPaginatedResponse]);
 
-  console.log(notificationsPaginatedResponse);
-
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Notifications" />
@@ -130,10 +134,11 @@ export default function Notifications() {
       <ul>
         {notifications?.map((notification) => (
           <li key={notification.id}>
-            <p>{JSON.stringify(notification)}</p>
-            {notification.type === 'friend_request' && <NotificationFriend notification={notification} />}
-
-            {notification.type === 'reminder' && <NotificationReminder notification={notification} />}
+            {notification.type === 'friend_request' ? (
+              <NotificationFriend notification={notification} />
+            ) : (
+              <NotificationReminder notification={notification} />
+            )}
           </li>
         ))}
       </ul>

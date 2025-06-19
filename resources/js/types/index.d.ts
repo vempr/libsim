@@ -48,6 +48,7 @@ export interface ListUser extends ChatUser {
 
 export interface ProfileUser extends ChatUser {
   info: ProfileFormInput;
+  private_works: boolean;
 }
 
 export interface FlashMessages {
@@ -59,7 +60,7 @@ export type FriendRequestStatus = 'mutual' | 'pending' | 'expecting' | null;
 
 export interface Notification {
   id: number;
-  type: 'friend_request' | 'reminder';
+  type: 'friend_request' | 'friend_request_response' | 'reminder';
   sender_id: string;
   receiver_id: string;
   mood: 'positive' | 'negative' | 'neutral';
@@ -143,11 +144,39 @@ interface SimpleWork {
   collections: Collection[];
 }
 
+interface DashboardData {
+  worksCount: number;
+  latestWork: Work;
+  publicationStatuses: {
+    [k: string]: number;
+  };
+  readingStatuses: {
+    [k: string]: number;
+  };
+  originalLanguages: {
+    [k: string]: number;
+  };
+  translatedLanguages: {
+    [k: string]: number;
+  };
+  collectionsData: {
+    [k: string]: {
+      name: string;
+      count: number;
+    };
+  };
+  tags: {
+    [k: string]: number;
+  };
+}
+
 export interface InertiaProps extends Page<PageProps> {
   flash?: FlashMessages;
   user: User;
   profile: ProfileUser;
   breadcrumbs: BreadcrumbItem[];
+
+  dashboardData: DashboardData;
 
   collection: Collection;
   worksForCollection: SimpleWork[];
@@ -172,7 +201,7 @@ export interface InertiaProps extends Page<PageProps> {
 
   usersPaginatedResponse: PaginatedResponse<ListUser & { is_friend: number }>;
   friendsPaginatedResponse: PaginatedResponse<ListUser>;
-  worksPaginatedResponse: PaginatedResponse<Work>;
+  worksPaginatedResponse: PaginatedResponse<Work> | null;
   favoritesPaginatedResponse: PaginatedResponse<Work>;
   collectionsPaginatedResponse: PaginatedResponse<CollectionList>;
 

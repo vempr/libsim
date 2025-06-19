@@ -6,7 +6,6 @@ use App\Models\Work;
 use App\Models\Collection;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
-use Illuminate\Support\Str;
 
 function sortByValue(array $data, ?string $key = null): array {
 	if ($key === null) {
@@ -78,7 +77,7 @@ class DashboardController extends Controller {
 		$tags = $works->pluck('tags')
 			->filter()
 			->flatMap(function ($tags) {
-				return collect(explode(',', $tags))->map(fn($tag) => trim(Str::lower($tag)));
+				return collect(explode(',', $tags));
 			})
 			->filter()
 			->countBy()
