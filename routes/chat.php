@@ -11,5 +11,6 @@ Route::middleware(['auth', 'verified'])
 		Route::get('{friend}', 'show')->name('chat.show');
 
 		Route::post('{friend}', 'store')->name('chat.store');
+		Route::patch('{message}', 'update')->name('chat.update');
 		Route::delete('{message}', 'destroy')->name('chat.destroy');
 	});

@@ -40,27 +40,30 @@ type Chat = z.infer<typeof chatForm>;
 
 export default function All() {
   const { friend, messagesPaginatedResponse, worksForChat, auth } = usePage<InertiaProps & SharedData>().props;
-  const [messages, setMessages] = useState<MessageEager[]>(messagesPaginatedResponse.data);
 
   const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Messages', href: '/chat' },
     { title: friend.name, href: `/chat/${friend.id}` },
   ];
 
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLDivElement>(null);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const [messages, setMessages] = useState<MessageEager[]>(messagesPaginatedResponse.data);
+  const [messageInEdit, setMessageInEdit] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [isFriendTyping, setIsFriendTyping] = useState(false);
-  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [scrollPage, setScrollPage] = useState(2);
   const [scrollPageUrl, setScrollPageUrl] = useState(messagesPaginatedResponse.links[2].url);
   const [loadingNewMessages, setLoadingNewMessages] = useState(false);
-  const reachedFirstMessage = scrollPage + 1 !== messagesPaginatedResponse.links.length;
   const [scrollToBottom, setScrollToBottom] = useState(true);
+
+  const reachedFirstMessage = scrollPage + 1 !== messagesPaginatedResponse.links.length;
 
   useEffect(() => {
     setScrollPageUrl(messagesPaginatedResponse.links[scrollPage].url);
   }, [scrollPage]);
-
-  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (scrollToBottom && scrollRef.current) {
@@ -69,16 +72,19 @@ export default function All() {
     }
   }, [messages]);
 
-  const { post, delete: destroy } = useInertiaForm();
+  const { post, patch, delete: destroy } = useInertiaForm();
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
+    setValue,
   } = useForm<Chat>({
     resolver: zodResolver(chatForm),
     defaultValues: { text: '' },
   });
+
+  const textRegister = register('text');
 
   const onChatSubmit = (values: Chat) => {
     const text = values.text.trim();
@@ -86,33 +92,40 @@ export default function All() {
 
     reset();
 
-    const tempId = `temp-${Date.now()}`;
+    if (messageInEdit) {
+      patch(route('chat.update', { message: messageInEdit, text }), {
+        preserveScroll: true,
+      });
+    } else {
+      const tempId = `temp-${Date.now()}`;
+      let tempMessage = {
+        id: tempId,
+        receiver_id: friend.id,
+        text,
+        work: null,
+        is_deleted: false,
+        created_at: getCurrentDateTime(),
+        sender: {
+          id: auth.user.id,
+          name: auth.user.name,
+          avatar: auth.user.avatar,
+        },
+      };
 
-    let tempMessage = {
-      id: tempId,
-      receiver_id: friend.id,
-      text,
-      work: null,
-      is_deleted: false,
-      created_at: getCurrentDateTime(),
-      sender: {
-        id: auth.user.id,
-        name: auth.user.name,
-        avatar: auth.user.avatar,
-      },
-    };
+      setScrollToBottom(true);
+      setMessages((prev) => [...prev, tempMessage]);
 
-    setScrollToBottom(true);
-    setMessages((prev) => [...prev, tempMessage]);
+      post(route('chat.store', { friend: friend.id, text }), {
+        preserveScroll: true,
+        onSuccess: (page) => {
+          console.log(page);
+          const messages = page.props.messages as MessageEager[];
+          setMessages(messages.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()));
+        },
+      });
+    }
 
-    post(route('chat.store', { friend: friend.id, text }), {
-      preserveScroll: true,
-      onSuccess: (page) => {
-        console.log(page);
-        const messages = page.props.messages as MessageEager[];
-        setMessages(messages.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()));
-      },
-    });
+    setMessageInEdit(null);
   };
 
   useEffect(() => {
@@ -196,46 +209,63 @@ export default function All() {
           )}
 
           <ul className="w-[40rem] space-y-2 overflow-scroll">
-            {messages.map((message) => (
-              <li key={`${message.id}-${new Date(message.created_at).getTime()}`}>
-                {message.work?.id ? (
-                  message.is_deleted ? (
-                    <span className={message.sender.id === auth.user.id ? 'text-red-500' : 'text-red-800'}>[deleted] (ID: {message.id})</span>
+            {messages.map((message) => {
+              const authUserOwnsWork = message.sender.id === auth.user.id;
+              return (
+                <li key={`${message.id}-${new Date(message.created_at).getTime()}`}>
+                  {message.work?.id ? (
+                    message.is_deleted ? (
+                      <span className={authUserOwnsWork ? 'text-red-500' : 'text-red-800'}>[deleted] (ID: {message.id})</span>
+                    ) : (
+                      <Link
+                        href={`/works/${message.work.id}?chat=${friend.id}`}
+                        className={authUserOwnsWork ? 'text-blue-600' : 'text-gray-700'}
+                      >
+                        {JSON.stringify(message)}
+                      </Link>
+                    )
+                  ) : message.is_deleted ? (
+                    <span className={authUserOwnsWork ? 'text-red-500' : 'text-red-800'}>[deleted] (ID: {message.id})</span>
                   ) : (
-                    <Link
-                      href={`/works/${message.work.id}?chat=${friend.id}`}
-                      className={message.sender.id === auth.user.id ? 'text-blue-600' : 'text-gray-700'}
+                    <span className={authUserOwnsWork ? 'text-blue-600' : 'text-gray-700'}>{JSON.stringify(message)}</span>
+                  )}
+
+                  {authUserOwnsWork && !message.is_deleted && !message.work && (
+                    <Button
+                      variant="secondary"
+                      onClick={() => {
+                        setValue('text', message.text as string);
+                        setMessageInEdit(message.id);
+
+                        inputRef.current?.focus();
+                      }}
                     >
-                      {JSON.stringify(message)}
-                    </Link>
-                  )
-                ) : message.is_deleted ? (
-                  <span className={message.sender.id === auth.user.id ? 'text-red-500' : 'text-red-800'}>[deleted] (ID: {message.id})</span>
-                ) : (
-                  <span className={message.sender.id === auth.user.id ? 'text-blue-600' : 'text-gray-700'}>{JSON.stringify(message)}</span>
-                )}
+                      edit
+                    </Button>
+                  )}
 
-                {message.sender.id === auth.user.id && !message.is_deleted && (
-                  <Button
-                    variant="destructive"
-                    onClick={() => {
-                      setMessages((prev) => prev.map((m) => (m.id === message.id ? { ...m, is_deleted: true } : m)));
+                  {authUserOwnsWork && !message.is_deleted && (
+                    <Button
+                      variant="destructive"
+                      onClick={() => {
+                        setMessages((prev) => prev.map((m) => (m.id === message.id ? { ...m, is_deleted: true } : m)));
 
-                      destroy(
-                        route('chat.destroy', {
-                          message: message.id,
-                        }),
-                        {
-                          preserveScroll: true,
-                        },
-                      );
-                    }}
-                  >
-                    delete
-                  </Button>
-                )}
-              </li>
-            ))}
+                        destroy(
+                          route('chat.destroy', {
+                            message: message.id,
+                          }),
+                          {
+                            preserveScroll: true,
+                          },
+                        );
+                      }}
+                    >
+                      delete
+                    </Button>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         </div>
 
@@ -247,7 +277,6 @@ export default function All() {
             className="mt-4 space-y-2"
           >
             <Input
-              {...register('text')}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   handleSubmit(onChatSubmit);
@@ -258,6 +287,11 @@ export default function All() {
                 }
               }}
               placeholder="Type a message..."
+              {...textRegister}
+              ref={(input) => {
+                textRegister.ref(input);
+                inputRef.current = input;
+              }}
             />
 
             {errors.text && <InputError message={errors.text.message} />}

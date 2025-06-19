@@ -6,11 +6,14 @@ use App\Events\MessageSent;
 use App\Models\ChatMessage;
 use App\Models\User;
 use App\Models\Work;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class ChatController extends Controller {
+	use AuthorizesRequests;
+
 	public function index() {
 		$userId = Auth::id();
 
@@ -111,6 +114,7 @@ class ChatController extends Controller {
 
 	public function store(Request $request, User $friend) {
 		$user = Auth::user();
+		$userId = $user->id;
 		if (!$user->allFriends()->contains($friend)) {
 			return redirect(route('chat.index'));
 		}
@@ -126,12 +130,12 @@ class ChatController extends Controller {
 		$message = null;
 
 		if ($workId) {
-			if (Auth::id() !== Work::find($workId)->user_id) {
+			if ($userId !== Work::find($workId)->user_id) {
 				return back();
 			}
 
 			$message = ChatMessage::create([
-				'sender_id' => Auth::id(),
+				'sender_id' => $userId,
 				'receiver_id' => $friend->id,
 				'work_id' => $workId,
 			]);
@@ -139,7 +143,7 @@ class ChatController extends Controller {
 
 		if ($text) {
 			$message = ChatMessage::create([
-				'sender_id' => Auth::id(),
+				'sender_id' => $userId,
 				'receiver_id' => $friend->id,
 				'text' => $text,
 			]);
@@ -150,13 +154,22 @@ class ChatController extends Controller {
 		return back();
 	}
 
-	public function destroy(ChatMessage $message) {
-		if ($message->sender_id !== Auth::id()) {
+	public function update(ChatMessage $message, Request $request) {
+		if ($message->sender_id !== Auth::id() || $message->is_deleted === true) {
 			return redirect(route('chat.index'));
 		}
 
-		if ($message->is_deleted === true) {
-			return back()->with('error', 'Message already deleted.');
+		$message->text = $request->validate(['text' => 'required|max:1000'])['text'];
+		$message->save();
+
+		broadcast(new MessageSent($message));
+
+		return back();
+	}
+
+	public function destroy(ChatMessage $message) {
+		if ($message->sender_id !== Auth::id() || $message->is_deleted === true) {
+			return redirect(route('chat.index'));
 		}
 
 		$message->text = null;
