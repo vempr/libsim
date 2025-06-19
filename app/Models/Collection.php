@@ -28,4 +28,8 @@ class Collection extends Model {
 			->withPivot('removed_from_favorites')
 			->withTimestamps();
 	}
+
+	public function collectionEntries() {
+		return $this->hasMany(CollectionEntry::class);
+	}
 }

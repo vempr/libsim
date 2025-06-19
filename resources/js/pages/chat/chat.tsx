@@ -180,6 +180,7 @@ export default function All() {
 
     return () => {
       channel.stopListening('MessageSent');
+      channel.stopListening('MessageEdited');
       channel.stopListeningForWhisper('typing');
       if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
     };
