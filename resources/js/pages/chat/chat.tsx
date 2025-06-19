@@ -93,6 +93,7 @@ export default function All() {
     reset();
 
     if (messageInEdit) {
+      setMessages((prev) => prev.map((m) => (m.id === messageInEdit ? { ...m, text: text, updated_at: getCurrentDateTime() } : m)));
       patch(route('chat.update', { message: messageInEdit, text }), {
         preserveScroll: true,
       });
@@ -151,6 +152,18 @@ export default function All() {
         setScrollToBottom(true);
         return [...prev, incoming].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
       });
+    });
+
+    channel.listen('MessageEdited', (e: MessageEvent) => {
+      const incoming = e.message;
+
+      const isRelevant =
+        (incoming.sender.id === friend.id && incoming.receiver_id === auth.user.id) ||
+        (incoming.receiver_id === friend.id && incoming.sender.id === auth.user.id);
+
+      if (!isRelevant) return;
+
+      setMessages((prev) => prev.map((m) => (m.id === incoming.id ? incoming : m)));
     });
 
     channel.listenForWhisper('typing', (e: { user_id: string }) => {

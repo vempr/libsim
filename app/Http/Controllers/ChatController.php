@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\MessageEdited;
 use App\Events\MessageSent;
 use App\Models\ChatMessage;
 use App\Models\User;
@@ -162,7 +163,7 @@ class ChatController extends Controller {
 		$message->text = $request->validate(['text' => 'required|max:1000'])['text'];
 		$message->save();
 
-		broadcast(new MessageSent($message));
+		broadcast(new MessageEdited($message));
 
 		return back();
 	}
