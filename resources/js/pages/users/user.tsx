@@ -1,3 +1,4 @@
+import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import Spinner from '@/components/ui/spinner';
@@ -69,7 +70,7 @@ export default function Work() {
     return () => {
       channel.stopListening('NotificationSent');
     };
-  }, [auth.user.id]);
+  }, [auth.user.id, profile.id]);
 
   const {
     post,
@@ -142,10 +143,15 @@ export default function Work() {
         >
           <Button
             type="submit"
-            disabled={processing}
+            disabled={auth.user.hide_profile || processing}
           >
             Send friend request
           </Button>
+          {auth.user.hide_profile && (
+            <Link href={`${route('profile.edit')}#privacy-options`}>
+              <InputError message={'Please make your profile public to send friend requests.'} />
+            </Link>
+          )}
         </form>
       )}
 

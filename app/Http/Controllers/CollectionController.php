@@ -19,7 +19,7 @@ class CollectionController extends Controller {
 			->leftJoin('collection_entries', 'collections.id', '=', 'collection_entries.collection_id')
 			->selectRaw('MAX(collection_entries.created_at) as updated_at')
 			->groupBy('collections.id', 'collections.name', 'collections.created_at')
-			->paginate(15);
+			->paginate(30);
 
 		return Inertia::render('collections/all', [
 			'collectionsPaginatedResponse' => $collections,

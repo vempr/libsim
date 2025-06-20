@@ -192,18 +192,18 @@ export interface InertiaProps extends Page<PageProps> {
   userQuery?: string | null;
   searchState?: SearchState;
 
-  notificationsPaginatedResponse: PaginatedResponse<Notification>;
+  notificationsPaginatedResponse: PaginatedResponse<Notification> | null;
 
   friends: (ChatUser & { latest_message: Message })[];
   friend: ChatUser;
-  messagesPaginatedResponse: PaginatedResponse<MessageEager>;
+  messagesPaginatedResponse: PaginatedResponse<MessageEager> | null;
   worksForChat: ChatWork[];
 
-  usersPaginatedResponse: PaginatedResponse<ListUser & { is_friend: number }>;
-  friendsPaginatedResponse: PaginatedResponse<ListUser>;
+  usersPaginatedResponse: PaginatedResponse<ListUser & { is_friend: number }> | null;
+  friendsPaginatedResponse: PaginatedResponse<ListUser> | null;
   worksPaginatedResponse: PaginatedResponse<Work> | null;
-  favoritesPaginatedResponse: PaginatedResponse<Work>;
-  collectionsPaginatedResponse: PaginatedResponse<CollectionList>;
+  favoritesPaginatedResponse: PaginatedResponse<Work> | null;
+  collectionsPaginatedResponse: PaginatedResponse<CollectionList> | null;
 
   [key: string]: unknown;
 }

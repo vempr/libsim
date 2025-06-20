@@ -1,5 +1,7 @@
+import InertiaPagination from '@/components/inertia-pagination';
 import NewCollectionSheet from '@/components/new-collection-sheet';
 import AppLayout from '@/layouts/app-layout';
+import { hasOnePage } from '@/lib/pagination';
 import { BreadcrumbItem, InertiaProps } from '@/types';
 import { Head, usePage, Link } from '@inertiajs/react';
 
@@ -12,6 +14,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function All() {
   const { collectionsPaginatedResponse } = usePage<InertiaProps>().props;
+  const singlePage = hasOnePage(collectionsPaginatedResponse);
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
@@ -19,11 +22,13 @@ export default function All() {
 
       <NewCollectionSheet />
 
-      {collectionsPaginatedResponse.data.map((collection) => (
+      {collectionsPaginatedResponse?.data.map((collection) => (
         <li>
           <Link href={`/collections/${collection.id}`}>{JSON.stringify(collection)}</Link>
         </li>
       ))}
+
+      {!singlePage && collectionsPaginatedResponse && <InertiaPagination paginateItems={collectionsPaginatedResponse} />}
     </AppLayout>
   );
 }

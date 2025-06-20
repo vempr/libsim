@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import Spinner from '@/components/ui/spinner';
 import AppLayout from '@/layouts/app-layout';
+import { getCurrentDateTime } from '@/lib/date';
 import { type InertiaProps, type BreadcrumbItem, SharedData, MessageEager, ChatWork, PaginatedResponse } from '@/types';
 import { MessageEvent } from '@/types/event';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -15,22 +16,6 @@ import { ChevronsUpDown } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-
-function getCurrentDateTime() {
-  const now = new Date();
-
-  const pad = (n: number) => n.toString().padStart(2, '0');
-
-  const year = now.getFullYear();
-  const month = pad(now.getMonth() + 1);
-  const day = pad(now.getDate());
-
-  const hours = pad(now.getHours());
-  const minutes = pad(now.getMinutes());
-  const seconds = pad(now.getSeconds());
-
-  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-}
 
 const chatForm = z.object({
   text: z.string().max(1000),
@@ -50,27 +35,27 @@ export default function All() {
   const inputRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const [messages, setMessages] = useState<MessageEager[]>(messagesPaginatedResponse.data);
+  const [messages, setMessages] = useState<MessageEager[] | undefined>(messagesPaginatedResponse?.data);
   const [messageInEdit, setMessageInEdit] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [isFriendTyping, setIsFriendTyping] = useState(false);
   const [scrollPage, setScrollPage] = useState(2);
-  const [scrollPageUrl, setScrollPageUrl] = useState(messagesPaginatedResponse.links[2].url);
+  const [scrollPageUrl, setScrollPageUrl] = useState(messagesPaginatedResponse?.links[2].url);
   const [loadingNewMessages, setLoadingNewMessages] = useState(false);
   const [scrollToBottom, setScrollToBottom] = useState(true);
 
-  const reachedFirstMessage = scrollPage + 1 !== messagesPaginatedResponse.links.length;
+  const reachedFirstMessage = scrollPage + 1 !== messagesPaginatedResponse?.links.length;
 
   useEffect(() => {
-    setScrollPageUrl(messagesPaginatedResponse.links[scrollPage].url);
-  }, [scrollPage]);
+    setScrollPageUrl(messagesPaginatedResponse?.links[scrollPage].url);
+  }, [scrollPage, messagesPaginatedResponse?.links]);
 
   useEffect(() => {
     if (scrollToBottom && scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
       setScrollToBottom(false);
     }
-  }, [messages]);
+  }, [messages, scrollToBottom]);
 
   const { post, patch, delete: destroy } = useInertiaForm();
   const {
@@ -93,12 +78,17 @@ export default function All() {
     reset();
 
     if (messageInEdit) {
-      setMessages((prev) => prev.map((m) => (m.id === messageInEdit ? { ...m, text: text, updated_at: getCurrentDateTime() } : m)));
+      setMessages((prev) => {
+        const olderMessages = prev as MessageEager[];
+
+        return olderMessages.map((m) => (m.id === messageInEdit ? { ...m, text: text, updated_at: getCurrentDateTime() } : m));
+      });
       patch(route('chat.update', { message: messageInEdit, text }), {
         preserveScroll: true,
       });
     } else {
       const tempId = `temp-${Date.now()}`;
+
       let tempMessage = {
         id: tempId,
         receiver_id: friend.id,
@@ -114,7 +104,7 @@ export default function All() {
       };
 
       setScrollToBottom(true);
-      setMessages((prev) => [...prev, tempMessage]);
+      setMessages((prev) => (prev ? [...prev, tempMessage] : [tempMessage]));
 
       post(route('chat.store', { friend: friend.id, text, temp_id: tempId }), {
         preserveScroll: true,
@@ -141,15 +131,17 @@ export default function All() {
       if (!isRelevant) return;
 
       setMessages((prev) => {
-        const existingIndex = prev.findIndex((m) => m.id === incoming.id);
+        const messages = prev as MessageEager[];
+
+        const existingIndex = messages.findIndex((m) => m.id === incoming.id);
         if (existingIndex >= 0) {
-          const newMessages = [...prev];
+          const newMessages = [...messages];
           newMessages[existingIndex] = incoming;
           return newMessages;
         }
 
         setScrollToBottom(true);
-        return [...prev, incoming].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+        return [...messages, incoming].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
       });
     });
 
@@ -162,7 +154,11 @@ export default function All() {
 
       if (!isRelevant) return;
 
-      setMessages((prev) => prev.map((m) => (m.id === incoming.id ? incoming : m)));
+      setMessages((prev) => {
+        const messages = prev as MessageEager[];
+
+        return messages.map((m) => (m.id === incoming.id ? incoming : m));
+      });
     });
 
     channel.listenForWhisper('typing', (e: { user_id: string }) => {
@@ -189,13 +185,16 @@ export default function All() {
     e.preventDefault();
     setLoadingNewMessages(true);
 
-    if (scrollPageUrl !== null) {
+    if (scrollPageUrl) {
       const response: {
         data: { messagesPaginatedResponse: PaginatedResponse<MessageEager> };
       } = await axios.get(scrollPageUrl, { params: { only_works: true } });
 
       setLoadingNewMessages(false);
-      setMessages((prev) => [...response.data.messagesPaginatedResponse.data, ...prev]);
+      setMessages((prev) => {
+        const messages = prev as MessageEager[];
+        return [...response.data.messagesPaginatedResponse.data, ...messages];
+      });
       setScrollPage(scrollPage + 1);
     }
   };
@@ -222,7 +221,7 @@ export default function All() {
           )}
 
           <ul className="w-[40rem] space-y-2 overflow-scroll">
-            {messages.map((message) => {
+            {messages?.map((message) => {
               const authUserOwnsWork = message.sender.id === auth.user.id;
               return (
                 <li key={`${message.id}-${new Date(message.created_at).getTime()}`}>
@@ -261,7 +260,10 @@ export default function All() {
                     <Button
                       variant="destructive"
                       onClick={() => {
-                        setMessages((prev) => prev.map((m) => (m.id === message.id ? { ...m, is_deleted: true } : m)));
+                        setMessages((prev) => {
+                          const messages = prev as MessageEager[];
+                          return messages.map((m) => (m.id === message.id ? { ...m, is_deleted: true } : m));
+                        });
 
                         destroy(
                           route('chat.destroy', {
@@ -357,14 +359,16 @@ export default function All() {
                           };
 
                           setScrollToBottom(true);
-                          setMessages((prev) => [...prev, tempMessage]);
+                          setMessages((prev) => (prev ? [...prev, tempMessage] : [tempMessage]));
 
                           setOpen(false);
                           post(route('chat.store', { friend: friend.id, work_id: work.id }), {
                             preserveScroll: true,
                             onSuccess: (page) => {
-                              const messages = page.props.messages as MessageEager[];
-                              setMessages(messages.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()));
+                              const messages = page.props.messagesPaginatedResponse as PaginatedResponse<MessageEager>;
+
+                              console.log(messages.data);
+                              setMessages(messages.data);
                             },
                           });
                         }}

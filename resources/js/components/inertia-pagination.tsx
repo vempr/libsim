@@ -41,6 +41,7 @@ export default function InertiaPagination<T>({ paginateItems }: PaginationProps<
               <PaginationLink
                 href={link.url ?? '#'}
                 isActive={link.active}
+                disabled={link.active}
               >
                 {link.label}
               </PaginationLink>

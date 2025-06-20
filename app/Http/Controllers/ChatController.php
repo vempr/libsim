@@ -27,7 +27,7 @@ class ChatController extends Controller {
 				});
 		})
 			->select(['id', 'name', 'avatar', 'private_works'])
-			->get();
+			->paginate(30);
 
 		$friendIds = $friends->pluck('id');
 
@@ -63,7 +63,7 @@ class ChatController extends Controller {
 		});
 
 		return Inertia::render('chat/all', [
-			'friends' => $friends,
+			'friendsPaginatedResponse' => $friends,
 		]);
 	}
 

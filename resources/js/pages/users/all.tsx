@@ -102,7 +102,7 @@ export default function All() {
         </TabsList>
         <TabsContent value="others">
           <ul>
-            {usersPaginatedResponse.data.map((user) => {
+            {usersPaginatedResponse?.data.map((user) => {
               if (user.is_friend) {
                 return (
                   <li>
@@ -122,11 +122,11 @@ export default function All() {
               );
             })}
           </ul>
-          <InertiaPagination paginateItems={usersPaginatedResponse} />
+          {usersPaginatedResponse && <InertiaPagination paginateItems={usersPaginatedResponse} />}
         </TabsContent>
         <TabsContent value="friends">
           <ul>
-            {friendsPaginatedResponse.data.map((friend) => (
+            {friendsPaginatedResponse?.data.map((friend) => (
               <li>
                 <Link
                   href={`/users/${friend.id}`}
@@ -137,7 +137,7 @@ export default function All() {
               </li>
             ))}
           </ul>
-          <InertiaPagination paginateItems={friendsPaginatedResponse} />
+          {friendsPaginatedResponse && <InertiaPagination paginateItems={friendsPaginatedResponse} />}
         </TabsContent>
       </Tabs>
     </AppLayout>

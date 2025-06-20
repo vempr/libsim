@@ -32,7 +32,7 @@ export default function Work() {
 
   const isMobile = useIsMobile();
   const breadcrumbs: BreadcrumbItem[] = isMobile
-    ? bc
+    ? [...bc, { title: "Friend's work", href: '' }]
     : [
         ...bc,
         {

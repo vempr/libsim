@@ -1,5 +1,5 @@
 import AppLayout from '@/layouts/app-layout';
-import { InertiaProps, type BreadcrumbItem } from '@/types';
+import { InertiaProps, SharedData, type BreadcrumbItem } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -10,14 +10,14 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Dashboard() {
-  const { auth, dashboardData } = usePage<InertiaProps>().props;
+  const { auth, dashboardData } = usePage<InertiaProps & SharedData>().props;
 
   console.log(dashboardData);
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Dashboard" />
-
+      hi {auth.user.name}
       {JSON.stringify(Object.entries(dashboardData.tags).sort((a, b) => b[1] - a[1]))}
     </AppLayout>
   );

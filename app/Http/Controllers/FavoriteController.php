@@ -15,6 +15,10 @@ class FavoriteController extends Controller {
 			return back();
 		}
 
+		if (!Auth::user()->friends()->where('friend_id', $work->user_id)->exists()) {
+			return back()->with('error', 'You can only favorite entries created by your friends.');
+		}
+
 		$user->favoriteWorks()->attach($id);
 		DB::table('collection_entries')->where('work_id', $id)->update(['removed_from_favorites' => false]);
 

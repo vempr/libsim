@@ -40,7 +40,7 @@ type PaginationLinkProps = {
 } & Pick<React.ComponentProps<typeof Button>, 'size'> &
   Omit<React.ComponentProps<typeof Link>, 'size'>;
 
-function PaginationLink({ className, isActive, size = 'icon', ...props }: PaginationLinkProps) {
+function PaginationLink({ className, isActive, size = 'icon', disabled = false, ...props }: PaginationLinkProps) {
   return (
     <Link
       aria-current={isActive ? 'page' : undefined}
@@ -52,6 +52,7 @@ function PaginationLink({ className, isActive, size = 'icon', ...props }: Pagina
           size,
         }),
         className,
+				disabled && 'cursor-not-allowed opacity-50 pointer-events-none'
       )}
       {...props}
     />

@@ -46,7 +46,10 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
       <Head title="Profile settings" />
 
       <SettingsLayout>
-        <div className="space-y-6">
+        <div
+          className="space-y-6"
+          id="account-information"
+        >
           <div className="-mb-6 flex justify-between">
             <HeadingSmall
               title="Account information"

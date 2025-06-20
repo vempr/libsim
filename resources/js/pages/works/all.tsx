@@ -52,24 +52,24 @@ export default function All() {
         <TabsContent value="own-works">
           <ul>
             OWN WORKS
-            {worksPaginatedResponse.data.map((work) => (
+            {worksPaginatedResponse?.data.map((work) => (
               <li>
                 <Link href={`/works/${work.id}`}>{JSON.stringify(work)}</Link>
               </li>
             ))}
           </ul>
-          <InertiaPagination paginateItems={worksPaginatedResponse} />
+          {worksPaginatedResponse && <InertiaPagination paginateItems={worksPaginatedResponse} />}
         </TabsContent>
         <TabsContent value="favorited-works">
           <ul>
             FAVORITED WORKS
-            {favoritesPaginatedResponse.data.map((favorite) => (
+            {favoritesPaginatedResponse?.data.map((favorite) => (
               <li>
                 <Link href={`/works/${favorite.id}?favorite=true`}>{JSON.stringify(favorite)}</Link>
               </li>
             ))}
           </ul>
-          <InertiaPagination paginateItems={favoritesPaginatedResponse} />
+          {favoritesPaginatedResponse && <InertiaPagination paginateItems={favoritesPaginatedResponse} />}
         </TabsContent>
       </Tabs>
     </AppLayout>

@@ -37,7 +37,10 @@ export default function UpdatePrivacy() {
   }
 
   return (
-    <div className="space-y-6">
+    <div
+      className="space-y-6"
+      id="privacy-options"
+    >
       <HeadingSmall
         title="Privacy options"
         description="Update profile and work visibility"

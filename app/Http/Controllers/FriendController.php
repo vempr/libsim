@@ -74,7 +74,12 @@ class FriendController extends Controller {
 			}])
 			->paginate(15, ['*'], 'users');
 
-		$friends = User::where(function ($query) {
+		$fq = User::query();
+		if ($q) {
+			$fq->where('name', 'like', '%' . $q . '%');
+		}
+
+		$friends = $fq->where(function ($query) {
 			$query->whereHas('friendsOf', function ($q) {
 				$q->where('user_id', Auth::id());
 			})
@@ -105,7 +110,7 @@ class FriendController extends Controller {
 		$status = null;
 		$works = null;
 
-		if ($user->hide_profile === 1) {
+		if ($user->hide_profile === 1 && !areFriends($receiverId)) {
 			return redirect('users');
 		}
 
@@ -155,10 +160,10 @@ class FriendController extends Controller {
 		$receiverId = $validated['receiver_id'];
 		$receiver = User::find($receiverId);
 
-		if ($receiver === null) {
-			return redirect('users');
+		if ($sender->hide_profile === 1) {
+			return back()->with('error', 'Please make your profile public to send friend requests.');
 		}
-		if ($receiver->hide_profile === 1) {
+		if ($receiver === null) {
 			return redirect('users');
 		}
 

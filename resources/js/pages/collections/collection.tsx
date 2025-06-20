@@ -140,13 +140,13 @@ export default function Collection() {
         collection={collection}
       />
 
-      {worksPaginatedResponse.data.map((work) => (
+      {worksPaginatedResponse?.data.map((work) => (
         <li>
           <Link href={`/works/${work.id}?collection=${collection.id}`}>{JSON.stringify(work)}</Link>
         </li>
       ))}
 
-      <InertiaPagination paginateItems={worksPaginatedResponse} />
+      {worksPaginatedResponse && <InertiaPagination paginateItems={worksPaginatedResponse} />}
     </AppLayout>
   );
 }

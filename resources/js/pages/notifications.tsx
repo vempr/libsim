@@ -73,7 +73,7 @@ const NotificationReminder = ({
   setNotifications,
 }: {
   notification: Notification;
-  setNotifications: React.Dispatch<React.SetStateAction<[] | Notification[]>>;
+  setNotifications: React.Dispatch<React.SetStateAction<[] | Notification[] | undefined>>;
 }) => {
   const { delete: destroy, processing } = useForm();
   const [hide, setHide] = useState(false);
@@ -114,7 +114,7 @@ const NotificationReminder = ({
 export default function Notifications() {
   const { notificationsPaginatedResponse, auth } = usePage<InertiaProps & SharedData>().props;
 
-  const [notifications, setNotifications] = useState(notificationsPaginatedResponse.data);
+  const [notifications, setNotifications] = useState(notificationsPaginatedResponse?.data);
 
   useEffect(() => {
     const channel = window.Echo.private(`notification.${auth.user.id}`);
@@ -124,7 +124,7 @@ export default function Notifications() {
 
       if (incoming.receiver_id !== auth.user.id) return;
 
-      setNotifications((prev) => [incoming, ...prev]);
+      setNotifications((prev) => (prev ? [incoming, ...prev] : [incoming]));
     });
 
     return () => {
@@ -133,7 +133,7 @@ export default function Notifications() {
   }, [auth.user.id]);
 
   useEffect(() => {
-    setNotifications(notificationsPaginatedResponse.data);
+    setNotifications(notificationsPaginatedResponse?.data);
   }, [notificationsPaginatedResponse]);
 
   return (
@@ -155,7 +155,7 @@ export default function Notifications() {
         ))}
       </ul>
 
-      <InertiaPagination paginateItems={notificationsPaginatedResponse} />
+      {notificationsPaginatedResponse && <InertiaPagination paginateItems={notificationsPaginatedResponse} />}
     </AppLayout>
   );
 }
