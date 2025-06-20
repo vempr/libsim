@@ -37,6 +37,7 @@ export default function All() {
   const handleSubmit: FormEventHandler = (e) => {
     e.preventDefault();
     if (searchQuery === userQuery) return;
+    if (searchQuery.length === 0) return;
 
     setIsSubmitting(true);
     router.get(
@@ -136,7 +137,7 @@ export default function All() {
               ))}
             </GridList>
           ) : (
-            <div className="font-secondary mt-6 flex justify-center text-4xl opacity-30">
+            <div className="font-secondary mt-3 flex justify-center text-2xl opacity-30">
               <p>No friends :(</p>
             </div>
           )}

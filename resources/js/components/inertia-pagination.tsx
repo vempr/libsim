@@ -18,12 +18,17 @@ export default function InertiaPagination<T>({ paginateItems }: PaginationProps<
 
   const pageLinks = links.filter((link) => !['&laquo; Previous', 'Next &raquo;'].includes(link.label));
 
+  console.log(paginateItems);
+
   return (
-    <Pagination>
+    <Pagination className="my-3">
       <PaginationContent>
         {/* Previous Page */}
         <PaginationItem>
-          <PaginationPrevious href={paginateItems.prev_page_url ?? '#'} />
+          <PaginationPrevious
+            href={paginateItems.prev_page_url ?? '#'}
+            disabled={paginateItems.prev_page_url === null}
+          />
         </PaginationItem>
 
         {/* Page Numbers and Ellipsis */}
@@ -51,7 +56,10 @@ export default function InertiaPagination<T>({ paginateItems }: PaginationProps<
 
         {/* Next Page */}
         <PaginationItem>
-          <PaginationNext href={paginateItems.next_page_url ?? '#'} />
+          <PaginationNext
+            href={paginateItems.next_page_url ?? '#'}
+            disabled={paginateItems.next_page_url === null}
+          />
         </PaginationItem>
       </PaginationContent>
     </Pagination>
