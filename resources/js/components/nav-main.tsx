@@ -23,6 +23,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
             <Link
               href={dashboard.href}
               prefetch
+              preserveState={false}
             >
               {dashboard.icon && <dashboard.icon />}
               <span>{dashboard.title}</span>
@@ -44,6 +45,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
               <Link
                 href={item.href}
                 prefetch
+                preserveState={false}
               >
                 {item.icon && <item.icon />}
                 <span>{item.title}</span>
@@ -66,6 +68,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
               <Link
                 href={item.href}
                 prefetch
+                preserveState={false}
               >
                 {item.icon && <item.icon />}
                 <span>{item.title}</span>
@@ -88,6 +91,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
               <Link
                 href={item.href}
                 prefetch
+                preserveState={false}
               >
                 {item.icon && <item.icon />}
                 <span>{item.title}</span>

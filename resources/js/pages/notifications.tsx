@@ -1,7 +1,7 @@
 import InertiaPagination from '@/components/inertia-pagination';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
-import { type InertiaProps, type BreadcrumbItem, SharedData, Notification } from '@/types';
+import { type InertiaProps, type BreadcrumbItem, SharedData, Notification, PaginatedResponse } from '@/types';
 import { NotificationEvent } from '@/types/event';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
@@ -68,7 +68,13 @@ const NotificationFriend = ({ notification }: { notification: Notification }) =>
   );
 };
 
-const NotificationReminder = ({ notification }: { notification: Notification }) => {
+const NotificationReminder = ({
+  notification,
+  setNotifications,
+}: {
+  notification: Notification;
+  setNotifications: React.Dispatch<React.SetStateAction<[] | Notification[]>>;
+}) => {
   const { delete: destroy, processing } = useForm();
   const [hide, setHide] = useState(false);
 
@@ -85,7 +91,10 @@ const NotificationReminder = ({ notification }: { notification: Notification }) 
                 notification: notification.id,
               }),
               {
-                onSuccess: handleNotificationsReload,
+                onSuccess: (page) => {
+                  const notifications = page.props.notificationsPaginatedResponse as PaginatedResponse<Notification>;
+                  setNotifications(notifications.data);
+                },
                 preserveScroll: true,
               },
             );
@@ -137,7 +146,10 @@ export default function Notifications() {
             {notification.type === 'friend_request' ? (
               <NotificationFriend notification={notification} />
             ) : (
-              <NotificationReminder notification={notification} />
+              <NotificationReminder
+                notification={notification}
+                setNotifications={setNotifications}
+              />
             )}
           </li>
         ))}

@@ -116,12 +116,11 @@ export default function All() {
       setScrollToBottom(true);
       setMessages((prev) => [...prev, tempMessage]);
 
-      post(route('chat.store', { friend: friend.id, text }), {
+      post(route('chat.store', { friend: friend.id, text, temp_id: tempId }), {
         preserveScroll: true,
         onSuccess: (page) => {
-          console.log(page);
-          const messages = page.props.messages as MessageEager[];
-          setMessages(messages.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()));
+          const messages = page.props.messagesPaginatedResponse as PaginatedResponse<MessageEager>;
+          setMessages(messages.data);
         },
       });
     }

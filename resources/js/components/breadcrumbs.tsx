@@ -24,6 +24,7 @@ export function Breadcrumbs({ breadcrumbs }: { breadcrumbs: BreadcrumbItemType[]
                         <Link
                           href={item.href}
                           className="font-secondary text-lg"
+                          preserveState={false}
                         >
                           {item.title}
                         </Link>
