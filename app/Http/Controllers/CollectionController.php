@@ -34,7 +34,7 @@ class CollectionController extends Controller {
 		$works = $collection
 			->works()
 			->wherePivot('removed_from_favorites', false)
-			->paginate(15);
+			->paginate(20);
 
 		return Inertia::render('collections/collection', [
 			'collection' => $collection->only(['id', 'name']),

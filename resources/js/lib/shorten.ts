@@ -10,3 +10,13 @@ export function shortenBreadcrumbs(breadcrumbs: BreadcrumbItem[]) {
       : b,
   );
 }
+
+export function shortenString(s: string | null, length?: number) {
+  if (!s) return '';
+
+  if (length) {
+    return s.length > length ? s.slice(0, length) + '...' : s;
+  }
+
+  return s.length > 30 ? s.slice(0, 30) + '...' : s;
+}

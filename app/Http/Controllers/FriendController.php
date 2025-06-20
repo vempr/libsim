@@ -72,7 +72,7 @@ class FriendController extends Controller {
 			->with(['profile' => function ($query) {
 				$query->select(Profile::$indexFields);
 			}])
-			->paginate(15, ['*'], 'users');
+			->paginate(30, ['*'], 'users');
 
 		$fq = User::query();
 		if ($q) {
@@ -91,7 +91,7 @@ class FriendController extends Controller {
 			->with(['profile' => function ($query) {
 				$query->select(Profile::$indexFields);
 			}])
-			->paginate(15, ['*'], 'saved');
+			->paginate(30, ['*'], 'saved');
 
 		return Inertia::render('users/all', [
 			'usersPaginatedResponse' => $users,

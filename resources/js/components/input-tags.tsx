@@ -15,7 +15,7 @@ type InputTagsProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value' 
 };
 
 const InputTags = React.forwardRef<HTMLInputElement, InputTagsProps>(
-  ({ className, value = '', lowercase, uppercase, onChange, displayAsList, children, pipeAsSeperator }, ref) => {
+  ({ className, value = '', lowercase, uppercase, onChange, displayAsList = true, children, pipeAsSeperator }, ref) => {
     const [pendingDataPoint, setPendingDataPoint] = React.useState('');
 
     const separator = pipeAsSeperator ? '|' : ',';
@@ -26,7 +26,8 @@ const InputTags = React.forwardRef<HTMLInputElement, InputTagsProps>(
           .split(separator)
           .map((tag) => {
             tag = tag.trim();
-            if (uppercase) {
+            if (tag === '') return '';
+            if (uppercase && tag[0]) {
               return tag[0].toUpperCase() + tag.slice(1);
             }
             if (lowercase) {
@@ -80,7 +81,8 @@ const InputTags = React.forwardRef<HTMLInputElement, InputTagsProps>(
             .split(separator)
             .map((chunk) => {
               const trimmedChunk = chunk.trim();
-              if (uppercase) {
+              if (trimmedChunk === '') return '';
+              if (uppercase && trimmedChunk[0]) {
                 return trimmedChunk[0].toUpperCase() + trimmedChunk.slice(1);
               }
               if (lowercase) {
@@ -110,28 +112,6 @@ const InputTags = React.forwardRef<HTMLInputElement, InputTagsProps>(
             className,
           )}
         >
-          {!displayAsList &&
-            tags.map((item, index) => (
-              <Badge
-                key={index}
-                variant="secondary"
-                className="dark:bg-sidebar-accent"
-              >
-                {item}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="ml-2 h-3 w-3"
-                  onClick={() => {
-                    const updatedTags = tags.filter((t) => t !== item);
-                    const newValue = updatedTags.join(separator);
-                    onChange({ target: { value: newValue } } as React.ChangeEvent<HTMLInputElement>);
-                  }}
-                >
-                  <XIcon className="w-3" />
-                </Button>
-              </Badge>
-            ))}
           <input
             className="flex-1 bg-transparent outline-none placeholder:text-neutral-500 dark:placeholder:text-neutral-400"
             value={pendingDataPoint}
@@ -163,14 +143,15 @@ const InputTags = React.forwardRef<HTMLInputElement, InputTagsProps>(
               <Badge
                 key={index}
                 variant="secondary"
-                className="dark:bg-sidebar-accent"
+                className="dark:bg-sidebar-accent h-6"
               >
                 {item}
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="ml-2 h-3 w-3"
+                  className="ml-1 h-3 w-3"
                   onClick={() => handleRemoveTag(item)}
+                  type="button"
                 >
                   <XIcon className="w-3" />
                 </Button>

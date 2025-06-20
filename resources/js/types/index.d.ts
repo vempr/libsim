@@ -40,6 +40,7 @@ export interface User extends ChatUser {
 }
 
 export interface ListUser extends ChatUser {
+  is_friend: number;
   profile: {
     introduction: string | null;
     good_tags: string | null;
@@ -199,7 +200,7 @@ export interface InertiaProps extends Page<PageProps> {
   messagesPaginatedResponse: PaginatedResponse<MessageEager> | null;
   worksForChat: ChatWork[];
 
-  usersPaginatedResponse: PaginatedResponse<ListUser & { is_friend: number }> | null;
+  usersPaginatedResponse: PaginatedResponse<ListUser> | null;
   friendsPaginatedResponse: PaginatedResponse<ListUser> | null;
   worksPaginatedResponse: PaginatedResponse<Work> | null;
   favoritesPaginatedResponse: PaginatedResponse<Work> | null;
