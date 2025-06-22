@@ -121,7 +121,14 @@ export default function All() {
           </form>
         </TabsList>
         <TabsContent value="others">
-          <GridList>{usersPaginatedResponse?.data.map((user) => <UserCard user={user} />)}</GridList>
+          <GridList>
+            {usersPaginatedResponse?.data.map((user) => (
+              <UserCard
+                key={user.id}
+                user={user}
+              />
+            ))}
+          </GridList>
 
           {!usersOnePage && usersPaginatedResponse && <InertiaPagination paginateItems={usersPaginatedResponse} />}
         </TabsContent>
@@ -132,7 +139,10 @@ export default function All() {
           {friendsPaginatedResponse?.data.length ? (
             <GridList>
               {friendsPaginatedResponse.data.map((friend) => (
-                <UserCard user={{ ...friend, is_friend: 1 }} />
+                <UserCard
+                  key={friend.id}
+                  user={{ ...friend, is_friend: 1 }}
+                />
               ))}
             </GridList>
           ) : (

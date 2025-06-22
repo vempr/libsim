@@ -35,8 +35,8 @@ export interface ChatUser {
 export interface User extends ChatUser {
   email: string;
   email_verified_at: string | null;
-  hide_profile: boolean;
-  private_works: boolean;
+  hide_profile: number;
+  private_works: number;
 }
 
 export interface ListUser extends ChatUser {
@@ -49,7 +49,7 @@ export interface ListUser extends ChatUser {
 
 export interface ProfileUser extends ChatUser {
   info: ProfileFormInput;
-  private_works: boolean;
+  private_works: number;
 }
 
 export interface FlashMessages {

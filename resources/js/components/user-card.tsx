@@ -18,7 +18,11 @@ export default function UserCard({ user }: { user: ListUser }) {
             <p className="text-muted-foreground text-sm">{shortenString(user.profile.introduction, 40)}</p>
           </div>
 
-          <AvatarPicture user={user} />
+          <AvatarPicture
+            avatar={user.avatar}
+            name={user.name}
+            is_friend={user.is_friend}
+          />
         </div>
 
         <div className="flex flex-col gap-y-1">
@@ -30,22 +34,24 @@ export default function UserCard({ user }: { user: ListUser }) {
                   .split(',')
                   .slice(0, -1)
                   .map((tag) => (
-                    <Badge
-                      variant="secondary"
-                      className="dark:bg-sidebar-accent h-6"
-                      key={tag}
-                    >
-                      {tag}
-                    </Badge>
+                    <li key={tag}>
+                      <Badge
+                        variant="secondary"
+                        className="dark:bg-sidebar-accent h-6"
+                      >
+                        {tag}
+                      </Badge>
+                    </li>
                   ))
               ) : (
-                <Badge
-                  variant="secondary"
-                  className="dark:bg-sidebar-accent h-6"
-                  key={user.profile.good_tags}
-                >
-                  {shortenString(user.profile.good_tags, 70)}
-                </Badge>
+                <li key={user.profile.good_tags}>
+                  <Badge
+                    variant="secondary"
+                    className="dark:bg-sidebar-accent h-6"
+                  >
+                    {shortenString(user.profile.good_tags, 70)}
+                  </Badge>
+                </li>
               )}
             </ul>
           ) : (
