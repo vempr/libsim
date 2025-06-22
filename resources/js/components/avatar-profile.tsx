@@ -61,7 +61,7 @@ export default function AvatarProfile() {
               <span className="text-5xl select-none">{getInitials(auth.user.name)}</span>
             </AvatarFallback>
           </Avatar>
-          <p className="bg-sidebar w-min -translate-y-8 rounded-lg px-2.5 py-0.5 text-xs opacity-45">Edit</p>
+          <p className="bg-sidebar w-min -translate-y-8 rounded px-2.5 py-0.5 text-xs opacity-45">Edit</p>
         </button>
       </DialogTrigger>
       <DialogContent>

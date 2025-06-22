@@ -18,8 +18,6 @@ export default function InertiaPagination<T>({ paginateItems }: PaginationProps<
 
   const pageLinks = links.filter((link) => !['&laquo; Previous', 'Next &raquo;'].includes(link.label));
 
-  console.log(paginateItems);
-
   return (
     <Pagination className="my-3">
       <PaginationContent>

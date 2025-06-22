@@ -367,7 +367,6 @@ export default function All() {
                             onSuccess: (page) => {
                               const messages = page.props.messagesPaginatedResponse as PaginatedResponse<MessageEager>;
 
-                              console.log(messages.data);
                               setMessages(messages.data);
                             },
                           });

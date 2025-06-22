@@ -12,8 +12,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function Dashboard() {
   const { auth, dashboardData } = usePage<InertiaProps & SharedData>().props;
 
-  console.log(dashboardData);
-
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Dashboard" />

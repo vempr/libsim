@@ -180,7 +180,7 @@ class WorkController extends Controller {
 			$favoriteQuery = $user->favoriteWorks();
 			$favoritedWorks = search($favoriteQuery, $state)->paginate(15, ['*'], 'favorited');
 		} else {
-			$favoritedWorks = $user->favoriteWorks()->paginate(20, ['*'], 'favorited');
+			$favoritedWorks = $user->favoriteWorks()->paginate(15, ['*'], 'favorited');
 		}
 
 		return Inertia::render('works/all', [

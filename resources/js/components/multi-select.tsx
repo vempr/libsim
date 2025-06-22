@@ -86,14 +86,10 @@ export function MultiSelect({
                   <Check className={cn('ml-auto h-4 w-4', selected.includes(option.value) ? 'opacity-100' : 'opacity-0')} />
                 </CommandItem>
               ))}
-              <CommandItem
-                onSelect={() => console.log('hi')}
-                className="p-0"
-              >
+              <CommandItem className="p-0">
                 {!hideNewCollectionSheet && (
                   <NewCollectionSheet>
                     <Button
-                      onClick={() => console.log('hi')}
                       className="m-0 flex w-full items-center"
                       variant="outline"
                       type="button"

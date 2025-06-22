@@ -32,7 +32,6 @@ export default function All() {
 
   const usersOnePage = hasOnePage(usersPaginatedResponse);
   const friendsOnePage = hasOnePage(friendsPaginatedResponse);
-  console.log(friendsPaginatedResponse);
 
   const handleSubmit: FormEventHandler = (e) => {
     e.preventDefault();

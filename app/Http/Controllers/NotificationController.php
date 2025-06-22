@@ -8,7 +8,9 @@ use Inertia\Inertia;
 
 class NotificationController extends Controller {
 	public function index() {
-		$notifications = Notification::where('receiver_id', Auth::id())->orderByDesc('created_at')->paginate(30);
+		$notifications = Notification::where('receiver_id', Auth::id())
+			->orderByDesc('created_at')
+			->paginate(30);
 
 		return Inertia::render('notifications', [
 			'notificationsPaginatedResponse' => $notifications,

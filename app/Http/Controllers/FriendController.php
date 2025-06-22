@@ -91,7 +91,7 @@ class FriendController extends Controller {
 			->with(['profile' => function ($query) {
 				$query->select(Profile::$indexFields);
 			}])
-			->paginate(30, ['*'], 'saved');
+			->paginate(30, ['*'], 'friends');
 
 		return Inertia::render('users/all', [
 			'usersPaginatedResponse' => $users,
@@ -125,7 +125,9 @@ class FriendController extends Controller {
 		}
 
 		if ($status === 'mutual' && $user->private_works === 0) {
-			$works = Work::query()->where('user_id', $user->id)->paginate(15);
+			$works = Work::query()
+				->where('user_id', $user->id)
+				->paginate(15);
 		}
 
 		if ($request->get('only_works')) {

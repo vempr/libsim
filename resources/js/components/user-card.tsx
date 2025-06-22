@@ -15,14 +15,14 @@ export default function UserCard({ user }: { user: ListUser }) {
         <div className="flex justify-between">
           <div>
             <h2 className="font-secondary text-xl">{user.name}</h2>
-            <p className="text-muted-foreground text-sm">{shortenString(user.profile.introduction)}</p>
+            <p className="text-muted-foreground text-sm">{shortenString(user.profile.introduction, 40)}</p>
           </div>
 
           <AvatarPicture user={user} />
         </div>
 
         <div className="flex flex-col gap-y-1">
-          <p className="font-secondary dark:text-secondary text-sm">Favorite tags</p>
+          <p className="font-secondary dark:text-secondary text-sm">Favorite categories</p>
           {user.profile.good_tags ? (
             <ul className="flex max-h-14 w-full flex-wrap gap-1 overflow-hidden lg:flex-nowrap">
               {user.profile.good_tags.includes(',') ? (
@@ -49,7 +49,7 @@ export default function UserCard({ user }: { user: ListUser }) {
               )}
             </ul>
           ) : (
-            <p className="text-secondary w-full overflow-hidden font-mono opacity-70 dark:opacity-30">{'NULL'.repeat(100)}</p>
+            <p className="text-secondary w-full overflow-hidden font-mono opacity-70 dark:opacity-30">{'NULL'.repeat(20)}</p>
           )}
         </div>
       </Link>

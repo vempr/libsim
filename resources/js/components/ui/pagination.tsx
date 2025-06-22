@@ -20,7 +20,7 @@ function PaginationContent({ className, ...props }: React.ComponentProps<'ul'>) 
   return (
     <ul
       data-slot="pagination-content"
-      className={cn('flex flex-row items-center gap-1', className)}
+      className={cn('flex flex-row items-center justify-center gap-1 gap-y-0.5 flex-wrap max-w-70 md:max-w-none', className)}
       {...props}
     />
   );
@@ -52,7 +52,8 @@ function PaginationLink({ className, isActive, size = 'icon', disabled = false, 
           size,
         }),
         className,
-				disabled && 'cursor-not-allowed opacity-50 pointer-events-none'
+				disabled && 'cursor-not-allowed opacity-50 pointer-events-none',
+				'size-7 md:size-8'
       )}
       {...props}
     />
@@ -92,7 +93,7 @@ function PaginationEllipsis({ className, ...props }: React.ComponentProps<'span'
     <span
       aria-hidden
       data-slot="pagination-ellipsis"
-      className={cn('flex size-9 items-center justify-center', className)}
+      className={cn('flex size-9 items-center justify-center opacity-50', className)}
       {...props}
     >
       <MoreHorizontalIcon className="size-4" />

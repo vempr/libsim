@@ -30,7 +30,6 @@ export default function UpdatePrivacy() {
   });
 
   function onSubmit(data: PrivacyOptions) {
-    console.log(data);
     patch(route('profile.update', data), {
       preserveScroll: true,
     });

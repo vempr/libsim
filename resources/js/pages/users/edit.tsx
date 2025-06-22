@@ -37,7 +37,6 @@ export default function Work() {
   });
 
   function onSubmit(values: ProfileFormInput) {
-    console.log(values);
     put(route('u.update', values));
   }
 
