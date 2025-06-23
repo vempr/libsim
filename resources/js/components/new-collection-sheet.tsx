@@ -2,11 +2,11 @@ import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { getResponsiveDialog } from '@/lib/responsive';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm as useInertiaForm } from '@inertiajs/react';
 import { FolderPlus } from 'lucide-react';
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -15,76 +15,77 @@ const nameSchema = z.object({
 });
 
 export default function NewCollectionSheet({ children }: { children?: ReactNode }) {
-  const [isOpen, setIsOpen] = useState(false);
+  const { rd, open, setOpen } = getResponsiveDialog();
 
   const {
     register,
     formState: { errors },
-    getValues,
+    handleSubmit,
   } = useForm<z.infer<typeof nameSchema>>({
     resolver: zodResolver(nameSchema),
   });
 
-  const { post, processing, wasSuccessful } = useInertiaForm();
+  const { post, processing } = useInertiaForm();
 
   function onSubmit(values: z.infer<typeof nameSchema>) {
-    post(route('collection.store', values));
+    post(route('collection.store', values), { onFinish: () => setOpen(false) });
   }
 
-  useEffect(() => {
-    if (wasSuccessful) setIsOpen(false);
-  }, [setIsOpen, wasSuccessful]);
-
   return (
-    <Sheet
-      open={isOpen}
-      onOpenChange={setIsOpen}
+    <rd.Wrapper
+      open={open}
+      onOpenChange={setOpen}
     >
-      <SheetTrigger asChild>
+      <rd.Trigger asChild>
         {children ? (
           children
         ) : (
-          <Button variant="outline">
+          <Button
+            variant="secondary"
+            size="sm"
+          >
             <FolderPlus />
           </Button>
         )}
-      </SheetTrigger>
-      <SheetContent>
-        <SheetHeader>
-          <SheetTitle>New collection</SheetTitle>
-          <SheetDescription>Add a new collection to sort your own works.</SheetDescription>
-        </SheetHeader>
-        <div>
+      </rd.Trigger>
+      <rd.Content>
+        <rd.Header>
+          <rd.Title>New collection</rd.Title>
+          <rd.Description>Add a new collection to sort your personal works.</rd.Description>
+        </rd.Header>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex h-full flex-col justify-between"
+        >
           <div className="mb-2 grid gap-y-3 px-4">
             <Label htmlFor="name">Name</Label>
             <Input
               id="name"
-              placeholder="The best works of all time"
+              placeholder="Perfection"
               {...register('name')}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   e.preventDefault();
-                  onSubmit(getValues());
+                  handleSubmit(onSubmit);
                 }
               }}
             />
             {errors.name && <InputError message={errors.name.message} />}
           </div>
 
-          <SheetFooter>
+          <rd.Footer>
             <Button
-              type="button"
+              type="submit"
               disabled={processing}
-              onClick={() => onSubmit(getValues())}
             >
               Create collection
             </Button>
-            <SheetClose asChild>
+            <rd.Close asChild>
               <Button variant="outline">Close</Button>
-            </SheetClose>
-          </SheetFooter>
-        </div>
-      </SheetContent>
-    </Sheet>
+            </rd.Close>
+          </rd.Footer>
+        </form>
+      </rd.Content>
+    </rd.Wrapper>
   );
 }

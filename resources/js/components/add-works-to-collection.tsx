@@ -1,4 +1,4 @@
-import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { getResponsiveDialog } from '@/lib/responsive';
 import { Collection, SimpleWork } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm as useInertiaForm } from '@inertiajs/react';
@@ -29,57 +29,75 @@ export default function AddWorksToCollection({ works, collection }: AddWorksToCo
 
   const { put, processing } = useInertiaForm();
 
+  const { rd, open, setOpen } = getResponsiveDialog();
+
   function onSubmit(values: WorksForm) {
     put(
       route('collection.entry.update.multiple', {
         work_ids: values.selectedWorks,
         collection: collection.id,
       }),
+      {
+        onFinish: () => setOpen(false),
+      },
     );
   }
 
   return (
-    <Sheet>
-      <SheetTrigger asChild>
-        <Button variant="outline">Works</Button>
-      </SheetTrigger>
+    <rd.Wrapper
+      open={open}
+      onOpenChange={setOpen}
+    >
+      <rd.Trigger asChild>
+        <Button
+          variant="secondary"
+          className="flex-1"
+        >
+          Edit collection entries
+        </Button>
+      </rd.Trigger>
 
-      <SheetContent>
-        <SheetHeader>
-          <SheetTitle>Edit collection's works</SheetTitle>
-          <SheetDescription>Update which works belongs to your collection.</SheetDescription>
-        </SheetHeader>
-        <form onSubmit={handleSubmit(onSubmit)}>
+      <rd.Content>
+        <rd.Header>
+          <rd.Title>Edit collection's works</rd.Title>
+          <rd.Description>Update which works belong to your collection.</rd.Description>
+        </rd.Header>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex h-full flex-col justify-between"
+        >
           <Controller
             name="selectedWorks"
             control={control}
             render={({ field }) => (
-              <MultiSelect
-                options={works.map((work) => ({
-                  value: work.id,
-                  label: `${work.title} - ${work.author}`,
-                }))}
-                selected={field.value}
-                onChange={field.onChange}
-                placeholder="Select works..."
-                emptyText="No works found."
-                hideNewCollectionSheet
-              />
+              <div className="flex w-full">
+                <MultiSelect
+                  options={works.map((work) => ({
+                    value: work.id,
+                    label: `${work.title} - ${work.author}`,
+                  }))}
+                  selected={field.value}
+                  onChange={field.onChange}
+                  placeholder="Select works..."
+                  emptyText="No works found."
+                  hideNewCollectionSheet
+                />
+              </div>
             )}
           />
-          <SheetFooter>
+          <rd.Footer>
             <Button
               type="submit"
               disabled={processing}
             >
               Update collection's works
             </Button>
-            <SheetClose asChild>
+            <rd.Close asChild>
               <Button variant="outline">Close</Button>
-            </SheetClose>
-          </SheetFooter>
+            </rd.Close>
+          </rd.Footer>
         </form>
-      </SheetContent>
-    </Sheet>
+      </rd.Content>
+    </rd.Wrapper>
   );
 }

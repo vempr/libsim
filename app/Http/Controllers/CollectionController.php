@@ -13,12 +13,13 @@ class CollectionController extends Controller {
 			'collections.id',
 			'collections.name',
 			'collections.created_at',
+			'collections.updated_at',
 		])
 			->where('user_id', Auth::id())
 			->withCount('activeWorks as works_count')
 			->leftJoin('collection_entries', 'collections.id', '=', 'collection_entries.collection_id')
-			->selectRaw('MAX(collection_entries.created_at) as updated_at')
 			->groupBy('collections.id', 'collections.name', 'collections.created_at')
+			->orderByDesc('works_count')
 			->paginate(30);
 
 		return Inertia::render('collections/all', [

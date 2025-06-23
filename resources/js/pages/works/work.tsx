@@ -2,9 +2,9 @@ import { FavoriteForm } from '@/components/favorite-form';
 import { MultiSelect } from '@/components/multi-select';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { useIsMobile } from '@/hooks/use-mobile';
 import AppLayout from '@/layouts/app-layout';
+import { getResponsiveDialog } from '@/lib/responsive';
 import { InertiaProps, SharedData, type BreadcrumbItem } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, Link, router, useForm as useInertiaForm, usePage } from '@inertiajs/react';
@@ -67,12 +67,17 @@ export default function Work() {
     </Dialog>
   );
 
+  const { rd, open, setOpen } = getResponsiveDialog();
+
   function onSubmit(data: CollectionForm) {
     put(
       route('collection.entry.update.single', {
         work: work.id,
         collection_ids: data.selectedCollections,
       }),
+      {
+        onFinish: () => setOpen(false),
+      },
     );
   }
 
@@ -84,17 +89,23 @@ export default function Work() {
       <p className="max-w-96 overflow-scroll">{JSON.stringify(work)}</p>
 
       {(favorited || isOwnWork) && (
-        <Sheet>
-          <SheetTrigger asChild>
+        <rd.Wrapper
+          open={open}
+          onOpenChange={setOpen}
+        >
+          <rd.Trigger asChild>
             <Button variant="outline">Collections</Button>
-          </SheetTrigger>
+          </rd.Trigger>
 
-          <SheetContent>
-            <SheetHeader>
-              <SheetTitle>Edit work's collections</SheetTitle>
-              <SheetDescription>Update which collections belongs to your work.</SheetDescription>
-            </SheetHeader>
-            <form onSubmit={handleSubmit(onSubmit)}>
+          <rd.Content>
+            <rd.Header>
+              <rd.Title>Edit work's collections</rd.Title>
+              <rd.Description>Update which collections belongs to your work.</rd.Description>
+            </rd.Header>
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="flex h-full flex-col justify-between"
+            >
               <Controller
                 name="selectedCollections"
                 control={control}
@@ -112,20 +123,20 @@ export default function Work() {
                   />
                 )}
               />
-              <SheetFooter>
+              <rd.Footer>
                 <Button
                   type="submit"
                   disabled={processing}
                 >
                   Update work's collections
                 </Button>
-                <SheetClose asChild>
+                <rd.Close asChild>
                   <Button variant="outline">Close</Button>
-                </SheetClose>
-              </SheetFooter>
+                </rd.Close>
+              </rd.Footer>
             </form>
-          </SheetContent>
-        </Sheet>
+          </rd.Content>
+        </rd.Wrapper>
       )}
 
       {!isOwnWork && (

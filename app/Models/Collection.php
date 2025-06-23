@@ -12,6 +12,7 @@ class Collection extends Model {
 	protected $fillable = [
 		'user_id',
 		'name',
+		'updated_at',
 	];
 
 	protected $hidden = ['pivot'];

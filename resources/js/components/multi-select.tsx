@@ -41,32 +41,26 @@ export function MultiSelect({
     [selected, onChange],
   );
 
-  const selectedLabels = React.useMemo(
-    () =>
-      selected
-        .map((value) => options.find((option) => option.value === value)?.label)
-        .filter(Boolean)
-        .join(', '),
-    [selected, options],
-  );
-
   return (
     <Popover
       open={open}
       onOpenChange={setOpen}
     >
       <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className={cn('ml-4 justify-between sm:w-88', className)}
-        >
-          <span className="truncate">{selected.length > 0 ? selectedLabels : placeholder}</span>
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
+        <div className="mx-4 w-full">
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className={cn('w-full justify-between', className)}
+            type="button"
+          >
+            <span className="truncate">{selected.length > 0 ? `${selected.length} selected` : placeholder}</span>
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </div>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0">
+      <PopoverContent className="p-0">
         <Command>
           <CommandInput
             placeholder="Search options..."
@@ -74,7 +68,7 @@ export function MultiSelect({
           />
           <CommandList>
             <CommandEmpty>{emptyText}</CommandEmpty>
-            <CommandGroup>
+            <CommandGroup className="max-w-screen">
               {options.map((option) => (
                 <CommandItem
                   key={option.value}

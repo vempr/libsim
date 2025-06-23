@@ -15,12 +15,12 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import AppLayout from '@/layouts/app-layout';
+import { getResponsiveDialog } from '@/lib/responsive';
 import { BreadcrumbItem, InertiaProps } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, usePage, Link, useForm as useInertiaForm } from '@inertiajs/react';
-import { FolderPlus } from 'lucide-react';
+import { Pencil, Trash } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -41,6 +41,8 @@ export default function Collection() {
       href: `/collections/${collection.id}`,
     },
   ];
+
+  const { rd, open, setOpen } = getResponsiveDialog();
 
   const {
     register,
@@ -63,6 +65,9 @@ export default function Collection() {
         ...values,
         collection: collection.id,
       }),
+      {
+        onFinish: () => setOpen(false),
+      },
     );
   }
 
@@ -70,81 +75,100 @@ export default function Collection() {
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Collections" />
 
-      <Sheet>
-        <SheetTrigger asChild>
-          <Button variant="outline">
-            <FolderPlus />
-          </Button>
-        </SheetTrigger>
-        <SheetContent>
-          <SheetHeader>
-            <SheetTitle>Edit collection</SheetTitle>
-            <SheetDescription>Rename your collection of works.</SheetDescription>
-          </SheetHeader>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="mb-2 grid gap-y-3 px-4">
-              <Label htmlFor="name">Name</Label>
-              <Input
-                id="name"
-                placeholder="The best works of all time"
-                {...register('name')}
-              />
-              {errors.name && <InputError message={errors.name.message} />}
-            </div>
-
-            <SheetFooter>
-              <Button
-                type="submit"
-                disabled={processing}
+      <div className="flex flex-row items-center gap-x-1">
+        <AlertDialog>
+          <AlertDialogTrigger className="bg-destructive hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60 focus-visible:border-ring aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive inline-flex h-9 shrink-0 items-center justify-center gap-2 rounded px-4 py-2 text-sm font-medium whitespace-nowrap text-white shadow-xs transition-all outline-none hover:cursor-pointer hover:opacity-80 focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 has-[>svg]:px-3 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4">
+            <Trash className="size-4" />
+            <p className="sr-only">Delete</p>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete your collection from our servers.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() =>
+                  destroy(
+                    route('collection.destroy', {
+                      collection: collection.id,
+                    }),
+                  )
+                }
+                className="bg-destructive hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 focus-visible:border-ring aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive text-white"
               >
-                Update collection
-              </Button>
-              <SheetClose asChild>
-                <Button variant="outline">Close</Button>
-              </SheetClose>
-            </SheetFooter>
-          </form>
-        </SheetContent>
-      </Sheet>
+                Continue
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
-      <AlertDialog>
-        <AlertDialogTrigger>
-          <Button variant="destructive">Delete</Button>
-        </AlertDialogTrigger>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete your collection from our servers.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() =>
-                destroy(
-                  route('collection.destroy', {
-                    collection: collection.id,
-                  }),
-                )
-              }
+        <rd.Wrapper
+          open={open}
+          onOpenChange={setOpen}
+        >
+          <rd.Trigger asChild>
+            <Button variant="outline">
+              <Pencil className="size-4" />
+              <p className="sr-only">Rename</p>
+            </Button>
+          </rd.Trigger>
+          <rd.Content>
+            <rd.Header>
+              <rd.Title>Edit collection</rd.Title>
+              <rd.Description>Rename your collection.</rd.Description>
+            </rd.Header>
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="flex h-full flex-col justify-between"
             >
-              Continue
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+              <div className="mb-2 grid gap-y-3 px-4">
+                <Label htmlFor="name">Name</Label>
+                <Input
+                  id="name"
+                  placeholder="The best works of all time"
+                  {...register('name')}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleSubmit(onSubmit);
+                    }
+                  }}
+                />
+                {errors.name && <InputError message={errors.name.message} />}
+              </div>
 
-      <AddWorksToCollection
-        works={worksForCollection}
-        collection={collection}
-      />
+              <rd.Footer>
+                <Button
+                  type="submit"
+                  disabled={processing}
+                >
+                  Update collection
+                </Button>
+                <rd.Close asChild>
+                  <Button variant="outline">Close</Button>
+                </rd.Close>
+              </rd.Footer>
+            </form>
+          </rd.Content>
+        </rd.Wrapper>
 
-      {worksPaginatedResponse?.data.map((work) => (
-        <li>
-          <Link href={`/works/${work.id}?collection=${collection.id}`}>{JSON.stringify(work)}</Link>
-        </li>
-      ))}
+        <AddWorksToCollection
+          works={worksForCollection}
+          collection={collection}
+        />
+      </div>
+
+      <ul className="max-w-64 overflow-auto">
+        {worksPaginatedResponse?.data.map((work) => (
+          <li key={work.id}>
+            <Link href={`/works/${work.id}?collection=${collection.id}`}>{JSON.stringify(work)}</Link>
+          </li>
+        ))}
+      </ul>
 
       {worksPaginatedResponse && <InertiaPagination paginateItems={worksPaginatedResponse} />}
     </AppLayout>

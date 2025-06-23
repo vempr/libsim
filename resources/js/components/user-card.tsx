@@ -15,7 +15,11 @@ export default function UserCard({ user }: { user: ListUser }) {
         <div className="flex justify-between">
           <div>
             <h2 className="font-secondary text-xl">{user.name}</h2>
-            <p className="text-muted-foreground text-sm">{shortenString(user.profile.introduction, 40)}</p>
+            {user.profile.introduction?.length ? (
+              <p className="text-muted-foreground text-sm">{shortenString(user.profile.introduction, 40)}</p>
+            ) : (
+              <p className="text-muted-foreground font-mono text-sm opacity-80">(No self-introduction)</p>
+            )}
           </div>
 
           <AvatarPicture

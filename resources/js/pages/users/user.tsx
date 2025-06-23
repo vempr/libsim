@@ -1,5 +1,6 @@
 import AvatarPicture from '@/components/avatar-picture';
 import InputError from '@/components/input-error';
+import { MutedP, MutedSpan } from '@/components/muted-text';
 import ProfileTags from '@/components/profile-tags';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -273,7 +274,11 @@ export default function Work() {
             friend={profile}
           />
 
-          <p className="font-mono">{profile.info.introduction}</p>
+          {profile.info.introduction?.length ? (
+            <p className="bg-sidebar rounded px-4 py-2 text-sm">{profile.info.introduction}</p>
+          ) : (
+            <MutedP>(No self introduction)</MutedP>
+          )}
         </div>
       ) : (
         <div className="flex flex-col gap-y-2">
@@ -299,11 +304,17 @@ export default function Work() {
             />
           </div>
 
-          <p className="font-mono italic opacity-80">{profile.info.introduction}</p>
+          {profile.info.introduction?.length ? (
+            <p className="bg-sidebar rounded px-4 py-2 text-sm">{profile.info.introduction}</p>
+          ) : (
+            <MutedP>(No self introduction)</MutedP>
+          )}
         </div>
       )}
 
-      <p className="my-4 max-h-36 scroll-py-1 overflow-x-hidden overflow-y-auto rounded border p-4 font-mono">{profile.info.description}</p>
+      <p className="my-4 max-h-36 scroll-py-1 overflow-x-hidden overflow-y-auto rounded border p-4">
+        {profile.info.description?.length ? profile.info.description : <MutedSpan>(Nothing for the description...)</MutedSpan>}
+      </p>
 
       <ul className="flex flex-col gap-2 md:flex-row">
         <ProfileTags
@@ -318,7 +329,7 @@ export default function Work() {
         />
         <ProfileTags
           title={'I really hate...'}
-          tags={profile.info.neutral_tags?.split(',')}
+          tags={profile.info.bad_tags?.split(',')}
           className="border-chart-5/70 text-foreground"
         />
       </ul>
@@ -332,16 +343,19 @@ export default function Work() {
 
       {fetchingWorks && <Spinner />}
 
-      {canViewWorks && (
-        <ul className="max-w-72 overflow-auto">
-          hello
-          {worksPaginatedResponse?.data.map((work) => (
-            <li>
-              <Link href={`/works/${work.id}?user=${work.user_id}`}>{JSON.stringify(work)}</Link>
-            </li>
-          ))}
-        </ul>
-      )}
+      {canViewWorks &&
+        (worksPaginatedResponse?.data.length ? (
+          <ul className="max-w-72 overflow-auto">
+            hello
+            {worksPaginatedResponse.data.map((work) => (
+              <li>
+                <Link href={`/works/${work.id}?user=${work.user_id}`}>{JSON.stringify(work)}</Link>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="font-mono opacity-80">{profile.name} has no work entries...</p>
+        ))}
     </AppLayout>
   );
 }

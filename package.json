@@ -61,6 +61,7 @@
 		"cmdk": "^1.0.4",
 		"concurrently": "^9.0.1",
 		"croppie": "^2.6.5",
+		"dayjs": "^1.11.13",
 		"globals": "^15.14.0",
 		"laravel-vite-plugin": "^1.0",
 		"lucide-react": "^0.475.0",

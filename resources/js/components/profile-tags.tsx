@@ -9,10 +9,12 @@ interface ProfileTagsProps {
 }
 
 export default function ProfileTags({ title, tags, className }: ProfileTagsProps) {
+  if (!tags) return;
+
   return (
     <li className="flex flex-1 flex-col gap-y-1.5">
       <h3 className="flex-1 text-center font-mono text-sm">
-        {title} {tags && <span className="opacity-50">({tags.length})</span>}
+        {title} {tags && <span className="text-muted-foreground">({tags.length})</span>}
       </h3>
 
       {tags ? (

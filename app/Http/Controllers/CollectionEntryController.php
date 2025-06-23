@@ -20,13 +20,16 @@ class CollectionEntryController extends Controller {
 		]);
 
 		$workIds = $validated['work_ids'];
+		if (Auth::user()->works()->whereIn('id', $workIds)->count() < count($workIds)) {
+			return back();
+		}
 
 		$existingWorkIds = CollectionEntry::where('collection_id', $collection->id)
 			->pluck('work_id')
 			->toArray();
 
-		$toAdd = array_diff($workIds, $existingWorkIds);
-		$toRemove = array_diff($existingWorkIds, $workIds);
+		$toAdd = array_values(array_diff($workIds, $existingWorkIds));
+		$toRemove = array_values(array_diff($existingWorkIds, $workIds));
 
 		if ($toAdd) {
 			foreach ($toAdd as $workId) {
@@ -42,6 +45,9 @@ class CollectionEntryController extends Controller {
 				->whereIn('work_id', $toRemove)
 				->delete();
 		}
+
+		$collection->updated_at = now();
+		$collection->save();
 
 		return back()->with('success', 'Collection successfully updated.');
 	}
@@ -61,20 +67,36 @@ class CollectionEntryController extends Controller {
 			->pluck('id')
 			->toArray();
 
+		if ($collectionIds) {
+			if (array_diff($collectionIds, $userCollectionIds)) return back();
+		}
+
 		if (!$collectionIds) {
-			CollectionEntry::where('work_id', $work->id)->delete();
+			$collection_entries = CollectionEntry::where('work_id', $work->id);
+
+			Collection::whereIn('id', $collection_entries->pluck('collection_id')->toArray())->update(['updated_at' => now()]);
+
+			$collection_entries->delete();
 			return back()->with('success', 'Collections successfully updated.');
 		}
 
-		$toAdd = array_diff($collectionIds, CollectionEntry::where('work_id', $work->id)
-			->pluck('collection_id')->toArray());
+		$toAdd = array_values(
+			array_diff(
+				$collectionIds,
+				CollectionEntry::where('work_id', $work->id)
+					->pluck('collection_id')
+					->toArray()
+			)
+		);
 
-		$toRemove = array_diff(
-			CollectionEntry::where('work_id', $work->id)
-				->whereIn('collection_id', $userCollectionIds)
-				->pluck('collection_id')
-				->toArray(),
-			$collectionIds
+		$toRemove = array_values(
+			array_diff(
+				CollectionEntry::where('work_id', $work->id)
+					->whereIn('collection_id', $userCollectionIds)
+					->pluck('collection_id')
+					->toArray(),
+				$collectionIds
+			)
 		);
 
 		if ($toAdd) {
@@ -93,6 +115,9 @@ class CollectionEntryController extends Controller {
 				->whereIn('collection_id', $toRemove)
 				->delete();
 		}
+
+		Collection::whereIn('id', $toAdd)->update(['updated_at' => now()]);
+		Collection::whereIn('id', $toRemove)->update(['updated_at' => now()]);
 
 		return back()->with('success', 'Collections successfully updated.');
 	}
