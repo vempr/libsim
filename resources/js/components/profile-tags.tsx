@@ -13,7 +13,7 @@ export default function ProfileTags({ title, tags, className }: ProfileTagsProps
 
   return (
     <li className="flex flex-1 flex-col gap-y-1.5">
-      <h3 className="flex-1 text-center font-mono text-sm">
+      <h3 className="text-center font-mono text-sm">
         {title} {tags && <span className="text-muted-foreground">({tags.length})</span>}
       </h3>
 

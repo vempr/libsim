@@ -3,19 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Models\Profile;
+use App\Models\Work;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class PublicProfileController extends Controller {
-
 	public function index() {
+		$auth = Auth::user();
+
 		return Inertia::render('users/me', [
 			'profile' => [
-				...Auth::user()->only(['id', 'name', 'avatar']),
-				'info' => Profile::where('user_id', Auth::id())->select(Profile::$profileFields)->first(),
+				...$auth->only(['id', 'name', 'avatar']),
+				'info' => Profile::where('user_id', $auth->id)->select(Profile::$ownFields)->first(),
 			],
+			'worksPaginatedResponse' => $auth->works()->paginate(15),
 		]);
 	}
 
