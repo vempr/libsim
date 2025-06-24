@@ -1,4 +1,5 @@
 import AvatarPicture from '@/components/avatar-picture';
+import InertiaPagination from '@/components/inertia-pagination';
 import { MutedP, MutedSpan } from '@/components/muted-text';
 import ProfileTags from '@/components/profile-tags';
 import { Button } from '@/components/ui/button';
@@ -7,9 +8,11 @@ import AppLayout from '@/layouts/app-layout';
 import { InertiaProps, SharedData, type BreadcrumbItem } from '@/types';
 import { type Work } from '@/types/schemas/work';
 import { Head, usePage, Link } from '@inertiajs/react';
+import { useEffect, useRef } from 'react';
 
 export default function Work() {
   const { profile, worksPaginatedResponse } = usePage<InertiaProps & SharedData>().props;
+  const profileNameRef = useRef<HTMLHeadingElement | null>(null);
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -20,7 +23,12 @@ export default function Work() {
 
   const isMobile = useIsMobile();
 
-  console.log(worksPaginatedResponse);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('page') && profileNameRef.current) {
+      profileNameRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, []);
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
@@ -100,7 +108,12 @@ export default function Work() {
         />
       </ul>
 
-      <h2 className="font-secondary mt-3 mb-2 text-2xl">{profile.name}'s works</h2>
+      <h2
+        className="font-secondary mt-3 mb-2 text-2xl"
+        ref={profileNameRef}
+      >
+        {profile.name}'s works
+      </h2>
 
       {worksPaginatedResponse?.data.length ? (
         <ul className="max-w-72 overflow-auto">
@@ -114,6 +127,8 @@ export default function Work() {
       ) : (
         <p className="font-mono opacity-80">{profile.name} has no work entries...</p>
       )}
+
+      {worksPaginatedResponse?.data.length && <InertiaPagination paginateItems={worksPaginatedResponse} />}
     </AppLayout>
   );
 }

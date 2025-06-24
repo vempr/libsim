@@ -3,7 +3,7 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { workFormSchema } from '@/types/schemas/work';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Head, useForm as useInertiaForm } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { useRef, useState } from 'react';
 import AvatarEditor from 'react-avatar-editor';
 import { useForm } from 'react-hook-form';
@@ -12,7 +12,6 @@ import { z } from 'zod';
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Create entry', href: '/works/create' }];
 
 export default function New() {
-  const { post } = useInertiaForm();
   const editor = useRef<AvatarEditor>(null);
   const [image, setImage] = useState<File | string | null>(null);
 
@@ -24,12 +23,31 @@ export default function New() {
   });
 
   function onSubmit(values: z.infer<typeof workFormSchema>) {
-    post(
-      route('work.store', {
-        ...values,
-        image: editor.current?.getImageScaledToCanvas().toDataURL(),
-      }),
-    );
+    if (image && editor.current) {
+      editor.current.getImageScaledToCanvas().toBlob((blob) => {
+        const formData = new FormData();
+        if (blob) {
+          const file = new File([blob], 'untitled', { type: blob.type });
+          formData.append('image', file);
+        }
+
+        router.post(
+          route('work.post', {
+            ...values,
+          }),
+          formData,
+          {
+            forceFormData: true,
+          },
+        );
+      });
+    } else {
+      router.post(
+        route('work.post', {
+          ...values,
+        }),
+      );
+    }
   }
 
   return (

@@ -3,7 +3,7 @@ import AppLayout from '@/layouts/app-layout';
 import { type InertiaProps, type BreadcrumbItem } from '@/types/index';
 import { PublicationStatus, ReadingStatus, workFormSchema } from '@/types/schemas/work';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Head, router, usePage } from '@inertiajs/react';
+import { Head, router, useForm as useInertiaForm, usePage } from '@inertiajs/react';
 import { useRef, useState } from 'react';
 import AvatarEditor from 'react-avatar-editor';
 import { useForm } from 'react-hook-form';
@@ -29,6 +29,8 @@ export default function Edit() {
   const editor = useRef<AvatarEditor>(null);
   const [image, setImage] = useState<File | string | null>(work.image);
 
+  const { get } = useInertiaForm();
+
   const form = useForm<z.infer<typeof workFormSchema>>({
     resolver: zodResolver(workFormSchema),
     defaultValues: {
@@ -48,20 +50,37 @@ export default function Edit() {
 
   function onSubmit(values: z.infer<typeof workFormSchema>) {
     const isDirty = form.formState.isDirty || work.tags !== values.tags || work.links !== values.links;
-    const fileIsDirty = work.image !== image;
 
-    if (isDirty || fileIsDirty) {
-      let i = null;
-      if (fileIsDirty) {
-        i = editor.current?.getImageScaledToCanvas().toDataURL();
+    if (isDirty) {
+      if (editor.current && work.image !== image) {
+        editor.current.getImageScaledToCanvas().toBlob((blob) => {
+          const formData = new FormData();
+          if (blob) {
+            const file = new File([blob], 'untitled', { type: blob.type });
+            formData.append('image', file);
+          }
+
+          router.post(
+            route('work.update', {
+              work: work.id,
+              ...values,
+            }),
+            formData,
+            {
+              forceFormData: true,
+            },
+          );
+        });
+      } else {
+        router.post(
+          route('work.update', {
+            work: work.id,
+            ...values,
+          }),
+        );
       }
-
-      router.put(route('work.update', work.id), {
-        ...values,
-        image: i,
-      });
     } else {
-      router.get(route('work', work.id));
+      get(route('work', work.id));
     }
   }
 

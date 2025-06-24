@@ -30,7 +30,7 @@ class UpdateWorkRequest extends FormRequest {
 			'language_translated' => 'nullable|string|in:' . $languages,
 			'publication_year' => 'nullable|integer|min:-5000|max:5000',
 			'image_self' => 'nullable|string|max:255',
-			'image' => 'nullable|string|max:16777216',
+			'image' => 'nullable|file|mimetypes:image/png,image/webp,image/jpeg,image/avif|max:16384',
 			'tags' => 'nullable|string|max:1000',
 			'links' => 'nullable|string|max:3000',
 		];

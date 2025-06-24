@@ -136,10 +136,6 @@ function getBreadcrumbs(ShowWorkRequest $request, Work $work): array {
 	return $defaultBreadcrumbs;
 }
 
-function fileIsAllowed(string $image): bool {
-	return str_starts_with($image, 'data:image/avif') || str_starts_with($image, 'data:image/jpeg') || str_starts_with($image, 'data:image/png') || str_starts_with($image, 'data:image/webp');
-}
-
 class WorkController extends Controller {
 	use AuthorizesRequests;
 
@@ -201,13 +197,9 @@ class WorkController extends Controller {
 		$requestWork['user_id'] = $user->id;
 		$image = $requestWork['image'] ?? null;
 
-		if ($image && !fileIsAllowed($image)) {
-			return back()->with('error', 'File data type not allowed.');
-		}
-
 		try {
 			if ($image) {
-				$result = $this->cloudinary->uploadApi()->upload($image);
+				$result = $this->cloudinary->uploadApi()->upload($image->getRealPath());
 				$requestWork['image'] = $result['secure_url'];
 				$requestWork['image_public_id'] = $result['public_id'];
 			}
@@ -258,19 +250,15 @@ class WorkController extends Controller {
 		$requestWork = $request->validated();
 		$image = $requestWork['image'] ?? null;
 
-		if ($image && !fileIsAllowed($image)) {
-			return back()->with('error', 'File data type not allowed.');
-		}
-
 		try {
-			if ($work->image_public_id) {
-				$this->cloudinary->uploadApi()->destroy($work->image_public_id);
-				$requestWork['image'] = null;
-				$requestWork['image_public_id'] = null;
-			}
-
 			if ($image) {
-				$result = $this->cloudinary->uploadApi()->upload($image);
+				if ($work->image_public_id) {
+					$this->cloudinary->uploadApi()->destroy($work->image_public_id);
+					$requestWork['image'] = null;
+					$requestWork['image_public_id'] = null;
+				}
+
+				$result = $this->cloudinary->uploadApi()->upload($image->getRealPath());
 				$requestWork['image'] = $result['secure_url'];
 				$requestWork['image_public_id'] = $result['public_id'];
 			}
