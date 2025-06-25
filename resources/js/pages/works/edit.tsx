@@ -28,6 +28,8 @@ export default function Edit() {
 
   const editor = useRef<AvatarEditor>(null);
   const [image, setImage] = useState<File | string | null>(work.image);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [imageIsDirty, setImageIsDirty] = useState(false);
 
   const { get } = useInertiaForm();
 
@@ -49,10 +51,38 @@ export default function Edit() {
   });
 
   function onSubmit(values: z.infer<typeof workFormSchema>) {
-    const isDirty = form.formState.isDirty || work.tags !== values.tags || work.links !== values.links;
+    setIsSubmitting(true);
+
+    const trimmedStringValues = {
+      title: values.title.trim(),
+      description: values.description?.trim(),
+      author: values.author?.trim(),
+      tags: values.tags?.trim(),
+      links: values.links?.trim(),
+      image_self: values.image_self?.trim(),
+    };
+
+    const processedValues = {
+      ...values,
+      ...trimmedStringValues,
+    };
+
+    const isDirty =
+      trimmedStringValues.title !== work.title ||
+      trimmedStringValues.description !== (work.description || '') ||
+      trimmedStringValues.author !== (work.author || '') ||
+      processedValues.status_publication !== (work.status_publication || undefined) ||
+      processedValues.status_reading !== work.status_reading ||
+      processedValues.language_original !== (work.language_original || undefined) ||
+      processedValues.language_translated !== (work.language_translated || undefined) ||
+      processedValues.publication_year !== (work.publication_year || undefined) ||
+      trimmedStringValues.image_self !== (work.image_self || '') ||
+      trimmedStringValues.tags !== (work.tags || '') ||
+      trimmedStringValues.links !== (work.links || '') ||
+      imageIsDirty; // i give up on form.formState.isDirty
 
     if (isDirty) {
-      if (editor.current && work.image !== image) {
+      if (editor.current && imageIsDirty) {
         editor.current.getImageScaledToCanvas().toBlob((blob) => {
           const formData = new FormData();
           if (blob) {
@@ -63,11 +93,13 @@ export default function Edit() {
           router.post(
             route('work.update', {
               work: work.id,
-              ...values,
+              ...processedValues,
             }),
             formData,
             {
               forceFormData: true,
+              onFinish: () => setIsSubmitting(false),
+              onError: () => setIsSubmitting(false),
             },
           );
         });
@@ -75,12 +107,17 @@ export default function Edit() {
         router.post(
           route('work.update', {
             work: work.id,
-            ...values,
+            ...processedValues,
           }),
+          undefined,
+          {
+            onFinish: () => setIsSubmitting(false),
+            onError: () => setIsSubmitting(false),
+          },
         );
       }
     } else {
-      get(route('work', work.id));
+      get(route('work', work.id), { onFinish: () => setIsSubmitting(false) });
     }
   }
 
@@ -94,6 +131,8 @@ export default function Edit() {
         form={form}
         onSubmit={onSubmit}
         editor={editor}
+        isSubmitting={isSubmitting}
+        setImageIsDirty={setImageIsDirty}
       />
     </AppLayout>
   );

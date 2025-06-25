@@ -16,10 +16,12 @@ import { z } from 'zod';
 
 interface WorkFormProps {
   image: File | string | null;
+  setImageIsDirty?: Dispatch<SetStateAction<boolean>>;
   setImage: Dispatch<SetStateAction<string | File | null>>;
   form: UseFormReturn<z.infer<typeof workFormSchema>>;
   onSubmit: (values: z.infer<typeof workFormSchema>) => void;
   editor: RefObject<AvatarEditor | null>;
+  isSubmitting: boolean;
 }
 
 const MAX_FILE_SIZE = 16777216;
@@ -34,7 +36,7 @@ function fileSizeValidator(file: File) {
   return null;
 }
 
-export default function WorkForm({ image, setImage, form, onSubmit, editor }: WorkFormProps) {
+export default function WorkForm({ image, setImage, form, onSubmit, editor, isSubmitting, setImageIsDirty }: WorkFormProps) {
   const [scale, setScale] = useState<number>(1);
 
   const onDrop = useCallback(
@@ -60,22 +62,43 @@ export default function WorkForm({ image, setImage, form, onSubmit, editor }: Wo
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-6"
+        className="mb-6 space-y-6"
       >
-        <FormField
-          control={form.control}
-          name="title"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Title</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormDescription>The title of the work, required</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <FormField
+            control={form.control}
+            name="title"
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormLabel>Title</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormDescription>The title of the work, up to 255 characters, required</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="publication_year"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Publication Year</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="number"
+                    className="[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                  />
+                </FormControl>
+                <FormDescription>Optional, between -5000 and 5000</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <FormField
           control={form.control}
@@ -86,197 +109,189 @@ export default function WorkForm({ image, setImage, form, onSubmit, editor }: Wo
               <FormControl>
                 <Textarea {...field} />
               </FormControl>
-              <FormDescription>A brief summary or synopsis of the work, optional</FormDescription>
+              <FormDescription>A brief summary/synopsis of the work, up to 2000 characters</FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="status_publication"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Publication status</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                defaultValue={field.value ?? undefined}
-              >
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
+          <FormField
+            control={form.control}
+            name="status_publication"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Publication status</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value ?? undefined}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select publication status" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {publicationStatuses.map((s: PublicationStatus) => (
+                      <SelectItem
+                        key={s}
+                        value={s}
+                      >
+                        {s.charAt(0).toUpperCase() + s.slice(1)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="status_reading"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Reading status</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select reading status" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {readingStatuses.map((s: ReadingStatus) => (
+                      <SelectItem
+                        key={s}
+                        value={s}
+                      >
+                        {s.charAt(0).toUpperCase() + s.slice(1)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="language_original"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Original Language</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value ?? undefined}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select original language" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {Object.entries(languages).map(([code, name]) => (
+                      <SelectItem
+                        key={code}
+                        value={code}
+                      >
+                        <Flag
+                          name={name}
+                          code={code}
+                        />
+                        {name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="language_translated"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Translated Language</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value ?? undefined}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select translated language" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {Object.entries(languages).map(([code, name]) => (
+                      <SelectItem
+                        key={code}
+                        value={code}
+                      >
+                        <Flag
+                          name={name}
+                          code={code}
+                        />
+                        {name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className="flex flex-col gap-2 lg:flex-row lg:items-start">
+          <FormField
+            control={form.control}
+            name="author"
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormLabel>Author(s)</FormLabel>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select publication status" />
-                  </SelectTrigger>
+                  <InputTags
+                    value={field.value ?? ''}
+                    onChange={(e) => field.onChange(e.target.value)}
+                    shorten
+                  >
+                    <FormDescription>Use commas to register names, up to 255 characters</FormDescription>
+                  </InputTags>
                 </FormControl>
-                <SelectContent>
-                  {publicationStatuses.map((s: PublicationStatus) => (
-                    <SelectItem
-                      key={s}
-                      value={s}
-                    >
-                      {s.charAt(0).toUpperCase() + s.slice(1)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="status_reading"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Reading status</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-              >
+          <FormField
+            control={form.control}
+            name="tags"
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormLabel>Tags</FormLabel>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select reading status" />
-                  </SelectTrigger>
+                  <InputTags
+                    lowercase
+                    value={field.value ?? ''}
+                    onChange={(e) => field.onChange(e.target.value)}
+                    shorten
+                    uppercase
+                  >
+                    <FormDescription>Use commas to register tags, up to 1000 characters</FormDescription>
+                  </InputTags>
                 </FormControl>
-                <SelectContent>
-                  {readingStatuses.map((s: ReadingStatus) => (
-                    <SelectItem
-                      key={s}
-                      value={s}
-                    >
-                      {s.charAt(0).toUpperCase() + s.slice(1)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="author"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Author</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormDescription>Use commas as separator for multiple names, optional, up to 255 characters.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="language_original"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Original Language</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                defaultValue={field.value ?? undefined}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select original language" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {Object.entries(languages).map(([code, name]) => (
-                    <SelectItem
-                      key={code}
-                      value={code}
-                    >
-                      <Flag
-                        name={name}
-                        code={code}
-                      />
-                      {name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="language_translated"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Translated Language</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                defaultValue={field.value ?? undefined}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select translated language" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {Object.entries(languages).map(([code, name]) => (
-                    <SelectItem
-                      key={code}
-                      value={code}
-                    >
-                      <Flag
-                        name={name}
-                        code={code}
-                      />
-                      {name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="publication_year"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Publication Year</FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  type="number"
-                  className="[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                />
-              </FormControl>
-              <FormDescription>Optional, between -5000 and 5000</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="tags"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Tags</FormLabel>
-              <FormControl>
-                <InputTags
-                  lowercase
-                  {...field}
-                  value={field.value ?? ''}
-                  onChange={(e) => field.onChange(e.target.value)}
-                />
-              </FormControl>
-              <FormDescription>Enter tags separated by commas e.g. "romance,comedy, isekai", optional, up to 1000 characters</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <FormField
           control={form.control}
@@ -290,8 +305,10 @@ export default function WorkForm({ image, setImage, form, onSubmit, editor }: Wo
                   pipeAsSeperator
                   {...field}
                   value={field.value ?? ''}
-                  children={<FormDescription>Enter links separated by pipe symbols |, optional, up to 3000 characters</FormDescription>}
-                />
+                  shorten
+                >
+                  <FormDescription>Enter links separated by pipe symbols |, optional, up to 3000 characters</FormDescription>
+                </InputTags>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -299,12 +316,12 @@ export default function WorkForm({ image, setImage, form, onSubmit, editor }: Wo
         />
 
         <Tabs
-          defaultValue={image ? 'upload' : 'url'}
-          className="w-full"
+          defaultValue={form.getValues('image_self')?.length ? 'url' : 'upload'}
+          className="w-full -translate-y-2"
         >
-          <TabsList>
-            <TabsTrigger value="url">Image URL</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="upload">Upload Image</TabsTrigger>
+            <TabsTrigger value="url">Image URL</TabsTrigger>
           </TabsList>
 
           <TabsContent value="url">
@@ -322,7 +339,7 @@ export default function WorkForm({ image, setImage, form, onSubmit, editor }: Wo
                       })}
                     />
                   </FormControl>
-                  <FormDescription>URL for the cover image of the work, optional, up to 255 characters</FormDescription>
+                  <FormDescription>URL for the cover image of the work, up to 255 characters</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -330,15 +347,7 @@ export default function WorkForm({ image, setImage, form, onSubmit, editor }: Wo
           </TabsContent>
 
           <TabsContent value="upload">
-            <div className="flex flex-col gap-y-3 sm:flex-row sm:gap-x-3">
-              <div
-                {...getRootProps()}
-                className="flex flex-1 flex-col items-center justify-center border-4 border-dashed p-6"
-              >
-                <input {...getInputProps()} />
-                {isDragActive ? <p>Drop the file here ...</p> : <p className="text-sm">Drag 'n' drop your file here, or click to select files</p>}
-                <em className="text-muted-foreground text-xs">Accepted formats: AVIF, JPEG, PNG, WEBP. Max file size: 16MB.</em>
-              </div>
+            <div className="mt-1 flex flex-col gap-y-3 sm:flex-row sm:gap-x-3">
               {image && (
                 <div className="flex flex-col items-center justify-center gap-y-4">
                   <AvatarEditor
@@ -351,20 +360,38 @@ export default function WorkForm({ image, setImage, form, onSubmit, editor }: Wo
                     scale={scale}
                     borderRadius={4}
                     className="rounded-sm"
+                    crossOrigin="anonymous"
                   />
                   <Slider
                     defaultValue={[0]}
-                    onValueChange={(s) => setScale(1 + s[0] / 25)}
+                    onValueChange={(s) => {
+                      setScale(1 + s[0] / 25);
+                      if (setImageIsDirty) setImageIsDirty(true);
+                    }}
                     max={100}
                     step={1}
                   />
                 </div>
               )}
+              <div
+                {...getRootProps()}
+                className="flex flex-1 flex-col items-center justify-center rounded border-4 border-dashed p-6"
+              >
+                <input {...getInputProps()} />
+                {isDragActive ? <p>Drop the file here ...</p> : <p className="text-sm">Drag 'n' drop your file here, or click to select files</p>}
+                <em className="text-muted-foreground text-xs">Accepted formats: AVIF, JPEG, PNG, WEBP. Max file size: 16MB.</em>
+              </div>
             </div>
           </TabsContent>
         </Tabs>
 
-        <Button type="submit">Submit</Button>
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={isSubmitting}
+        >
+          {form.getValues('title') ? 'Update your entry!' : 'Create new entry!'}
+        </Button>
       </form>
     </Form>
   );

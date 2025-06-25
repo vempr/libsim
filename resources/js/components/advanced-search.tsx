@@ -49,6 +49,7 @@ export function AdvancedSearchForm({ state }: { state?: AdvancedSearchFormState 
     setIsSubmitting(true);
     get(route('work.index', { ...values, advanced: adv }), {
       onFinish: () => setIsSubmitting(false),
+      onError: () => setIsSubmitting(false),
     });
   };
 
@@ -334,6 +335,7 @@ export function AdvancedSearchForm({ state }: { state?: AdvancedSearchFormState 
                       value={field.value ?? ''}
                       onChange={(e) => field.onChange(e.target.value)}
                       shorten
+                      uppercase
                     >
                       <FormDescription>Use commas to register tags, up to 1000 characters</FormDescription>
                     </InputTags>
