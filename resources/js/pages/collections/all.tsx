@@ -36,15 +36,16 @@ export default function All() {
               className="text-card-foreground bg-card border-border hover:bg-card-accent flex h-full w-full flex-col justify-between gap-y-2 rounded-md border px-3 py-2 md:flex-row"
             >
               <div className="flex flex-col overflow-hidden">
-                <h2 className="font-secondary text-xl tracking-tight md:text-3xl">
-                  {shortenString(collection.name)} <MutedSpan>({collection.works_count})</MutedSpan>
+                <h2 className="font-secondary text-xl tracking-tight md:text-2xl">
+                  {shortenString(collection.name)}{' '}
+                  <MutedSpan>
+                    <span className="text-base">({collection.works_count})</span>
+                  </MutedSpan>
                 </h2>
-                <p className="text-muted-foreground text-sm md:text-base">
-                  Last updated: {collection.updated_at ? dayjs(collection.updated_at).fromNow() : ' -'}
-                </p>
+                <p className="text-muted-foreground text-sm">Last updated: {collection.updated_at ? dayjs(collection.updated_at).fromNow() : ' -'}</p>
               </div>
 
-              <div className="text-sm opacity-80 md:text-base">
+              <div className="text-sm opacity-80">
                 <MutedP>Created on {dayjs(collection.created_at).format('MMMM D, YYYY')}</MutedP>
               </div>
             </Link>

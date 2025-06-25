@@ -156,7 +156,6 @@ class WorkController extends Controller {
 
 	public function index(Request $request) {
 		$state = [
-			'searchIncludeFavorites' => $request->input('searchIncludeFavorites'),
 			'q' => $request->input('q'),
 			'author' => $request->input('author'),
 			'tags' => $request->input('tags'),
@@ -171,13 +170,8 @@ class WorkController extends Controller {
 		$worksQuery = Work::query()->where('user_id', $user->id);
 		$works = search($worksQuery, $state)->paginate(15, ['*'], 'saved');
 
-		$favoritedWorks = null;
-		if (filter_var($request->input('searchIncludeFavorites', false), FILTER_VALIDATE_BOOLEAN)) {
-			$favoriteQuery = $user->favoriteWorks();
-			$favoritedWorks = search($favoriteQuery, $state)->paginate(15, ['*'], 'favorited');
-		} else {
-			$favoritedWorks = $user->favoriteWorks()->paginate(15, ['*'], 'favorited');
-		}
+		$favoriteQuery = $user->favoriteWorks();
+		$favoritedWorks = search($favoriteQuery, $state)->paginate(15, ['*'], 'favorited');
 
 		return Inertia::render('works/all', [
 			'worksPaginatedResponse' => $works,

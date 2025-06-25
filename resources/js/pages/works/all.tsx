@@ -33,9 +33,9 @@ export default function All() {
       <Tabs
         defaultValue={value}
         onValueChange={setValue}
-        className="w-[400px]"
+        className="my-2"
       >
-        <TabsList>
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger
             value="own-works"
             onClick={() => updateLs(false)}
@@ -50,10 +50,9 @@ export default function All() {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="own-works">
-          <ul>
-            OWN WORKS
+          <ul className="flex flex-col gap-y-2">
             {worksPaginatedResponse?.data.map((work) => (
-              <li>
+              <li className="max-w-40 overflow-auto">
                 <Link href={`/works/${work.id}`}>{JSON.stringify(work)}</Link>
               </li>
             ))}
@@ -62,7 +61,6 @@ export default function All() {
         </TabsContent>
         <TabsContent value="favorited-works">
           <ul>
-            FAVORITED WORKS
             {favoritesPaginatedResponse?.data.map((favorite) => (
               <li>
                 <Link href={`/works/${favorite.id}?favorite=true`}>{JSON.stringify(favorite)}</Link>

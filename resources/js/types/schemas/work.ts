@@ -57,7 +57,7 @@ export const workFormSchema = z.object({
   description: z.string().max(2000, 'Description cannot exceed 2000 characters').optional(),
   status_publication: z.enum(publicationStatuses).optional(),
   status_reading: z.enum(readingStatuses),
-  author: z.string().max(255, "Author's name can't be longer than 255 characters").optional(),
+  author: z.string().max(255, "Name(s) can't be longer than 255 characters").optional(),
   language_original: languageSchema.optional(),
   language_translated: languageSchema.optional(),
   publication_year: z.coerce
@@ -72,7 +72,7 @@ export const workFormSchema = z.object({
 
 export const searchSchema = z.object({
   q: z.string().max(255, "Query can't be longer than 255 characters").optional(),
-  author: z.string().max(255, "Author's name can't be longer than 255 characters").nullable().optional(),
+  author: z.string().max(255, "Name(s) can't be longer than 255 characters").nullable().optional(),
   tags: z.string().max(1000, 'Tags cannot exceed 1000 characters').nullable().optional(),
   language_original: languageSchema.nullable().optional(),
   language_translated: languageSchema.nullable().optional(),

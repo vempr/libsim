@@ -4,15 +4,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { PublicationStatus, ReadingStatus, SearchInput, languages, publicationStatuses, readingStatuses, searchSchema } from '@/types/schemas/work';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { router } from '@inertiajs/react';
+import { useForm as useInertiaForm } from '@inertiajs/react';
+import { ChevronLeft, EllipsisVerticalIcon, Search } from 'lucide-react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { Flag } from './flag';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Switch } from './ui/switch';
 
 type AdvancedSearchFormState = {
   q: string | null;
@@ -27,7 +27,9 @@ type AdvancedSearchFormState = {
 
 export function AdvancedSearchForm({ state }: { state?: AdvancedSearchFormState }) {
   const { ls: adv, updateLs: setAdv } = useLocalStorage('advancedSearch');
-  const { ls: searchIncludeFavorites, updateLs: updateSearchIncludeFavorites } = useLocalStorage('searchIncludeFavorites');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { get } = useInertiaForm();
 
   const form = useForm<SearchInput>({
     resolver: zodResolver(searchSchema),
@@ -44,15 +46,24 @@ export function AdvancedSearchForm({ state }: { state?: AdvancedSearchFormState 
   });
 
   const handleSearch = (values?: z.infer<typeof searchSchema>) => {
-    router.get(route('work.index'), { ...values, advanced: adv, searchIncludeFavorites });
+    setIsSubmitting(true);
+    get(route('work.index', { ...values, advanced: adv }), {
+      onFinish: () => setIsSubmitting(false),
+    });
   };
 
   const onSubmit = (values: z.infer<typeof searchSchema>) => {
+    const trimmedStringValues = {
+      q: values.q?.trim(),
+      author: values.author?.trim(),
+      tags: values.tags?.trim(),
+    };
+
     if (!adv) {
-      handleSearch({ q: values.q });
+      if (trimmedStringValues.q?.length) handleSearch({ q: trimmedStringValues.q });
     } else {
       delete values.q;
-      handleSearch(values);
+      handleSearch({ ...values, ...trimmedStringValues });
     }
   };
 
@@ -60,253 +71,310 @@ export function AdvancedSearchForm({ state }: { state?: AdvancedSearchFormState 
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-6"
+        className="flex flex-col space-y-2"
       >
-        <div className={adv ? 'hidden' : 'block'}>
-          <FormField
-            control={form.control}
-            name="q"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Search by title</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      if (val.length === 0) {
-                        field.onChange('');
-                        handleSearch();
-                      } else field.onChange(val);
-                    }}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <div className={adv ? 'hidden' : 'mb-0 flex flex-col-reverse gap-x-1 gap-y-2'}>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => {
+              setAdv(!adv);
+              window.scrollTo(0, 0);
+            }}
+            className="flex gap-x-1.5 md:hidden"
+          >
+            <div className="-ml-2 rounded-full border p-0.5">
+              <EllipsisVerticalIcon />
+            </div>
+            <p className="-translate-y-0.25">Advanced search</p>
+          </Button>
+
+          <div className="flex gap-x-1">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => {
+                setAdv(!adv);
+                window.scrollTo(0, 0);
+              }}
+              className="hidden gap-x-1.5 md:flex"
+            >
+              <div className="-ml-2 rounded-full border p-0.5">
+                <EllipsisVerticalIcon />
+              </div>
+              <p className="-translate-y-0.25">Advanced search</p>
+            </Button>
+
+            <FormField
+              control={form.control}
+              name="q"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel className="sr-only">Search by title</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (val.length === 0) {
+                          field.onChange('');
+                          handleSearch();
+                        } else field.onChange(val);
+                      }}
+                      placeholder="Search for works..."
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="not-sr-only w-fit md:w-16"
+            >
+              <Search />
+            </Button>
+
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="sr-only"
+            >
+              Search for user
+            </Button>
+          </div>
         </div>
 
-        <div className={adv ? 'block space-y-6' : 'hidden'}>
-          <FormField
-            control={form.control}
-            name="status_publication"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Publication status</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={(state?.status_publication as PublicationStatus) ?? undefined}
-                >
+        <div className={adv ? 'flex flex-col gap-y-3' : 'hidden'}>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
+            <FormField
+              control={form.control}
+              name="status_publication"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel className="font-secondary">Publication status</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={(state?.status_publication as PublicationStatus) ?? undefined}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select publication status" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {publicationStatuses.map((s: PublicationStatus) => (
+                        <SelectItem
+                          key={s}
+                          value={s}
+                        >
+                          {s.charAt(0).toUpperCase() + s.slice(1)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="status_reading"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel className="font-secondary">Reading status</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={(state?.status_reading as ReadingStatus) ?? undefined}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select reading status" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {readingStatuses.map((s: ReadingStatus) => (
+                        <SelectItem
+                          key={s}
+                          value={s}
+                        >
+                          {s.charAt(0).toUpperCase() + s.slice(1)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="language_original"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel className="font-secondary">Original Language</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={state?.language_original ?? undefined}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select original language" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {Object.entries(languages).map(([code, name]) => (
+                        <SelectItem
+                          key={code}
+                          value={code}
+                        >
+                          <Flag
+                            name={name}
+                            code={code}
+                          />
+                          {name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="language_translated"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel className="font-secondary">Translated Language</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={state?.language_translated ?? undefined}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select translated language" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {Object.entries(languages).map(([code, name]) => (
+                        <SelectItem
+                          key={code}
+                          value={code}
+                        >
+                          <Flag
+                            name={name}
+                            code={code}
+                          />
+                          {name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="flex flex-col gap-2 lg:flex-row lg:items-start">
+            <FormField
+              control={form.control}
+              name="publication_year"
+              render={({ field }) => (
+                <FormItem className="flex-2 lg:flex-1">
+                  <FormLabel className="font-secondary">Publication Year</FormLabel>
                   <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select publication status" />
-                    </SelectTrigger>
+                    <Input
+                      {...field}
+                      type="number"
+                      className="[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                    />
                   </FormControl>
-                  <SelectContent>
-                    {publicationStatuses.map((s: PublicationStatus) => (
-                      <SelectItem
-                        key={s}
-                        value={s}
-                      >
-                        {s.charAt(0).toUpperCase() + s.slice(1)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  <FormDescription>-5000 {'< year <'} 5000</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name="status_reading"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Reading status</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={(state?.status_reading as ReadingStatus) ?? undefined}
-                >
+            <FormField
+              control={form.control}
+              name="author"
+              render={({ field }) => (
+                <FormItem className="flex-2">
+                  <FormLabel className="font-secondary">Author</FormLabel>
                   <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select reading status" />
-                    </SelectTrigger>
+                    <InputTags
+                      value={field.value ?? ''}
+                      onChange={(e) => field.onChange(e.target.value)}
+                      shorten
+                    >
+                      <FormDescription>Use commas to register names, up to 255 characters</FormDescription>
+                    </InputTags>
                   </FormControl>
-                  <SelectContent>
-                    {readingStatuses.map((s: ReadingStatus) => (
-                      <SelectItem
-                        key={s}
-                        value={s}
-                      >
-                        {s.charAt(0).toUpperCase() + s.slice(1)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name="author"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Author</FormLabel>
-                <FormControl>
-                  <InputTags
-                    value={field.value ?? ''}
-                    onChange={(e) => field.onChange(e.target.value)}
-                  />
-                </FormControl>
-                <FormDescription>Use commas as separator for multiple names, optional, up to 255 characters.</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="language_original"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Original Language</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={state?.language_original ?? undefined}
-                >
+            <FormField
+              control={form.control}
+              name="tags"
+              render={({ field }) => (
+                <FormItem className="flex-2">
+                  <FormLabel className="font-secondary">Tags</FormLabel>
                   <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select original language" />
-                    </SelectTrigger>
+                    <InputTags
+                      lowercase
+                      value={field.value ?? ''}
+                      onChange={(e) => field.onChange(e.target.value)}
+                      shorten
+                    >
+                      <FormDescription>Use commas to register tags, up to 1000 characters</FormDescription>
+                    </InputTags>
                   </FormControl>
-                  <SelectContent>
-                    {Object.entries(languages).map(([code, name]) => (
-                      <SelectItem
-                        key={code}
-                        value={code}
-                      >
-                        <Flag
-                          name={name}
-                          code={code}
-                        />
-                        {name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
 
-          <FormField
-            control={form.control}
-            name="language_translated"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Translated Language</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={state?.language_translated ?? undefined}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select translated language" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {Object.entries(languages).map(([code, name]) => (
-                      <SelectItem
-                        key={code}
-                        value={code}
-                      >
-                        <Flag
-                          name={name}
-                          code={code}
-                        />
-                        {name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
-          <FormField
-            control={form.control}
-            name="publication_year"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Publication Year</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    type="number"
-                    className="[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                  />
-                </FormControl>
-                <FormDescription>Optional, between -5000 and 5000</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="flex gap-x-1">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => {
+                setAdv(!adv);
+                window.scrollTo(0, 0);
+              }}
+            >
+              <ChevronLeft /> <p className="sr-only">Back to simple search</p>
+            </Button>
 
-          <FormField
-            control={form.control}
-            name="tags"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Tags</FormLabel>
-                <FormControl>
-                  <InputTags
-                    lowercase
-                    value={field.value ?? ''}
-                    onChange={(e) => field.onChange(e.target.value)}
-                  />
-                </FormControl>
-                <FormDescription>Enter tags separated by commas e.g. "romance,comedy, isekai", optional, up to 1000 characters</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={() => handleSearch()}
+              className="dark:hover:opacity-80"
+            >
+              Reset query options
+            </Button>
+
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="not-sr-only w-16 flex-1"
+            >
+              <Search />
+            </Button>
+          </div>
         </div>
-
-        <Button
-          type="button"
-          variant="secondary"
-          onClick={() => {
-            setAdv(!adv);
-            window.scrollTo(0, 0);
-          }}
-        >
-          {adv ? 'Simple search' : 'Advanced search'}
-        </Button>
-
-        <Button type="submit">Submit</Button>
-
-        <div className="flex items-center space-x-2">
-          <Switch
-            id="include-favorites"
-            checked={searchIncludeFavorites}
-            onCheckedChange={updateSearchIncludeFavorites}
-          />
-          <Label htmlFor="include-favorites">Search includes favorited works?</Label>
-        </div>
-
-        <Button
-          type="button"
-          variant="secondary"
-          onClick={() => handleSearch()}
-          className={adv ? 'inline' : 'hidden'}
-        >
-          Reset query options
-        </Button>
       </form>
     </Form>
   );

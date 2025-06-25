@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { shortenString } from '@/lib/shorten';
 import { cn } from '@/lib/utils';
 import { XIcon } from 'lucide-react';
 import * as React from 'react';
@@ -12,10 +13,11 @@ type InputTagsProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value' 
   displayAsList?: boolean;
   pipeAsSeperator?: boolean;
   children?: React.ReactNode;
+  shorten?: boolean;
 };
 
 const InputTags = React.forwardRef<HTMLInputElement, InputTagsProps>(
-  ({ className, value = '', lowercase, uppercase, onChange, displayAsList = true, children, pipeAsSeperator }, ref) => {
+  ({ className, value = '', lowercase, uppercase, onChange, displayAsList = true, children, pipeAsSeperator, shorten = false }, ref) => {
     const [pendingDataPoint, setPendingDataPoint] = React.useState('');
 
     const separator = pipeAsSeperator ? '|' : ',';
@@ -138,14 +140,14 @@ const InputTags = React.forwardRef<HTMLInputElement, InputTagsProps>(
         {children}
 
         {displayAsList && tags.length > 0 && (
-          <div className="mb-2 flex flex-wrap gap-2">
+          <div className="mb-2 max-h-24 space-y-1 space-x-1.5 overflow-x-hidden overflow-y-scroll">
             {tags.map((item, index) => (
               <Badge
                 key={index}
                 variant="secondary"
                 className="dark:bg-sidebar-accent h-6"
               >
-                {item}
+                {shorten ? shortenString(item) : item}
                 <Button
                   variant="ghost"
                   size="icon"
