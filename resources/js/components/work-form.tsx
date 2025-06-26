@@ -329,7 +329,7 @@ export default function WorkForm({ image, setImage, form, onSubmit, editor, isSu
               control={form.control}
               name="image_self"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="mt-1">
                   <FormLabel>Image (URL)</FormLabel>
                   <FormControl>
                     <Input
@@ -355,10 +355,11 @@ export default function WorkForm({ image, setImage, form, onSubmit, editor, isSu
                     image={image}
                     width={200}
                     height={284.383}
-                    border={4}
-                    color={[255, 255, 255, 0.7]} // RGBA
+                    border={3}
+                    color={[255, 224, 102]}
                     scale={scale}
-                    borderRadius={4}
+                    borderRadius={2}
+                    borderColor={[58, 91, 160]}
                     className="rounded-sm"
                     crossOrigin="anonymous"
                   />
@@ -390,7 +391,7 @@ export default function WorkForm({ image, setImage, form, onSubmit, editor, isSu
           className="w-full"
           disabled={isSubmitting}
         >
-          {form.getValues('title') ? 'Update your entry!' : 'Create new entry!'}
+          {form.getValues('title')?.length ? 'Update your entry!' : 'Create new entry!'}
         </Button>
       </form>
     </Form>

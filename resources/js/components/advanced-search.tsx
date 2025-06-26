@@ -84,7 +84,7 @@ export function AdvancedSearchForm({ state }: { state?: AdvancedSearchFormState 
             }}
             className="flex gap-x-1.5 md:hidden"
           >
-            <div className="-ml-2 rounded-full border p-0.5">
+            <div className="border-border/50 -ml-2 rounded-full border p-0.5">
               <EllipsisVerticalIcon />
             </div>
             <p className="-translate-y-0.25">Advanced search</p>
@@ -100,7 +100,7 @@ export function AdvancedSearchForm({ state }: { state?: AdvancedSearchFormState 
               }}
               className="hidden gap-x-1.5 md:flex"
             >
-              <div className="-ml-2 rounded-full border p-0.5">
+              <div className="border-border/50 -ml-2 rounded-full border p-0.5">
                 <EllipsisVerticalIcon />
               </div>
               <p className="-translate-y-0.25">Advanced search</p>

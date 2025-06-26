@@ -63,7 +63,7 @@ class ChatController extends Controller {
 		});
 
 		return Inertia::render('chat/all', [
-			'friendsPaginatedResponse' => $friends,
+			'friendsMessagesPaginatedResponse' => $friends,
 		]);
 	}
 

@@ -2,12 +2,11 @@ import InertiaPagination from '@/components/inertia-pagination';
 import { MutedP, MutedSpan } from '@/components/muted-text';
 import NewCollectionSheet from '@/components/new-collection-sheet';
 import AppLayout from '@/layouts/app-layout';
+import { getFormattedDate, getRelativeTime } from '@/lib/date';
 import { hasOnePage } from '@/lib/pagination';
 import { shortenString } from '@/lib/shorten';
 import { BreadcrumbItem, InertiaProps } from '@/types';
 import { Head, usePage, Link } from '@inertiajs/react';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -19,8 +18,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function All() {
   const { collectionsPaginatedResponse } = usePage<InertiaProps>().props;
   const singlePage = hasOnePage(collectionsPaginatedResponse);
-
-  dayjs.extend(relativeTime);
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
@@ -42,11 +39,13 @@ export default function All() {
                     <span className="text-base">({collection.works_count})</span>
                   </MutedSpan>
                 </h2>
-                <p className="text-muted-foreground text-sm">Last updated: {collection.updated_at ? dayjs(collection.updated_at).fromNow() : ' -'}</p>
+                <p className="text-muted-foreground text-sm">
+                  Last updated: {collection.updated_at ? getFormattedDate(collection.updated_at) : ' -'}
+                </p>
               </div>
 
               <div className="text-sm opacity-80">
-                <MutedP>Created on {dayjs(collection.created_at).format('MMMM D, YYYY')}</MutedP>
+                <MutedP>Created on {getRelativeTime(collection.created_at)}</MutedP>
               </div>
             </Link>
           </li>

@@ -111,6 +111,21 @@ interface CollectionList extends Collection {
   updated_at: string | null;
 }
 
+interface MessageFriend extends ChatUser {
+  private_works: number;
+  latest_message: {
+    id: string;
+    sender_id: string;
+    receiver_id: string;
+    text: string | null;
+    work_id: string | null;
+    is_deleted: number;
+    created_at: string;
+    updated_at: string;
+    work: ChatWork | null;
+  } | null;
+}
+
 interface ChatWork {
   id: string;
   title: string;
@@ -198,6 +213,7 @@ export interface InertiaProps extends Page<PageProps> {
   friends: (ChatUser & { latest_message: Message })[];
   friend: ChatUser;
   messagesPaginatedResponse: PaginatedResponse<MessageEager> | null;
+  friendsMessagesPaginatedResponse: PaginatedResponse<MessageFriend> | null;
   worksForChat: ChatWork[];
 
   usersPaginatedResponse: PaginatedResponse<ListUser> | null;

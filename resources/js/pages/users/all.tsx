@@ -1,3 +1,4 @@
+import { EmptyListPlaceholder } from '@/components/empty';
 import GridList from '@/components/grid-list';
 import InertiaPagination from '@/components/inertia-pagination';
 import { Button } from '@/components/ui/button';
@@ -146,9 +147,7 @@ export default function All() {
               ))}
             </GridList>
           ) : (
-            <div className="font-secondary mt-3 flex justify-center text-2xl opacity-30">
-              <p>No friends :(</p>
-            </div>
+            <EmptyListPlaceholder>No friends :(</EmptyListPlaceholder>
           )}
 
           {!friendsOnePage && friendsPaginatedResponse && <InertiaPagination paginateItems={friendsPaginatedResponse} />}

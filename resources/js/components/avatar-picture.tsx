@@ -3,7 +3,7 @@ import { useInitials } from '@/hooks/use-initials';
 import { cn } from '@/lib/utils';
 
 interface AvatarPictureProps {
-  avatar: string | null;
+  avatar?: string | null;
   name: string;
   is_friend: number;
   className?: string;

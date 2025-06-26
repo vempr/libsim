@@ -207,13 +207,15 @@ class FriendController extends Controller {
 			'receiver_id' => $receiverId,
 		]);
 
+		$notificationDescription = $sender->private_works ? $sender->name . " has sent you a friend request. Their work entries are private." : $sender->name . " has sent you a friend request. Their work entries are visible to friends.";
+
 		$notification = Notification::create([
 			'type' => 'friend_request',
 			'sender_id' => $senderId,
 			'receiver_id' => $receiverId,
 			'mood' => 'neutral',
 			'title' => 'Pending friend request',
-			'description' => $sender->name . " has sent you a friend request. They have 'share works' enabled.",
+			'description' => $notificationDescription,
 			'image' => $sender->avatar,
 		]);
 
@@ -258,7 +260,7 @@ class FriendController extends Controller {
 				'receiver_id' => $receiverId,
 				'mood' => 'negative',
 				'title' => 'Friend request declined',
-				'description' => $user->name . " has declined your friend request. You can not see each other's works.",
+				'description' => $user->name . " has declined your friend request.",
 				'image' => $user->avatar,
 			]);
 

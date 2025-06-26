@@ -109,7 +109,7 @@ const InputTags = React.forwardRef<HTMLInputElement, InputTagsProps>(
           className={cn(
             'flex h-9 w-full min-w-0 gap-2 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] duration-75 outline-none md:text-sm',
             'border-input file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground',
-            'focus-within:border-ring/50 focus-within:ring-ring/50 focus-within:ring-[2px]',
+            'focus-within:border-ring/50 focus-within:ring-ring/50 focus-within:ring-[1px]',
             'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
             className,
           )}

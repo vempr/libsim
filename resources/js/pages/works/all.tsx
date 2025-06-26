@@ -1,8 +1,11 @@
 import { AdvancedSearchForm } from '@/components/advanced-search';
+import { EmptyListPlaceholder } from '@/components/empty';
 import InertiaPagination from '@/components/inertia-pagination';
+import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import AppLayout from '@/layouts/app-layout';
+import { hasOnePage } from '@/lib/pagination';
 import { type InertiaProps, type BreadcrumbItem } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
@@ -57,7 +60,19 @@ export default function All() {
               </li>
             ))}
           </ul>
-          {worksPaginatedResponse && <InertiaPagination paginateItems={worksPaginatedResponse} />}
+          {!hasOnePage(worksPaginatedResponse) && worksPaginatedResponse ? (
+            <InertiaPagination paginateItems={worksPaginatedResponse} />
+          ) : (
+            <EmptyListPlaceholder>
+              You haven't created any entries yet!{' '}
+              <Button
+                asChild
+                variant="secondary"
+              >
+                <Link href={route('work.create')}>Create new entry!</Link>
+              </Button>
+            </EmptyListPlaceholder>
+          )}
         </TabsContent>
         <TabsContent value="favorited-works">
           <ul>
@@ -67,7 +82,19 @@ export default function All() {
               </li>
             ))}
           </ul>
-          {favoritesPaginatedResponse && <InertiaPagination paginateItems={favoritesPaginatedResponse} />}
+          {!hasOnePage(favoritesPaginatedResponse) && favoritesPaginatedResponse ? (
+            <InertiaPagination paginateItems={favoritesPaginatedResponse} />
+          ) : (
+            <EmptyListPlaceholder>
+              You haven't favorited any entries from your friends yet!{' '}
+              <Button
+                asChild
+                variant="secondary"
+              >
+                <Link href={route('users.index')}>Favorite an entry!</Link>
+              </Button>
+            </EmptyListPlaceholder>
+          )}
         </TabsContent>
       </Tabs>
     </AppLayout>

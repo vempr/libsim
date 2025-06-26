@@ -1,3 +1,6 @@
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+
 export function getCurrentDateTime() {
   const now = new Date();
 
@@ -12,4 +15,13 @@ export function getCurrentDateTime() {
   const seconds = pad(now.getSeconds());
 
   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+
+export function getFormattedDate(date: string) {
+  return dayjs(date).format('MMMM D, YYYY');
+}
+
+export function getRelativeTime(date: string) {
+  dayjs.extend(relativeTime);
+  return dayjs(date).fromNow();
 }

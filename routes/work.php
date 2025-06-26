@@ -9,7 +9,7 @@ Route::middleware(['auth', 'verified'])
 	->group(function () {
 		Route::get('/', 'index')->name('work.index');
 
-		Route::get('new', 'create');
+		Route::get('new', 'create')->name('work.create');
 		Route::post('new', 'store')->name('work.post');
 
 		Route::get('{work}', 'show')->name('work');
