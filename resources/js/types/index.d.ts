@@ -140,7 +140,8 @@ interface MessageEager {
   text: string | null;
   work: ChatWork | null;
   created_at: string;
-  is_deleted: boolean;
+  updated_at: string;
+  is_deleted: number;
   sender: ChatUser;
 }
 

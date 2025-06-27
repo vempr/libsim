@@ -31,7 +31,7 @@ export default function Work() {
   const isOwnWork = work.user_id === auth.user.id;
 
   const isMobile = useIsMobile();
-  const breadcrumbs: BreadcrumbItem[] = isMobile
+  let breadcrumbs: BreadcrumbItem[] = isMobile
     ? [...bc, { title: "Friend's work", href: '' }]
     : [
         ...bc,

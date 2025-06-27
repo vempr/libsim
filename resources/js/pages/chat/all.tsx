@@ -112,10 +112,14 @@ export default function All() {
 
                 {!friend.latest_message && <p className="text-muted-foreground opacity-80">No messages sent</p>}
 
-                <p className="text-muted-foreground font-mono text-sm">
+                <p className="text-muted-foreground font-mono text-sm lg:hidden">
                   Last chatted {friend.latest_message?.updated_at ? getRelativeTime(friend.latest_message.updated_at) : '-'}
                 </p>
               </div>
+
+              <p className="text-muted-foreground hidden text-right font-mono text-sm lg:block">
+                Last chatted {friend.latest_message?.updated_at ? getRelativeTime(friend.latest_message.updated_at) : '-'}
+              </p>
             </Link>
             {friend.latest_message?.work && isMobile && (
               <Drawer>

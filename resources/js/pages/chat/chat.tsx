@@ -1,5 +1,6 @@
 import { AppSidebarHeader } from '@/components/app-sidebar-header';
 import InputError from '@/components/input-error';
+import Message from '@/components/message';
 import { Button } from '@/components/ui/button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Input } from '@/components/ui/input';
@@ -7,10 +8,11 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import Spinner from '@/components/ui/spinner';
 import AppLayout from '@/layouts/app-layout';
 import { getCurrentDateTime } from '@/lib/date';
+import { cn } from '@/lib/utils';
 import { type InertiaProps, type BreadcrumbItem, SharedData, MessageEager, ChatWork, PaginatedResponse } from '@/types';
 import { MessageEvent } from '@/types/event';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Head, Link, useForm as useInertiaForm, usePage } from '@inertiajs/react';
+import { Head, useForm as useInertiaForm, usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { ChevronsUpDown } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -88,14 +90,16 @@ export default function All() {
       });
     } else {
       const tempId = `temp-${Date.now()}`;
+      const currentTime = getCurrentDateTime();
 
       let tempMessage = {
         id: tempId,
         receiver_id: friend.id,
         text,
         work: null,
-        is_deleted: false,
-        created_at: getCurrentDateTime(),
+        is_deleted: 0,
+        created_at: currentTime,
+        updated_at: currentTime,
         sender: {
           id: auth.user.id,
           name: auth.user.name,
@@ -206,180 +210,172 @@ export default function All() {
     >
       <Head title="Messages" />
 
-      <div className="flex h-screen flex-col">
+      <div className="flex h-screen flex-col pb-3">
         <AppSidebarHeader breadcrumbs={breadcrumbs} />
 
-        <div
-          className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-track]:bg-neutral-700"
-          ref={scrollRef}
-        >
-          {loadingNewMessages && <Spinner />}
-          {reachedFirstMessage && !loadingNewMessages && (
-            <form onSubmit={onScrollSubmit}>
-              <Button type="submit">Load more messages</Button>
-            </form>
-          )}
-
-          <ul className="w-[40rem] space-y-2 overflow-scroll">
-            {messages?.map((message) => {
-              const authUserOwnsWork = message.sender.id === auth.user.id;
-              return (
-                <li key={`${message.id}-${new Date(message.created_at).getTime()}`}>
-                  {message.work?.id ? (
-                    message.is_deleted ? (
-                      <span className={authUserOwnsWork ? 'text-red-500' : 'text-red-800'}>[deleted] (ID: {message.id})</span>
-                    ) : (
-                      <Link
-                        href={`/works/${message.work.id}?chat=${friend.id}`}
-                        className={authUserOwnsWork ? 'text-blue-600' : 'text-gray-700'}
-                      >
-                        {JSON.stringify(message)}
-                      </Link>
-                    )
-                  ) : message.is_deleted ? (
-                    <span className={authUserOwnsWork ? 'text-red-500' : 'text-red-800'}>[deleted] (ID: {message.id})</span>
-                  ) : (
-                    <span className={authUserOwnsWork ? 'text-blue-600' : 'text-gray-700'}>{JSON.stringify(message)}</span>
-                  )}
-
-                  {authUserOwnsWork && !message.is_deleted && !message.work && (
-                    <Button
-                      variant="secondary"
-                      onClick={() => {
-                        setValue('text', message.text as string);
-                        setMessageInEdit(message.id);
-
-                        inputRef.current?.focus();
-                      }}
-                    >
-                      edit
-                    </Button>
-                  )}
-
-                  {authUserOwnsWork && !message.is_deleted && (
-                    <Button
-                      variant="destructive"
-                      onClick={() => {
-                        setMessages((prev) => {
-                          const messages = prev as MessageEager[];
-                          return messages.map((m) => (m.id === message.id ? { ...m, is_deleted: true } : m));
-                        });
-
-                        destroy(
-                          route('chat.destroy', {
-                            message: message.id,
-                          }),
-                          {
-                            preserveScroll: true,
-                          },
-                        );
-                      }}
-                    >
-                      delete
-                    </Button>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-
-        <div>
-          {isFriendTyping && <p className="text-sm text-gray-500">{friend.name} is typing...</p>}
-
-          <form
-            onSubmit={handleSubmit(onChatSubmit)}
-            className="mt-4 space-y-2"
+        <div className="flex min-h-0 flex-1 flex-col">
+          <div
+            className="flex-1 overflow-y-auto px-4 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-track]:bg-neutral-700"
+            ref={scrollRef}
           >
-            <Input
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  handleSubmit(onChatSubmit);
-                } else {
-                  window.Echo.private(`chat.${friend.id}`).whisper('typing', {
-                    user_id: auth.user.id,
-                  });
-                }
-              }}
-              placeholder="Type a message..."
-              {...textRegister}
-              ref={(input) => {
-                textRegister.ref(input);
-                inputRef.current = input;
-              }}
-            />
+            {messagesPaginatedResponse?.total && 20 * (scrollPage - 1) - messagesPaginatedResponse.total > 0 && (
+              <p className="font-secondary text-muted-foreground mb-2 text-center text-sm md:text-base">The beginning of your conversation!</p>
+            )}
 
-            {errors.text && <InputError message={errors.text.message} />}
-            <Button type="submit">Send</Button>
-          </form>
+            {loadingNewMessages && (
+              <div className="mb-2 flex flex-1 justify-center">
+                <Spinner />
+              </div>
+            )}
 
-          <Popover
-            open={open}
-            onOpenChange={setOpen}
-          >
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                role="combobox"
-                aria-expanded={open}
-                className="w-[200px] justify-between"
+            {reachedFirstMessage && !loadingNewMessages && (
+              <form onSubmit={onScrollSubmit}>
+                <Button
+                  type="submit"
+                  className="mb-2 w-full"
+                >
+                  Load more messages
+                </Button>
+              </form>
+            )}
+
+            <ul className="space-y-3">
+              {messages?.map((message) => {
+                return (
+                  <Message
+                    message={message}
+                    friend={friend}
+                    onEditFocus={() => {
+                      setValue('text', message.text as string);
+                      setMessageInEdit(message.id);
+
+                      inputRef.current?.focus();
+                    }}
+                    onDelete={() => {
+                      setMessages((prev) => {
+                        const messages = prev as MessageEager[];
+                        return messages.map((m) => (m.id === message.id ? { ...m, is_deleted: 1 } : m));
+                      });
+
+                      destroy(
+                        route('chat.destroy', {
+                          message: message.id,
+                        }),
+                        {
+                          preserveScroll: true,
+                        },
+                      );
+                    }}
+                  />
+                );
+              })}
+            </ul>
+          </div>
+
+          <p className={cn('text-muted-foreground relative py-1.5 text-center text-xs', isFriendTyping ? 'animate-pulse opacity-100' : 'opacity-0')}>
+            {friend.name} is typing...
+          </p>
+
+          <div>
+            <form
+              onSubmit={handleSubmit(onChatSubmit)}
+              className="flex flex-col-reverse gap-2 md:flex-row"
+            >
+              <Popover
+                open={open}
+                onOpenChange={setOpen}
               >
-                Share personal work...
-                <ChevronsUpDown className="opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[200px] p-0">
-              <Command>
-                <CommandInput
-                  placeholder="Search work..."
-                  className="h-9"
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={open}
+                    className="flex-1 justify-between md:flex-0"
+                  >
+                    Share personal work...
+                    <ChevronsUpDown className="opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[200px] p-0">
+                  <Command>
+                    <CommandInput
+                      placeholder="Search work..."
+                      className="h-9"
+                    />
+                    <CommandList>
+                      <CommandEmpty>No work found.</CommandEmpty>
+                      <CommandGroup>
+                        {worksForChat.map((work) => (
+                          <CommandItem
+                            key={work.id}
+                            value={work.title}
+                            onSelect={(workTitle) => {
+                              const work = worksForChat.find((w) => w.title === workTitle) as ChatWork;
+                              const currentTime = getCurrentDateTime();
+
+                              const tempMessage = {
+                                id: `temp-${Date.now()}`,
+                                receiver_id: friend.id,
+                                text: null,
+                                work,
+                                is_deleted: 0,
+                                created_at: currentTime,
+                                updated_at: currentTime,
+                                sender: {
+                                  id: auth.user.id,
+                                  name: auth.user.name,
+                                  avatar: auth.user.avatar,
+                                },
+                              };
+
+                              setScrollToBottom(true);
+                              setMessages((prev) => (prev ? [...prev, tempMessage] : [tempMessage]));
+
+                              setOpen(false);
+                              post(route('chat.store', { friend: friend.id, work_id: work.id }), {
+                                preserveScroll: true,
+                                onSuccess: (page) => {
+                                  const messages = page.props.messagesPaginatedResponse as PaginatedResponse<MessageEager>;
+
+                                  setMessages(messages.data);
+                                },
+                              });
+                            }}
+                          >
+                            {work.title}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+
+              <div className="flex flex-1 gap-x-2">
+                <Input
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handleSubmit(onChatSubmit);
+                    } else {
+                      window.Echo.private(`chat.${friend.id}`).whisper('typing', {
+                        user_id: auth.user.id,
+                      });
+                    }
+                  }}
+                  placeholder="Type a message..."
+                  {...textRegister}
+                  ref={(input) => {
+                    textRegister.ref(input);
+                    inputRef.current = input;
+                  }}
+                  className="flex-1"
                 />
-                <CommandList>
-                  <CommandEmpty>No work found.</CommandEmpty>
-                  <CommandGroup>
-                    {worksForChat.map((work) => (
-                      <CommandItem
-                        key={work.id}
-                        value={work.title}
-                        onSelect={(workTitle) => {
-                          const work = worksForChat.find((w) => w.title === workTitle) as ChatWork;
 
-                          const tempMessage = {
-                            id: `temp-${Date.now()}`,
-                            receiver_id: friend.id,
-                            text: null,
-                            work,
-                            is_deleted: false,
-                            created_at: getCurrentDateTime(),
-                            sender: {
-                              id: auth.user.id,
-                              name: auth.user.name,
-                              avatar: auth.user.avatar,
-                            },
-                          };
-
-                          setScrollToBottom(true);
-                          setMessages((prev) => (prev ? [...prev, tempMessage] : [tempMessage]));
-
-                          setOpen(false);
-                          post(route('chat.store', { friend: friend.id, work_id: work.id }), {
-                            preserveScroll: true,
-                            onSuccess: (page) => {
-                              const messages = page.props.messagesPaginatedResponse as PaginatedResponse<MessageEager>;
-
-                              setMessages(messages.data);
-                            },
-                          });
-                        }}
-                      >
-                        {work.title}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
+                {errors.text && <InputError message={errors.text.message} />}
+                <Button type="submit">Send</Button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </AppLayout>
