@@ -12,7 +12,7 @@ import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHe
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useState } from 'react';
 
-export function getResponsiveDialog() {
+export function useResponsiveDialog() {
   const isMobile = useIsMobile();
   const [open, setOpen] = useState(false);
 

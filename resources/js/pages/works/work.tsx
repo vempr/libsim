@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useIsMobile } from '@/hooks/use-mobile';
 import AppLayout from '@/layouts/app-layout';
-import { getResponsiveDialog } from '@/lib/responsive';
+import { useResponsiveDialog } from '@/lib/responsive';
 import { InertiaProps, SharedData, type BreadcrumbItem } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, Link, router, useForm as useInertiaForm, usePage } from '@inertiajs/react';
@@ -67,7 +67,7 @@ export default function Work() {
     </Dialog>
   );
 
-  const { rd, open, setOpen } = getResponsiveDialog();
+  const { rd, open, setOpen } = useResponsiveDialog();
 
   function onSubmit(data: CollectionForm) {
     put(

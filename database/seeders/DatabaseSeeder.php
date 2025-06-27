@@ -38,6 +38,8 @@ class DatabaseSeeder extends Seeder {
 			$user->profile()->create(Profile::factory()->make()->toArray());
 		});
 
+		User::factory()->create(['name' => 'empty', 'email' => 'empty@example.com'])->profile()->create(Profile::factory()->make()->toArray());
+
 		Work::factory(500)
 			->recycle($allUsers->all())
 			->create();

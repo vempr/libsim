@@ -1,4 +1,4 @@
-import { getResponsiveDialog } from '@/lib/responsive';
+import { useResponsiveDialog } from '@/lib/responsive';
 import { Collection, SimpleWork } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm as useInertiaForm } from '@inertiajs/react';
@@ -29,7 +29,7 @@ export default function AddWorksToCollection({ works, collection }: AddWorksToCo
 
   const { put, processing } = useInertiaForm();
 
-  const { rd, open, setOpen } = getResponsiveDialog();
+  const { rd, open, setOpen } = useResponsiveDialog();
 
   function onSubmit(values: WorksForm) {
     put(

@@ -166,6 +166,49 @@ const InputTags = React.forwardRef<HTMLInputElement, InputTagsProps>(
   },
 );
 
-InputTags.displayName = 'InputTags';
+type ReadOnlyInputTagsProps = {
+  className?: string;
+  value: string;
+  pipeAsSeperator?: boolean;
+  shorten?: boolean;
+  variant?: 'default' | 'secondary' | 'destructive' | 'outline';
+};
 
-export { InputTags };
+const ReadOnlyInputTags = React.forwardRef<HTMLDivElement, ReadOnlyInputTagsProps>(
+  ({ className, value = '', pipeAsSeperator, shorten = false, variant = 'secondary' }, ref) => {
+    const separator = pipeAsSeperator ? '|' : ',';
+
+    const tags = React.useMemo(
+      () =>
+        value
+          .split(separator)
+          .map((tag) => tag.trim())
+          .filter((tag) => tag !== ''),
+      [value, separator],
+    );
+
+    if (tags.length === 0) return null;
+
+    return (
+      <div
+        ref={ref}
+        className={cn('max-h-24 space-y-1 space-x-1 overflow-x-hidden overflow-y-scroll', className)}
+      >
+        {tags.map((item, index) => (
+          <Badge
+            key={index}
+            variant={variant}
+            className="dark:bg-sidebar-accent h-6"
+          >
+            {shorten ? shortenString(item) : item}
+          </Badge>
+        ))}
+      </div>
+    );
+  },
+);
+
+InputTags.displayName = 'InputTags';
+ReadOnlyInputTags.displayName = 'ReadOnlyInputTags';
+
+export { InputTags, ReadOnlyInputTags };

@@ -243,6 +243,7 @@ export default function All() {
               {messages?.map((message) => {
                 return (
                   <Message
+                    key={message.id}
                     message={message}
                     friend={friend}
                     onEditFocus={() => {
@@ -254,7 +255,7 @@ export default function All() {
                     onDelete={() => {
                       setMessages((prev) => {
                         const messages = prev as MessageEager[];
-                        return messages.map((m) => (m.id === message.id ? { ...m, is_deleted: 1 } : m));
+                        return messages.map((m) => (m.id === message.id ? { ...m, is_deleted: 1, updated_at: getCurrentDateTime() } : m));
                       });
 
                       destroy(

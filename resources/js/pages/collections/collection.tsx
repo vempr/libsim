@@ -17,7 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import { hasOnePage } from '@/lib/pagination';
-import { getResponsiveDialog } from '@/lib/responsive';
+import { useResponsiveDialog } from '@/lib/responsive';
 import { BreadcrumbItem, InertiaProps } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, usePage, Link, useForm as useInertiaForm } from '@inertiajs/react';
@@ -43,7 +43,7 @@ export default function Collection() {
     },
   ];
 
-  const { rd, open, setOpen } = getResponsiveDialog();
+  const { rd, open, setOpen } = useResponsiveDialog();
 
   const {
     register,

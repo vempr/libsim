@@ -1,3 +1,4 @@
+import { EmptyListPlaceholder } from '@/components/empty';
 import InertiaPagination from '@/components/inertia-pagination';
 import { MutedP, MutedSpan } from '@/components/muted-text';
 import NewCollectionSheet from '@/components/new-collection-sheet';
@@ -45,12 +46,14 @@ export default function All() {
               </div>
 
               <div className="text-sm opacity-80">
-                <MutedP>Created on {getRelativeTime(collection.created_at)}</MutedP>
+                <MutedP>Created {getRelativeTime(collection.created_at)}</MutedP>
               </div>
             </Link>
           </li>
         ))}
       </ul>
+
+      {collectionsPaginatedResponse?.data.length === 0 && <EmptyListPlaceholder>You have no collections to sort your works!</EmptyListPlaceholder>}
 
       {!singlePage && collectionsPaginatedResponse && <InertiaPagination paginateItems={collectionsPaginatedResponse} />}
     </AppLayout>

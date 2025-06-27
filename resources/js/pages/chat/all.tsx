@@ -1,4 +1,5 @@
 import AvatarPicture from '@/components/avatar-picture';
+import { EmptyListPlaceholder } from '@/components/empty';
 import InertiaPagination from '@/components/inertia-pagination';
 import { Button } from '@/components/ui/button';
 import {
@@ -167,6 +168,15 @@ export default function All() {
           </li>
         ))}
       </ul>
+
+      {friendsMessagesPaginatedResponse?.data.length === 0 && (
+        <EmptyListPlaceholder>
+          You don't have any friends to message
+          <Link href={route('users.index')}>
+            <Button variant="secondary">Make new friends!</Button>
+          </Link>
+        </EmptyListPlaceholder>
+      )}
 
       {!singlePage && friendsMessagesPaginatedResponse && <InertiaPagination paginateItems={friendsMessagesPaginatedResponse} />}
     </AppLayout>

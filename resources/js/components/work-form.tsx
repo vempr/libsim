@@ -7,8 +7,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Slider } from '@/components/ui/slider';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { languages, PublicationStatus, publicationStatuses, ReadingStatus, readingStatuses, workFormSchema } from '@/types/schemas/work';
-import { Dispatch, RefObject, SetStateAction, useCallback, useState } from 'react';
+import { Dispatch, RefObject, SetStateAction, useCallback, useEffect, useState } from 'react';
 import AvatarEditor from 'react-avatar-editor';
 import { useDropzone } from 'react-dropzone';
 import { UseFormReturn } from 'react-hook-form';
@@ -38,6 +39,9 @@ function fileSizeValidator(file: File) {
 
 export default function WorkForm({ image, setImage, form, onSubmit, editor, isSubmitting, setImageIsDirty }: WorkFormProps) {
   const [scale, setScale] = useState<number>(1);
+  const [workExists, setWorkExists] = useState(false);
+
+  const isMobile = useIsMobile();
 
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
@@ -57,6 +61,10 @@ export default function WorkForm({ image, setImage, form, onSubmit, editor, isSu
       'image/webp': [],
     },
   });
+
+  useEffect(() => {
+    if (form.getValues('title')?.length > 0) setWorkExists(true);
+  }, []);
 
   return (
     <Form {...form}>
@@ -353,8 +361,8 @@ export default function WorkForm({ image, setImage, form, onSubmit, editor, isSu
                   <AvatarEditor
                     ref={editor}
                     image={image}
-                    width={200}
-                    height={284.383}
+                    width={isMobile ? 300 : 400}
+                    height={isMobile ? 426.5745 : 568.766}
                     border={3}
                     color={[255, 224, 102]}
                     scale={scale}
@@ -391,7 +399,7 @@ export default function WorkForm({ image, setImage, form, onSubmit, editor, isSu
           className="w-full"
           disabled={isSubmitting}
         >
-          {form.getValues('title')?.length ? 'Update your entry!' : 'Create new entry!'}
+          {workExists ? 'Update your entry!' : 'Create new entry!'}
         </Button>
       </form>
     </Form>

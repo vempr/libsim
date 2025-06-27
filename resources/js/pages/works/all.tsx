@@ -3,6 +3,7 @@ import { EmptyListPlaceholder } from '@/components/empty';
 import InertiaPagination from '@/components/inertia-pagination';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import WorkCard from '@/components/work';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import AppLayout from '@/layouts/app-layout';
 import { hasOnePage } from '@/lib/pagination';
@@ -53,16 +54,16 @@ export default function All() {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="own-works">
-          <ul className="flex flex-col gap-y-2">
+          <ul className="grid grid-cols-1 gap-y-2">
             {worksPaginatedResponse?.data.map((work) => (
-              <li className="max-w-40 overflow-auto">
-                <Link href={`/works/${work.id}`}>{JSON.stringify(work)}</Link>
-              </li>
+              <WorkCard
+                key={work.id}
+                work={work}
+              />
             ))}
           </ul>
-          {!hasOnePage(worksPaginatedResponse) && worksPaginatedResponse ? (
-            <InertiaPagination paginateItems={worksPaginatedResponse} />
-          ) : (
+
+          {worksPaginatedResponse?.data.length === 0 && (
             <EmptyListPlaceholder>
               You haven't created any entries yet!{' '}
               <Button
@@ -73,6 +74,7 @@ export default function All() {
               </Button>
             </EmptyListPlaceholder>
           )}
+          {!hasOnePage(worksPaginatedResponse) && worksPaginatedResponse && <InertiaPagination paginateItems={worksPaginatedResponse} />}
         </TabsContent>
         <TabsContent value="favorited-works">
           <ul>
@@ -82,9 +84,8 @@ export default function All() {
               </li>
             ))}
           </ul>
-          {!hasOnePage(favoritesPaginatedResponse) && favoritesPaginatedResponse ? (
-            <InertiaPagination paginateItems={favoritesPaginatedResponse} />
-          ) : (
+
+          {favoritesPaginatedResponse?.data.length === 0 && (
             <EmptyListPlaceholder>
               You haven't favorited any entries from your friends yet!{' '}
               <Button
@@ -95,6 +96,7 @@ export default function All() {
               </Button>
             </EmptyListPlaceholder>
           )}
+          {!hasOnePage(favoritesPaginatedResponse) && favoritesPaginatedResponse && <InertiaPagination paginateItems={favoritesPaginatedResponse} />}
         </TabsContent>
       </Tabs>
     </AppLayout>

@@ -110,11 +110,10 @@ export default function Message({ message, friend, onEditFocus, onDelete }: Mess
   }
 
   return (
-    <div className="flex flex-col">
+    <li className="flex flex-col">
       <div className="flex">
         {isOwnMessage && EditMessageMobile}
-        <li
-          key={`${message.id}-${new Date(message.created_at).getTime()}`}
+        <div
           className={cn(
             isOwnMessage ? 'bg-primary text-primary-foreground ml-auto' : 'bg-card text-foreground mr-auto',
             'border-border text flex w-50 max-w-50 flex-col justify-center rounded border p-2 md:w-96 md:max-w-96',
@@ -207,12 +206,12 @@ export default function Message({ message, friend, onEditFocus, onDelete }: Mess
           )}
 
           {isOwnMessage && EditMessageDesktop}
-        </li>
+        </div>
       </div>
 
       <p className={cn('text-muted-foreground mt-1 font-mono text-xs', isOwnMessage ? 'text-right' : '')}>
         {getRelativeTime(message.created_at)} {message.created_at !== message.updated_at && `(updated ${getRelativeTime(message.updated_at)})`}
       </p>
-    </div>
+    </li>
   );
 }

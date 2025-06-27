@@ -40,6 +40,11 @@ class DashboardController extends Controller {
 		$works = Work::where('user_id', $user->id)->get();
 
 		$worksCount = $works->count();
+		if ($worksCount === 0) {
+			return Inertia::render('dashboard', [
+				'dashboardData' => null
+			]);
+		}
 
 		$latestWork = $works->sortByDesc('created_at')->first()->toArray();
 
