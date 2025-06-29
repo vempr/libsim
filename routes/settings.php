@@ -6,7 +6,7 @@ use App\Http\Controllers\Settings\AvatarController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', 'throttle:60,1'])->group(function () {
 	Route::redirect('settings', 'settings/profile');
 
 	Route::put('settings/profile/avatar', [AvatarController::class, 'update'])->name('profile.avatar.update');

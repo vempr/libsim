@@ -3,7 +3,7 @@
 use App\Http\Controllers\ChatController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', 'verified'])
+Route::middleware(['auth', 'verified', 'throttle:60,1'])
 	->controller(ChatController::class)
 	->prefix('chat')
 	->group(function () {

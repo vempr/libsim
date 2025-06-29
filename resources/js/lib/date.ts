@@ -21,7 +21,7 @@ export function getFormattedDate(date: string) {
   return dayjs(date).format('MMMM D, YYYY');
 }
 
-export function getRelativeTime(date: string) {
+export function getRelativeTime(date: string, noSuffix?: boolean) {
   dayjs.extend(relativeTime);
-  return dayjs(date).fromNow();
+  return dayjs(date).fromNow(noSuffix);
 }

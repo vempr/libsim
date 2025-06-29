@@ -6,7 +6,7 @@ import { ProfileFormInput } from './schemas/profile.js';
 import { Work } from './schemas/work.ts';
 
 export interface Auth {
-  user: User;
+  user: User & { created_at: string };
 }
 
 export interface BreadcrumbItem {

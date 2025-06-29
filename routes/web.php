@@ -4,12 +4,12 @@ use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
+Route::middleware(['throttle:60,1'])->get('/', function () {
 	return Inertia::render('welcome');
 })->name('home');
 
 Route::get('/dashboard', DashboardController::class)
-	->middleware(['auth', 'verified'])->name('dashboard');
+	->middleware(['auth', 'verified', 'throttle:60,1'])->name('dashboard');
 
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

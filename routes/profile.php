@@ -3,7 +3,7 @@
 use App\Http\Controllers\PublicProfileController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', 'verified'])
+Route::middleware(['auth', 'verified', 'throttle:60,1'])
 	->controller(PublicProfileController::class)
 	->prefix('u')
 	->group(function () {
