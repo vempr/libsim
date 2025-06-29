@@ -64,7 +64,7 @@ export default function WorkForm({ image, setImage, form, onSubmit, editor, isSu
 
   useEffect(() => {
     if (form.getValues('title')?.length > 0) setWorkExists(true);
-  }, []);
+  }, [form]);
 
   return (
     <Form {...form}>

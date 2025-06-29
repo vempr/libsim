@@ -18,7 +18,7 @@ class PublicProfileController extends Controller {
 				...$auth->only(['id', 'name', 'avatar']),
 				'info' => Profile::where('user_id', $auth->id)->select(Profile::$ownFields)->first(),
 			],
-			'worksPaginatedResponse' => $auth->works()->paginate(15),
+			'worksPaginatedResponse' => $auth->works()->orderByDesc('updated_at')->paginate(15),
 		]);
 	}
 

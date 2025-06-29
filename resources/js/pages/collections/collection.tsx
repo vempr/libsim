@@ -1,4 +1,5 @@
 import AddWorksToCollection from '@/components/add-works-to-collection';
+import { EmptyBottomMargin, EmptyListPlaceholder } from '@/components/empty';
 import InertiaPagination from '@/components/inertia-pagination';
 import InputError from '@/components/input-error';
 import {
@@ -15,12 +16,13 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import WorkCard, { WorkGrid } from '@/components/work';
 import AppLayout from '@/layouts/app-layout';
 import { hasOnePage } from '@/lib/pagination';
 import { useResponsiveDialog } from '@/lib/responsive';
 import { BreadcrumbItem, InertiaProps } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Head, usePage, Link, useForm as useInertiaForm } from '@inertiajs/react';
+import { Head, usePage, useForm as useInertiaForm } from '@inertiajs/react';
 import { Pencil, Trash } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -76,7 +78,7 @@ export default function Collection() {
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Collections" />
 
-      <div className="flex flex-row items-center gap-x-1">
+      <div className="mb-2 flex flex-row items-center gap-x-1">
         <AlertDialog>
           <AlertDialogTrigger className="bg-destructive hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60 focus-visible:border-ring aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive inline-flex h-9 shrink-0 items-center justify-center gap-2 rounded px-4 py-2 text-sm font-medium whitespace-nowrap text-white shadow-xs transition-all outline-none hover:cursor-pointer hover:opacity-80 focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 has-[>svg]:px-3 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4">
             <Trash className="size-4" />
@@ -163,13 +165,19 @@ export default function Collection() {
         />
       </div>
 
-      <ul className="max-w-64 overflow-auto">
+      <WorkGrid>
         {worksPaginatedResponse?.data.map((work) => (
-          <li key={work.id}>
-            <Link href={`/works/${work.id}?collection=${collection.id}`}>{JSON.stringify(work)}</Link>
-          </li>
+          <WorkCard
+            key={work.id}
+            work={work}
+            collection={collection.id}
+          />
         ))}
-      </ul>
+      </WorkGrid>
+
+      <EmptyBottomMargin />
+
+      {worksPaginatedResponse?.data.length === 0 && <EmptyListPlaceholder>You haven't registered any works yet</EmptyListPlaceholder>}
 
       {!hasOnePage(worksPaginatedResponse) && worksPaginatedResponse && <InertiaPagination paginateItems={worksPaginatedResponse} />}
     </AppLayout>

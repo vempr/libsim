@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { useIsMobile } from '@/hooks/use-mobile';
 import AppLayout from '@/layouts/app-layout';
+import { getRelativeTime } from '@/lib/date';
 import { useResponsiveDialog } from '@/lib/responsive';
 import { shortenString } from '@/lib/shorten';
 import { cn } from '@/lib/utils';
@@ -224,23 +225,25 @@ export default function Work() {
         </Link>
       )}
 
-      <Badge
-        variant={badgeVariant}
-        className="w-full font-mono capitalize"
-      >
-        {work.status_reading}
-      </Badge>
+      {work.user_id === auth.user.id && (
+        <Badge
+          variant={badgeVariant}
+          className="w-full font-mono capitalize"
+        >
+          {work.status_reading}
+        </Badge>
+      )}
 
-      <div className="border-border/70 my-6 flex h-full flex-col items-center justify-center gap-y-1 border-t border-b py-4">
+      <div className="border-border/70 my-6 flex h-full flex-col items-center justify-center gap-y-2 border-t border-b py-4">
         {favoriteAndCollection}
 
         <div className="flex flex-col items-center">
-          <h2 className="font-secondary text-lg">
+          <h2 className="font-secondary text-center text-lg/5">
             {work.title} {work.publication_year && <span>({work.publication_year})</span>}
           </h2>
 
           {(work.author || work.status_publication) && (
-            <div className="-mb-2 flex -translate-y-2 items-center font-light tracking-tight">
+            <div className="-mb-2 flex items-center font-light tracking-tight">
               {work.author && <p>{authors}</p>}
 
               {work.status_publication && (
@@ -276,23 +279,29 @@ export default function Work() {
           {work.description ? (
             <span className="text-sm">{work.description}</span>
           ) : (
-            <span className="text-muted-foreground font-mono tracking-normal">(No description provided...)</span>
+            <span className="text-muted-foreground ml-2 text-center font-mono text-xs tracking-normal">No description provided...</span>
           )}
         </div>
       </div>
 
       <div className="mb-2 space-y-1">
         <div>
+          <h3 className="font-secondary text-lg">Metadata</h3>
+          <p className="text-sm">First created {getRelativeTime(work.created_at)}</p>
+          <p className="text-sm">Updated {getRelativeTime(work.updated_at)}</p>
+        </div>
+
+        <div>
           <h3 className="font-secondary text-lg">Collections</h3>
           <p className="-mt-1">
-            In <span className="font-mono">({collections.length})</span>{' '}
+            In <span className="font-mono">({work.collections ? work.collections.length : 0})</span>{' '}
             <HoverCard>
               <HoverCardTrigger>
-                <span className={cn('hover:underline', isMobile ? '' : 'text-secondary')}>collections</span>
+                <span className={cn('hover:underline', isMobile ? '' : 'text-secondary')}>{isMobile ? 'collections' : '<collections>'}</span>
               </HoverCardTrigger>
               <HoverCardContent className="max-h-96 w-96 overflow-y-scroll">
                 <ul className="flex flex-col gap-y-1">
-                  {collections.map((collection) => (
+                  {work.collections?.map((collection) => (
                     <li
                       key={collection.id}
                       className="bg-accent text-accent-foreground rounded border px-2 py-1 text-xs"
@@ -303,7 +312,15 @@ export default function Work() {
                 </ul>
               </HoverCardContent>
             </HoverCard>
-            {isMobile ? <span className="ml-1 tracking-tight">({collections.map((collection) => collection.name).join(', ')})</span> : <></>}
+            {isMobile ? (
+              work.collections?.length ? (
+                <span className="ml-1 tracking-tight">({work.collections.map((collection) => collection.name).join(', ')})</span>
+              ) : (
+                <></>
+              )
+            ) : (
+              <></>
+            )}
           </p>
         </div>
 
@@ -334,7 +351,7 @@ export default function Work() {
               ))}
             </ul>
           ) : (
-            <p className="text-muted-foreground text-center font-mono text-sm">No links provided...</p>
+            <p className="text-muted-foreground font-mono text-sm">No links provided...</p>
           )}
         </div>
       </div>

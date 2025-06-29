@@ -1,12 +1,15 @@
 import AvatarPicture from '@/components/avatar-picture';
+import InertiaPagination from '@/components/inertia-pagination';
 import InputError from '@/components/input-error';
 import { MutedP, MutedSpan } from '@/components/muted-text';
 import ProfileTags from '@/components/profile-tags';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import Spinner from '@/components/ui/spinner';
+import WorkCard, { WorkGrid } from '@/components/work';
 import { useIsMobile } from '@/hooks/use-mobile';
 import AppLayout from '@/layouts/app-layout';
+import { hasOnePage } from '@/lib/pagination';
 import { InertiaProps, PaginatedResponse, ProfileUser, SharedData, type BreadcrumbItem } from '@/types';
 import { NotificationEvent } from '@/types/event';
 import { type Work } from '@/types/schemas/work';
@@ -345,17 +348,20 @@ export default function Work() {
 
       {canViewWorks &&
         (worksPaginatedResponse?.data.length ? (
-          <ul className="max-w-72 overflow-auto">
-            hello
+          <WorkGrid>
             {worksPaginatedResponse.data.map((work) => (
-              <li>
-                <Link href={`/works/${work.id}?user=${work.user_id}`}>{JSON.stringify(work)}</Link>
-              </li>
+              <WorkCard
+                key={work.id}
+                work={work}
+                user={profile.id}
+              />
             ))}
-          </ul>
+          </WorkGrid>
         ) : (
           <p className="font-mono opacity-80">{profile.name} has no work entries...</p>
         ))}
+
+      {canViewWorks && !hasOnePage(worksPaginatedResponse) && worksPaginatedResponse && <InertiaPagination paginateItems={worksPaginatedResponse} />}
     </AppLayout>
   );
 }

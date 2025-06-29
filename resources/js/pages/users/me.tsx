@@ -1,10 +1,13 @@
 import AvatarPicture from '@/components/avatar-picture';
+import { EmptyBottomMargin } from '@/components/empty';
 import InertiaPagination from '@/components/inertia-pagination';
 import { MutedP, MutedSpan } from '@/components/muted-text';
 import ProfileTags from '@/components/profile-tags';
 import { Button } from '@/components/ui/button';
+import WorkCard, { WorkGrid } from '@/components/work';
 import { useIsMobile } from '@/hooks/use-mobile';
 import AppLayout from '@/layouts/app-layout';
+import { hasOnePage } from '@/lib/pagination';
 import { InertiaProps, SharedData, type BreadcrumbItem } from '@/types';
 import { type Work } from '@/types/schemas/work';
 import { Head, usePage, Link } from '@inertiajs/react';
@@ -90,23 +93,25 @@ export default function Work() {
         {profile.info.description?.length ? profile.info.description : <MutedSpan>(Nothing for the description...)</MutedSpan>}
       </p>
 
-      <ul className="bg-sidebar border-sidebar flex flex-col gap-2 rounded border-3 p-3 md:flex-row">
-        <ProfileTags
-          title={'I love to read...'}
-          tags={profile.info.good_tags?.split(',')}
-          className="text-foreground border-secondary/70"
-        />
-        <ProfileTags
-          title={'This is pretty fine...'}
-          tags={profile.info.neutral_tags?.split(',')}
-          className="border-chart-3/70 text-foreground"
-        />
-        <ProfileTags
-          title={'I really hate...'}
-          tags={profile.info.bad_tags?.split(',')}
-          className="border-chart-5/70 text-foreground"
-        />
-      </ul>
+      {(profile.info.good_tags || profile.info.neutral_tags || profile.info.bad_tags) && (
+        <ul className="bg-sidebar border-sidebar flex flex-col gap-2 rounded border-3 p-3 md:flex-row">
+          <ProfileTags
+            title={'I love to read...'}
+            tags={profile.info.good_tags?.split(',')}
+            className="text-foreground border-secondary/70"
+          />
+          <ProfileTags
+            title={'This is pretty fine...'}
+            tags={profile.info.neutral_tags?.split(',')}
+            className="border-chart-3/70 text-foreground"
+          />
+          <ProfileTags
+            title={'I really hate...'}
+            tags={profile.info.bad_tags?.split(',')}
+            className="border-chart-5/70 text-foreground"
+          />
+        </ul>
+      )}
 
       <h2
         className="font-secondary mt-3 mb-2 text-2xl"
@@ -116,19 +121,18 @@ export default function Work() {
       </h2>
 
       {worksPaginatedResponse?.data.length ? (
-        <ul className="max-w-72 overflow-auto">
-          hello
+        <WorkGrid>
           {worksPaginatedResponse.data.map((work) => (
-            <li>
-              <Link href={`/works/${work.id}?user=${work.user_id}`}>{JSON.stringify(work)}</Link>
-            </li>
+            <WorkCard work={work} />
           ))}
-        </ul>
+        </WorkGrid>
       ) : (
         <p className="font-mono opacity-80">{profile.name} has no work entries...</p>
       )}
 
-      {worksPaginatedResponse?.data.length && <InertiaPagination paginateItems={worksPaginatedResponse} />}
+      <EmptyBottomMargin />
+
+      {!hasOnePage(worksPaginatedResponse) && worksPaginatedResponse && <InertiaPagination paginateItems={worksPaginatedResponse} />}
     </AppLayout>
   );
 }

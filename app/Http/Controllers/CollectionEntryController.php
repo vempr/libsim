@@ -15,11 +15,11 @@ class CollectionEntryController extends Controller {
 		}
 
 		$validated = $request->validate([
-			'work_ids' => 'required|array',
+			'work_ids' => 'nullable|array',
 			'work_ids.*' => 'exists:works,id',
 		]);
 
-		$workIds = $validated['work_ids'];
+		$workIds = $validated['work_ids'] ?? [];
 		if (Auth::user()->works()->whereIn('id', $workIds)->count() < count($workIds)) {
 			return back();
 		}
@@ -53,10 +53,6 @@ class CollectionEntryController extends Controller {
 	}
 
 	public function updateSingle(Request $request, Work $work) {
-		if ($work->user_id !== Auth::id()) {
-			return back()->with('error', 'You do not have permission to update this work.');
-		}
-
 		$validated = $request->validate([
 			'collection_ids' => 'nullable|array',
 			'collection_ids.*' => 'exists:collections,id',

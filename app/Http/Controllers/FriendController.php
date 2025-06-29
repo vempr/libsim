@@ -53,6 +53,7 @@ class FriendController extends Controller {
 			->where('id', '!=', Auth::id())
 			->where('hide_profile', '=', 0)
 			->select(['id', 'name', 'avatar'])
+			->orderByRaw('LOWER(name) ASC')
 			->addSelect([
 				'is_friend' => function ($query) {
 					$query->selectRaw('COUNT(*) > 0')
@@ -88,6 +89,7 @@ class FriendController extends Controller {
 				});
 		})
 			->select(['id', 'name', 'avatar'])
+			->orderByRaw('LOWER(name) ASC')
 			->with(['profile' => function ($query) {
 				$query->select(Profile::$indexFields);
 			}])
@@ -127,6 +129,7 @@ class FriendController extends Controller {
 		if ($status === 'mutual' && $user->private_works === 0) {
 			$works = Work::query()
 				->where('user_id', $user->id)
+				->orderByDesc('updated_at')
 				->paginate(15);
 		}
 

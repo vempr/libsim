@@ -3,12 +3,17 @@ import { shortenString } from '@/lib/shorten';
 import { languages, type Work } from '@/types/schemas/work';
 import { Link } from '@inertiajs/react';
 import { Dot } from 'lucide-react';
+import { ReactNode } from 'react';
 
 import { Flag } from './flag';
 import { ReadOnlyInputTags } from './input-tags';
 import { Badge } from './ui/badge';
 
-export default function WorkCard({ work }: { work: Work }) {
+export function WorkGrid({ children }: { children: ReactNode }) {
+  return <ul className="grid grid-cols-1 gap-y-2">{children}</ul>;
+}
+
+export default function WorkCard({ work, favorite, collection, user }: { work: Work; favorite?: boolean; collection?: string; user?: string }) {
   const isMobile = useIsMobile();
   const image = work.image || work.image_self || undefined;
 
@@ -56,11 +61,21 @@ export default function WorkCard({ work }: { work: Work }) {
   const title = isMobile ? shortenString(work.title, 30) : shortenString(work.title, 60);
   const authors = work.author ? shortenString(work.author.replaceAll(',', ', '), 50) : null;
 
+  const params: { [key: string]: string } = { work: work.id };
+  if (collection) {
+    params['collection'] = collection;
+  }
+  if (user) {
+    params['user'] = user;
+  }
+  const link = route('work', params);
+  const canViewStatusReading = !favorite && !user;
+
   if (isMobile) {
     return (
       <li>
         <Link
-          href={`/works/${work.id}`}
+          href={link}
           className="bg-card flex flex-col gap-y-2 rounded border p-3"
         >
           <div className="flex flex-1">
@@ -80,17 +95,19 @@ export default function WorkCard({ work }: { work: Work }) {
             </div>
 
             <div className="flex flex-1 flex-col justify-between gap-y-2">
-              <div>
-                <Badge
-                  variant={badgeVariant}
-                  className="w-full font-mono capitalize"
-                >
-                  {work.status_reading}
-                </Badge>
-                <h2 className="font-secondary text-lg">
-                  {title} {work.publication_year && <span>({work.publication_year})</span>}
-                </h2>
-              </div>
+              {canViewStatusReading && (
+                <div className="-translate-y-0.5">
+                  <Badge
+                    variant={badgeVariant}
+                    className="w-full font-mono capitalize"
+                  >
+                    {work.status_reading ?? 'Unknown'}
+                  </Badge>
+                  <h2 className="font-secondary text-lg">
+                    {title} {work.publication_year && <span>({work.publication_year})</span>}
+                  </h2>
+                </div>
+              )}
 
               {(work.author || work.status_publication) && (
                 <div className="flex flex-1 flex-col justify-end font-light tracking-tight">
@@ -120,7 +137,7 @@ export default function WorkCard({ work }: { work: Work }) {
   return (
     <li>
       <Link
-        href={`/works/${work.id}`}
+        href={link}
         className="bg-card hover:border-primary flex rounded border p-2"
       >
         <div className="relative flex flex-col">
@@ -140,12 +157,14 @@ export default function WorkCard({ work }: { work: Work }) {
 
         <div className="flex flex-1 flex-col gap-y-0.5">
           <div className="">
-            <Badge
-              variant={badgeVariant}
-              className="float-right font-mono capitalize"
-            >
-              {work.status_reading}
-            </Badge>
+            {canViewStatusReading && (
+              <Badge
+                variant={badgeVariant}
+                className="float-right font-mono capitalize"
+              >
+                {work.status_reading ?? 'Unknown'}
+              </Badge>
+            )}
             <h2 className="font-secondary text-lg">
               {title} {work.publication_year && <span>({work.publication_year})</span>}
             </h2>
@@ -164,7 +183,9 @@ export default function WorkCard({ work }: { work: Work }) {
             </div>
           )}
 
-          <ReadOnlyInputTags value={work.tags ?? '<Tags not provided>'} />
+          <div className="max-h-7 overflow-scroll">
+            <ReadOnlyInputTags value={work.tags ?? '<Tags not provided>'} />
+          </div>
 
           <p className="my-0.5 max-h-52 overflow-y-auto">
             {work.description ?? <span className="text-muted-foreground font-mono tracking-normal">(No description provided...)</span>}

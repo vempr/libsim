@@ -62,14 +62,13 @@ function search(Builder | Relation $query, array $state): Builder | Relation {
 
 function getBreadcrumbs(ShowWorkRequest $request, Work $work): array {
 	$defaultBreadcrumbs = [[
-		'title' => 'Saved works',
+		'title' => 'Personal works',
 		'href' => '/works',
 	]];
 
 	$validated = $request->validated();
 	$collectionId = $validated['collection'] ?? null;
 	$userId = $validated['user'] ?? null;
-	$favorite = $validated['favorite'] ?? null;
 	$chat = $validated['chat'] ?? null;
 
 	$authUser = Auth::user();
@@ -103,17 +102,6 @@ function getBreadcrumbs(ShowWorkRequest $request, Work $work): array {
 		], [
 			'title' => $user->name,
 			'href' => "/users/$userId",
-		]];
-	}
-
-	if ($favorite) {
-		if (!$authUser->favoriteWorks()->where('work_id', $work->id)->exists()) {
-			return $defaultBreadcrumbs;
-		}
-
-		return [[
-			'title' => 'Favorited works',
-			'href' => '/works',
 		]];
 	}
 
@@ -168,10 +156,10 @@ class WorkController extends Controller {
 		];
 
 		$user = Auth::user();
-		$worksQuery = Work::query()->where('user_id', $user->id);
+		$worksQuery = Work::query()->where('user_id', $user->id)->orderByDesc('updated_at');
 		$works = search($worksQuery, $state)->paginate(15, ['*'], 'saved');
 
-		$favoriteQuery = $user->favoriteWorks();
+		$favoriteQuery = $user->favoriteWorks()->orderByDesc('updated_at');
 		$favoritedWorks = search($favoriteQuery, $state)->paginate(15, ['*'], 'favorited');
 
 		return Inertia::render('works/all', [
@@ -222,7 +210,7 @@ class WorkController extends Controller {
 		return Inertia::render('works/work', [
 			'work' => [
 				...$work->toArray(),
-				'collections' => $work->collections->map->only(['id', 'name']),
+				'collections' => $work->collections()->where('user_id', $authUser->id)->get()->map->only(['id', 'name']),
 			],
 			'workCreatorProfile' => $profile,
 			'favorited' => $authUser->favoriteWorks()->where('work_id', $work->id)->exists(),

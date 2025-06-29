@@ -35,7 +35,16 @@ class CollectionController extends Controller {
 		$works = $collection
 			->works()
 			->wherePivot('removed_from_favorites', false)
+			->orderByDesc('collection_entries.updated_at')
+			->select('works.*')
 			->paginate(20);
+
+		$works->getCollection()->transform(function ($work) {
+			if ($work->user_id !== Auth::id()) {
+				unset($work->status_reading);
+			}
+			return $work;
+		});
 
 		return Inertia::render('collections/collection', [
 			'collection' => $collection->only(['id', 'name']),

@@ -23,7 +23,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function Work() {
   const { info } = usePage<InertiaProps>().props;
-  const { put } = useInertiaForm();
+  const { put, processing } = useInertiaForm();
 
   const form = useForm<ProfileFormInput>({
     resolver: zodResolver(profileFormSchema),
@@ -47,21 +47,21 @@ export default function Work() {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-6"
+          className="flex h-full flex-col gap-y-4"
         >
           <FormField
             control={form.control}
             name="introduction"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Title</FormLabel>
+                <FormLabel>Introduction</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
                     value={field.value ?? ''}
                   />
                 </FormControl>
-                <FormDescription>introduction</FormDescription>
+                <FormDescription>Introduce yourself in a few words, up to 255 characters</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -79,73 +79,86 @@ export default function Work() {
                     value={field.value ?? ''}
                   />
                 </FormControl>
-                <FormDescription>description</FormDescription>
+                <FormDescription>Tell a little more about yourself, up to 2000 characters</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="good_tags"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>good tags</FormLabel>
-                <FormControl>
-                  <InputTags
-                    {...field}
-                    uppercase
-                    value={field.value ?? ''}
-                    onChange={(e) => field.onChange(e.target.value)}
-                  />
-                </FormControl>
-                <FormDescription>Enter good tags</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="flex items-start gap-x-2">
+            <FormField
+              control={form.control}
+              name="good_tags"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>I love to read...</FormLabel>
+                  <FormControl>
+                    <InputTags
+                      {...field}
+                      uppercase
+                      value={field.value ?? ''}
+                      onChange={(e) => field.onChange(e.target.value)}
+                    >
+                      <FormDescription>Use commas to register your favorite tags, up to 255 characters</FormDescription>
+                    </InputTags>
+                  </FormControl>
 
-          <FormField
-            control={form.control}
-            name="neutral_tags"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>neutral Tags</FormLabel>
-                <FormControl>
-                  <InputTags
-                    {...field}
-                    uppercase
-                    value={field.value ?? ''}
-                    onChange={(e) => field.onChange(e.target.value)}
-                  />
-                </FormControl>
-                <FormDescription>Enter neutral tags</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name="bad_tags"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>bad tags</FormLabel>
-                <FormControl>
-                  <InputTags
-                    {...field}
-                    uppercase
-                    value={field.value ?? ''}
-                    onChange={(e) => field.onChange(e.target.value)}
-                  />
-                </FormControl>
-                <FormDescription>Enter bad tags</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name="neutral_tags"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>This is pretty fine...</FormLabel>
+                  <FormControl>
+                    <InputTags
+                      {...field}
+                      uppercase
+                      value={field.value ?? ''}
+                      onChange={(e) => field.onChange(e.target.value)}
+                    >
+                      <FormDescription>Use commas to register tolerable tags, up to 255 characters</FormDescription>
+                    </InputTags>
+                  </FormControl>
 
-          <Button type="submit">Submit</Button>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="bad_tags"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>I really hate...</FormLabel>
+                  <FormControl>
+                    <InputTags
+                      {...field}
+                      uppercase
+                      value={field.value ?? ''}
+                      onChange={(e) => field.onChange(e.target.value)}
+                    >
+                      <FormDescription>Use commas to register atrocious tags, up to 255 characters</FormDescription>
+                    </InputTags>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <Button
+            type="submit"
+            className="mt-auto mb-2.5 w-full"
+            disabled={processing}
+          >
+            Update your profile!
+          </Button>
         </form>
       </Form>
     </AppLayout>

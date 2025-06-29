@@ -235,6 +235,8 @@ export default function All() {
                 <Button
                   type="submit"
                   className="mb-2 w-full"
+                  variant="secondary"
+                  size="sm"
                 >
                   Load more messages
                 </Button>

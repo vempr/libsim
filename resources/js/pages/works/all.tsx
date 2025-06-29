@@ -3,7 +3,7 @@ import { EmptyListPlaceholder } from '@/components/empty';
 import InertiaPagination from '@/components/inertia-pagination';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import WorkCard from '@/components/work';
+import WorkCard, { WorkGrid } from '@/components/work';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import AppLayout from '@/layouts/app-layout';
 import { hasOnePage } from '@/lib/pagination';
@@ -54,14 +54,14 @@ export default function All() {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="own-works">
-          <ul className="grid grid-cols-1 gap-y-2">
+          <WorkGrid>
             {worksPaginatedResponse?.data.map((work) => (
               <WorkCard
                 key={work.id}
                 work={work}
               />
             ))}
-          </ul>
+          </WorkGrid>
 
           {worksPaginatedResponse?.data.length === 0 && (
             <EmptyListPlaceholder>
@@ -74,16 +74,19 @@ export default function All() {
               </Button>
             </EmptyListPlaceholder>
           )}
+
           {!hasOnePage(worksPaginatedResponse) && worksPaginatedResponse && <InertiaPagination paginateItems={worksPaginatedResponse} />}
         </TabsContent>
         <TabsContent value="favorited-works">
-          <ul>
+          <WorkGrid>
             {favoritesPaginatedResponse?.data.map((favorite) => (
-              <li>
-                <Link href={`/works/${favorite.id}?favorite=true`}>{JSON.stringify(favorite)}</Link>
-              </li>
+              <WorkCard
+                key={favorite.id}
+                work={favorite}
+                favorite
+              />
             ))}
-          </ul>
+          </WorkGrid>
 
           {favoritesPaginatedResponse?.data.length === 0 && (
             <EmptyListPlaceholder>

@@ -32,6 +32,7 @@ export default function AddWorksToCollection({ works, collection }: AddWorksToCo
   const { rd, open, setOpen } = useResponsiveDialog();
 
   function onSubmit(values: WorksForm) {
+    console.log(values);
     put(
       route('collection.entry.update.multiple', {
         work_ids: values.selectedWorks,
@@ -50,7 +51,7 @@ export default function AddWorksToCollection({ works, collection }: AddWorksToCo
     >
       <rd.Trigger asChild>
         <Button
-          variant="secondary"
+          variant="outline"
           className="flex-1"
         >
           Edit collection entries
@@ -93,7 +94,8 @@ export default function AddWorksToCollection({ works, collection }: AddWorksToCo
                             key={id}
                             className="bg-accent text-accent-foreground rounded border px-2 py-1 text-xs"
                           >
-                            {work.title} ({work.author})
+                            {work.title}{' '}
+                            {work.author ? `(${work.author.replaceAll(',', ', ')})` : <span className="font-mono opacity-80">(N/A)</span>}
                           </li>
                         );
                     })}
