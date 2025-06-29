@@ -47,6 +47,8 @@ export default function All() {
   const [scrollToBottom, setScrollToBottom] = useState(true);
 
   const reachedFirstMessage = scrollPage + 1 !== messagesPaginatedResponse?.links.length;
+  const reachedBeginningOfConvo =
+    (messagesPaginatedResponse?.total && 20 * (scrollPage - 1) - messagesPaginatedResponse.total > 0) || messagesPaginatedResponse?.total === 0;
 
   useEffect(() => {
     setScrollPageUrl(messagesPaginatedResponse?.links[scrollPage].url);
@@ -218,7 +220,7 @@ export default function All() {
             className="flex-1 overflow-y-auto px-4 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-track]:bg-neutral-700"
             ref={scrollRef}
           >
-            {messagesPaginatedResponse?.total && 20 * (scrollPage - 1) - messagesPaginatedResponse.total > 0 && (
+            {reachedBeginningOfConvo && (
               <p className="font-secondary text-muted-foreground mb-2 text-center text-sm md:text-base">The beginning of your conversation!</p>
             )}
 

@@ -28,7 +28,7 @@ export default function NewCollectionSheet({ children }: { children?: ReactNode 
   const { post, processing } = useInertiaForm();
 
   function onSubmit(values: z.infer<typeof nameSchema>) {
-    post(route('collection.store', values), { onFinish: () => setOpen(false) });
+    post(route('collection.store', values), { onFinish: () => setOpen(false), preserveScroll: true });
   }
 
   return (
@@ -53,10 +53,7 @@ export default function NewCollectionSheet({ children }: { children?: ReactNode 
           <rd.Title>New collection</rd.Title>
           <rd.Description>Add a new collection to sort your personal works.</rd.Description>
         </rd.Header>
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="flex h-full flex-col justify-between"
-        >
+        <form className="flex h-full flex-col justify-between">
           <div className="mb-2 grid gap-y-3 px-4">
             <Label htmlFor="name">Name</Label>
             <Input
@@ -75,8 +72,9 @@ export default function NewCollectionSheet({ children }: { children?: ReactNode 
 
           <rd.Footer>
             <Button
-              type="submit"
+              type="button"
               disabled={processing}
+              onClick={handleSubmit(onSubmit)}
             >
               Create collection
             </Button>

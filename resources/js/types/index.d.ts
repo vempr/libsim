@@ -190,7 +190,6 @@ interface DashboardData {
 export interface InertiaProps extends Page<PageProps> {
   flash?: FlashMessages;
   user: User;
-  profile: ProfileUser;
   breadcrumbs: BreadcrumbItem[];
 
   dashboardData: DashboardData;
@@ -204,6 +203,8 @@ export interface InertiaProps extends Page<PageProps> {
   friendRequestStatus?: FriendRequestStatus;
 
   work: Work;
+  workCreatorProfile: ChatUser & { introduction: string };
+  areFriends: boolean;
   favorited: boolean;
 
   userQuery?: string | null;

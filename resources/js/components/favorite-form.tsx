@@ -3,6 +3,8 @@ import { useForm } from '@inertiajs/react';
 import { Star } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
+import { Button } from './ui/button';
+
 interface FavoriteFormProps {
   favorited: boolean;
   workId: string;
@@ -24,25 +26,27 @@ export function FavoriteForm({ favorited, workId }: FavoriteFormProps) {
   }, [favoriteDebounced, post, destroy, workId]);
 
   return (
-    <button
+    <Button
       onClick={() => setFavorite(!favorite)}
-      className="bg-secondary hover:bg-secondary/90 w-min rounded-md p-1 shadow-xs hover:cursor-pointer disabled:pointer-events-none disabled:opacity-50"
+      variant="outline"
       disabled={processing}
+      className="w-max"
+      aria-pressed={favorite}
     >
-      <Star
-        className={`absolute transition-opacity ${favorite ? 'opacity-100' : 'opacity-0'}`}
-        fill="#ffff00"
-        stroke="#ffff00"
-        size={35}
-        strokeWidth={1}
-      />
-      <Star
-        className={`transition-opacity ${favorite ? 'opacity-0' : 'opacity-100'}`}
-        stroke="#ffffff"
-        size={35}
-        strokeWidth={1}
-        strokeOpacity={favorite ? 0.9 : 0.6}
-      />
-    </button>
+      <span className="sr-only">{favorite ? 'Unfavorite this work' : 'Favorite this work'}</span>
+
+      {favorite ? (
+        <Star
+          fill="oklch(0.4815 0.1178 263.3758)"
+          stroke="oklch(0.4815 0.1178 263.3758)"
+          strokeWidth={1}
+        />
+      ) : (
+        <Star
+          stroke="#ffffff"
+          strokeWidth={1}
+        />
+      )}
+    </Button>
   );
 }

@@ -29,7 +29,7 @@ interface MessageProps {
 
 export default function Message({ message, friend, onEditFocus, onDelete }: MessageProps) {
   const { auth } = usePage<SharedData>().props;
-  const isOwnMessage = auth.user.id === message.sender.id;
+  const isOwnMessage = auth.user.id !== message.receiver_id;
   const messageIsWork = Boolean(message.work?.id ?? false);
   const isMobile = useIsMobile();
 
@@ -116,7 +116,7 @@ export default function Message({ message, friend, onEditFocus, onDelete }: Mess
         <div
           className={cn(
             isOwnMessage ? 'bg-primary text-primary-foreground ml-auto' : 'bg-card text-foreground mr-auto',
-            'border-border text flex w-50 max-w-50 flex-col justify-center rounded border p-2 md:w-96 md:max-w-96',
+            'border-border text flex w-50 max-w-50 flex-col justify-center overflow-hidden rounded border p-2 md:w-96 md:max-w-96',
           )}
         >
           {message.work?.title ? (
@@ -197,7 +197,7 @@ export default function Message({ message, friend, onEditFocus, onDelete }: Mess
                 <AvatarPicture
                   avatar={isOwnMessage ? auth.user.avatar : friend.avatar}
                   is_friend={isOwnMessage ? 0 : 1}
-                  name={friend.name}
+                  name={isOwnMessage ? auth.user.name : friend.name}
                   className={cn('h-6 w-6 border-1', isOwnMessage ? 'float-right ml-2' : 'float-left mr-2')}
                 />
               )}

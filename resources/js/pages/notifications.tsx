@@ -50,17 +50,6 @@ export default function Notifications() {
         <EmptyListPlaceholder>You have no notifications :)</EmptyListPlaceholder>
       )}
 
-      {/* {
-  id: number;
-  type: 'friend_request' | 'friend_request_response' | 'reminder';
-  sender_id: string;
-  mood: 'positive' | 'negative' | 'neutral';
-  title: string;
-  description: string;
-  image?: string | null;
-  created_at: string;
-} */}
-
       {!hasOnePage(notificationsPaginatedResponse) && notificationsPaginatedResponse && (
         <InertiaPagination paginateItems={notificationsPaginatedResponse} />
       )}

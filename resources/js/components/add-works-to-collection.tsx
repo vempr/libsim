@@ -70,11 +70,11 @@ export default function AddWorksToCollection({ works, collection }: AddWorksToCo
             name="selectedWorks"
             control={control}
             render={({ field }) => (
-              <div className="flex w-full">
+              <div className="flex h-full w-full flex-col px-4">
                 <MultiSelect
                   options={works.map((work) => ({
                     value: work.id,
-                    label: `${work.title} - ${work.author}`,
+                    label: `${work.title} (${work.author})`,
                   }))}
                   selected={field.value}
                   onChange={field.onChange}
@@ -82,6 +82,23 @@ export default function AddWorksToCollection({ works, collection }: AddWorksToCo
                   emptyText="No works found."
                   hideNewCollectionSheet
                 />
+
+                {field.value && (
+                  <ul className="my-2 max-h-60 space-y-1 overflow-scroll">
+                    {field.value.map((id) => {
+                      const work = works.find((w) => w.id === id);
+                      if (work)
+                        return (
+                          <li
+                            key={id}
+                            className="bg-accent text-accent-foreground rounded border px-2 py-1 text-xs"
+                          >
+                            {work.title} ({work.author})
+                          </li>
+                        );
+                    })}
+                  </ul>
+                )}
               </div>
             )}
           />

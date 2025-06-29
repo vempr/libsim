@@ -47,7 +47,7 @@ export function MultiSelect({
       onOpenChange={setOpen}
     >
       <PopoverTrigger asChild>
-        <div className="mx-4 w-full">
+        <div className="w-full">
           <Button
             variant="outline"
             role="combobox"

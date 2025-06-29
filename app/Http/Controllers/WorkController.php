@@ -6,6 +6,7 @@ use App\Http\Requests\ShowWorkRequest;
 use App\Http\Requests\StoreWorkRequest;
 use App\Http\Requests\UpdateWorkRequest;
 use App\Models\Collection;
+use App\Models\Profile;
 use App\Models\User;
 use App\Models\Work;
 use Cloudinary\Cloudinary;
@@ -213,7 +214,7 @@ class WorkController extends Controller {
 
 		$profile = null;
 		if ($user->id !== $authUser->id) {
-			$profile = $user->only(['id', 'name', 'avatar', 'introduction', 'description']);
+			$profile = [...$user->only(['id', 'name', 'avatar']), 'introduction' => $user->profile->introduction];
 		}
 
 		$breadcrumbs = getBreadcrumbs($request, $work);
@@ -223,10 +224,11 @@ class WorkController extends Controller {
 				...$work->toArray(),
 				'collections' => $work->collections->map->only(['id', 'name']),
 			],
-			'profile' => $profile,
+			'workCreatorProfile' => $profile,
 			'favorited' => $authUser->favoriteWorks()->where('work_id', $work->id)->exists(),
 			'collections' => $authUser->collections->map->only(['id', 'name']),
 			'breadcrumbs' => $breadcrumbs,
+			'areFriends' => $authUser->friends()->where('friend_id', $user->id)->exists(),
 		]);
 	}
 

@@ -15,8 +15,8 @@
   height: 20px;
   box-sizing: border-box;
   border: 4px solid transparent;
-  border-top-color: oklch(0.9366 0.0129 266.6974);
-  border-left-color: oklch(0.9366 0.0129 266.6974);
+  border-top-color: oklch(0.4815 0.1178 263.3758);
+  border-left-color: oklch(0.4815 0.1178 263.3758);
   border-radius: 50%;
   -webkit-animation: nprogress-spinner 400ms linear infinite;
   animation: nprogress-spinner 400ms linear infinite;
