@@ -188,7 +188,7 @@ class WorkController extends Controller {
 			}
 
 			$work = Work::create($requestWork);
-			return redirect('works/' . $work->id)->with('success', 'Your work "' . $work->title . '" has been created.');
+			return redirect('works/' . $work->id)->with('success', 'Your work ' . $work->title . ' has been created!');
 		} catch (\Exception $e) {
 			return back()->with('error', 'An error occurred while creating your work: \'' . $e->getMessage() . '\'.');
 		}
@@ -248,7 +248,7 @@ class WorkController extends Controller {
 			}
 
 			$work->update($requestWork);
-			return redirect('works/' . $work->id)->with('success', 'Your work "' . $work->title . '" has been updated.');
+			return redirect('works/' . $work->id)->with('success', 'Your work ' . $work->title . ' has been updated!');
 		} catch (\Exception $e) {
 			return back()->with('error', 'An error occurred while creating your work: \'' . $e->getMessage() . '\'.');
 		}
@@ -263,7 +263,7 @@ class WorkController extends Controller {
 			}
 
 			$work->delete();
-			return redirect('works')->with('success', 'Your work "' . $work->title . '" has been deleted.');
+			return redirect('works')->with('success', 'Your work ' . $work->title . ' has been deleted.');
 		} catch (\Exception $e) {
 			return back()->with('error', 'An error occurred while deleting your work: \'' . $e->getMessage() . '\'.');
 		}

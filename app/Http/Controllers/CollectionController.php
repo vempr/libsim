@@ -62,7 +62,7 @@ class CollectionController extends Controller {
 		$userId = Auth::id();
 
 		if (Collection::where('user_id', $userId)->where('name', $name)->exists()) {
-			return back()->with('error', 'The collection "' . $name . '" already exists. Please choose another name.');
+			return back()->with('error', 'The collection ' . $name . ' already exists. Please choose another name.');
 		}
 
 		Collection::create([
@@ -70,7 +70,7 @@ class CollectionController extends Controller {
 			'name' => $name
 		]);
 
-		return back()->with('success', 'Your collection "' . $name . '" has been created.');
+		return back()->with('success', 'Your collection ' . $name . ' has been created!');
 	}
 
 	public function update(Collection $collection, Request $request) {
@@ -80,12 +80,12 @@ class CollectionController extends Controller {
 		$name = $validated['name'];
 
 		if (Collection::where('user_id', Auth::id())->where('name', $name)->exists()) {
-			return back()->with('error', 'The collection "' . $name . '" already exists. Please choose another name.');
+			return back()->with('error', 'The collection ' . $name . ' already exists. Please choose another name.');
 		}
 
 		$collection->update(['name' => $name]);
 
-		return back()->with('success', 'Your collection has been renamed to "' . $name . '".');
+		return back()->with('success', 'Your collection has been renamed to ' . $name . '!');
 	}
 
 	public function destroy(Collection $collection) {
@@ -95,6 +95,6 @@ class CollectionController extends Controller {
 
 		$collection->delete();
 
-		return redirect(route('collection.index'))->with('success', 'Your collection "' . $collection->name . '" has been deleted.');
+		return redirect(route('collection.index'))->with('success', 'Your collection ' . $collection->name . ' has been deleted.');
 	}
 }

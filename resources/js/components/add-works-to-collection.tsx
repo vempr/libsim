@@ -40,6 +40,7 @@ export default function AddWorksToCollection({ works, collection }: AddWorksToCo
       }),
       {
         onFinish: () => setOpen(false),
+        preserveScroll: true,
       },
     );
   }

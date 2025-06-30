@@ -54,19 +54,19 @@ const publicationChartConfig = {
     label: 'Unknown',
     color: 'var(--chart-1)',
   },
-  completed: {
+  ongoing: {
     label: 'Ongoing',
     color: 'var(--chart-2)',
   },
-  hiatus: {
+  completed: {
     label: 'Completed',
     color: 'var(--chart-3)',
   },
-  cancelled: {
+  hiatus: {
     label: 'Hiatus',
     color: 'var(--chart-4)',
   },
-  ongoing: {
+  cancelled: {
     label: 'Cancelled',
     color: 'var(--chart-5)',
   },
@@ -225,11 +225,11 @@ export default function Dashboard() {
     { status: 'dropped', count: dashboardData.readingStatuses.dropped ?? 0, fill: 'var(--chart-4)' },
   ];
   const publicationChartData = [
-    { status: 'unknown', count: dashboardData.readingStatuses.unknown ?? 0, fill: 'var(--chart-1)' },
-    { status: 'ongoing', count: dashboardData.readingStatuses.ongoing ?? 0, fill: 'var(--chart-2)' },
-    { status: 'completed', count: dashboardData.readingStatuses.completed ?? 0, fill: 'var(--chart-3)' },
-    { status: 'hiatus', count: dashboardData.readingStatuses.hiatus ?? 0, fill: 'var(--chart-4)' },
-    { status: 'cancelled', count: dashboardData.readingStatuses.cancelled ?? 0, fill: 'var(--chart-5)' },
+    { status: 'unknown', count: dashboardData.publicationStatuses.unknown ?? 0, fill: 'var(--chart-1)' },
+    { status: 'ongoing', count: dashboardData.publicationStatuses.ongoing ?? 0, fill: 'var(--chart-2)' },
+    { status: 'completed', count: dashboardData.publicationStatuses.completed ?? 0, fill: 'var(--chart-3)' },
+    { status: 'hiatus', count: dashboardData.publicationStatuses.hiatus ?? 0, fill: 'var(--chart-4)' },
+    { status: 'cancelled', count: dashboardData.publicationStatuses.cancelled ?? 0, fill: 'var(--chart-5)' },
   ];
   const originalLanguagesChartData = [
     { code: 'ja', count: dashboardData.originalLanguages.ja ?? 0, fill: 'var(--chart-ja)' },
@@ -278,6 +278,8 @@ export default function Dashboard() {
   const translatedLanguagesTotalCount = useMemo(() => {
     return translatedLanguagesChartData.reduce((acc, curr) => acc + curr.count, 0);
   }, []);
+
+  console.log(publicationTotalCount, publicationChartData);
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>

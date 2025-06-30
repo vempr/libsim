@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 class CollectionEntryController extends Controller {
 	public function updateMultiple(Request $request, Collection $collection) {
 		if ($collection->user_id !== Auth::id()) {
-			return back()->with('error', 'You do not own this collection.');
+			return back()->with('error', 'You do not own this collection!');
 		}
 
 		$validated = $request->validate([
@@ -49,7 +49,7 @@ class CollectionEntryController extends Controller {
 		$collection->updated_at = now();
 		$collection->save();
 
-		return back()->with('success', 'Collection successfully updated.');
+		return back()->with('success', 'Collection successfully updated!');
 	}
 
 	public function updateSingle(Request $request, Work $work) {
@@ -73,7 +73,7 @@ class CollectionEntryController extends Controller {
 			Collection::whereIn('id', $collection_entries->pluck('collection_id')->toArray())->update(['updated_at' => now()]);
 
 			$collection_entries->delete();
-			return back()->with('success', 'Collections successfully updated.');
+			return back()->with('success', 'Collections successfully updated!');
 		}
 
 		$toAdd = array_values(
@@ -115,6 +115,6 @@ class CollectionEntryController extends Controller {
 		Collection::whereIn('id', $toAdd)->update(['updated_at' => now()]);
 		Collection::whereIn('id', $toRemove)->update(['updated_at' => now()]);
 
-		return back()->with('success', 'Collections successfully updated.');
+		return back()->with('success', 'Collections successfully updated!');
 	}
 }

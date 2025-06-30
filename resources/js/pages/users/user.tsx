@@ -220,6 +220,7 @@ export default function Work() {
         setAreFriends(false);
         setFriendRequestStatus(undefined);
       },
+      preserveScroll: true,
     });
   };
 
@@ -239,6 +240,7 @@ export default function Work() {
         setWorksPaginatedResponse(response.data.worksPaginatedResponse);
         if (response) setFetchingWorks(false);
       },
+      preserveScroll: true,
     });
   };
 
@@ -246,6 +248,7 @@ export default function Work() {
     e.preventDefault();
     post(route('users.store'), {
       onFinish: () => setFriendRequestStatus('pending'),
+      preserveScroll: true,
     });
   };
 

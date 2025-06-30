@@ -30,7 +30,7 @@ export default function All() {
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title="Saved works" />
+      <Head title="Personal works" />
 
       <AdvancedSearchForm state={searchState} />
 

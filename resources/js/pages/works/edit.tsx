@@ -13,7 +13,7 @@ export default function Edit() {
   const { work } = usePage<InertiaProps>().props;
   const breadcrumbs: BreadcrumbItem[] = [
     {
-      title: 'Saved works',
+      title: 'Personal works',
       href: '/works',
     },
     {

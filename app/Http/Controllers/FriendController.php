@@ -224,7 +224,7 @@ class FriendController extends Controller {
 
 		broadcast(new NotificationSent($notification));
 
-		return back()->with('success', 'Friend request sent.');
+		return back()->with('success', 'Friend request sent!');
 	}
 
 	public function destroy(Request $request) {

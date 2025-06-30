@@ -70,6 +70,7 @@ export default function Collection() {
       }),
       {
         onFinish: () => setOpen(false),
+        preserveScroll: true,
       },
     );
   }

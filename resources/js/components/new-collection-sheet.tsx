@@ -3,11 +3,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useResponsiveDialog } from '@/lib/responsive';
+import { FlashMessages } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm as useInertiaForm } from '@inertiajs/react';
 import { FolderPlus } from 'lucide-react';
 import { ReactNode } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { z } from 'zod';
 
 const nameSchema = z.object({
@@ -28,7 +30,16 @@ export default function NewCollectionSheet({ children }: { children?: ReactNode 
   const { post, processing } = useInertiaForm();
 
   function onSubmit(values: z.infer<typeof nameSchema>) {
-    post(route('collection.store', values), { onFinish: () => setOpen(false), preserveScroll: true });
+    post(route('collection.store', values), {
+      onSuccess: (page) => {
+        console.log(page);
+        const flash = page.props.flash as FlashMessages;
+        if (!flash.error) {
+          setOpen(false);
+        } else toast.error(flash.error);
+      },
+      preserveScroll: true,
+    });
   }
 
   return (

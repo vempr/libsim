@@ -21,8 +21,8 @@ export function FavoriteForm({ favorited, workId }: FavoriteFormProps) {
       isFirstRender.current = false;
       return;
     }
-    if (favoriteDebounced === true) post(route('favorite.store', workId));
-    if (favoriteDebounced === false) destroy(route('favorite.destroy', workId));
+    if (favoriteDebounced === true) post(route('favorite.store', workId), { preserveScroll: true });
+    if (favoriteDebounced === false) destroy(route('favorite.destroy', workId), { preserveScroll: true });
   }, [favoriteDebounced, post, destroy, workId]);
 
   return (

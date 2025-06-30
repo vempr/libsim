@@ -39,6 +39,6 @@ class PublicProfileController extends Controller {
 
 		DB::table('profiles')->where('user_id', '=', Auth::id())->update($validated);
 
-		return redirect(route('u.index'))->with('success', 'Your profile information has been updated.');
+		return redirect(route('u.index'))->with('success', 'Your profile settings have been updated!');
 	}
 }

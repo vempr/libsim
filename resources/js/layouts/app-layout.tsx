@@ -16,8 +16,9 @@ export default ({ children, breadcrumbs, excludeAppSidebarHeader, ...props }: Ap
   const currentRoute = route().current();
 
   useEffect(() => {
-    if (flash?.success) toast(flash.success);
-    if (flash?.error) toast(flash.error);
+    if (flash?.error?.includes('The collection')) return;
+    if (flash?.success) toast.success(flash.success);
+    if (flash?.error) toast.error(flash.error);
   }, [flash?.success, flash?.error]);
 
   useEffect(() => {
@@ -65,7 +66,13 @@ export default ({ children, breadcrumbs, excludeAppSidebarHeader, ...props }: Ap
       {...props}
     >
       {children}
-      <Toaster />
+      <Toaster
+        toastOptions={{
+          classNames: {
+            toast: '!bg-secondary !p-2 !text-xs !text-secondary-foreground !border-2 !border-border !ring-0',
+          },
+        }}
+      />
     </AppLayoutTemplate>
   );
 };

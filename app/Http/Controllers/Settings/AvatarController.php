@@ -53,7 +53,7 @@ class AvatarController extends Controller {
 			$user->avatar_public_id = $result['public_id'];
 			$user->update();
 
-			return back()->with('success', 'Avatar successfully updated.');
+			return back()->with('success', 'Avatar successfully updated!');
 		} catch (\Exception $e) {
 			return back()->with('error', 'An error occurred while updating your avatar: \'' . $e->getMessage() . '\'.');
 		}
