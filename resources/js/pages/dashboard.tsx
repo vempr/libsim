@@ -279,8 +279,6 @@ export default function Dashboard() {
     return translatedLanguagesChartData.reduce((acc, curr) => acc + curr.count, 0);
   }, []);
 
-  console.log(publicationTotalCount, publicationChartData);
-
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title="Dashboard" />

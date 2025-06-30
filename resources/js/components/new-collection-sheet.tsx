@@ -32,7 +32,6 @@ export default function NewCollectionSheet({ children }: { children?: ReactNode 
   function onSubmit(values: z.infer<typeof nameSchema>) {
     post(route('collection.store', values), {
       onSuccess: (page) => {
-        console.log(page);
         const flash = page.props.flash as FlashMessages;
         if (!flash.error) {
           setOpen(false);

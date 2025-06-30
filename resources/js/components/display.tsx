@@ -10,11 +10,9 @@ import {
 } from '@/components/ui/drawer';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { getRelativeTime } from '@/lib/date';
 import { shortenString } from '@/lib/shorten';
 import { cn } from '@/lib/utils';
-import { ChatUser, MessageEager, SharedData } from '@/types';
-import { Link, usePage } from '@inertiajs/react';
+import { MessageEager } from '@/types';
 import { Ellipsis } from 'lucide-react';
 
 import AvatarPicture from './avatar-picture';
@@ -22,16 +20,12 @@ import { Button } from './ui/button';
 
 interface MessageProps {
   message: MessageEager;
-  friend: ChatUser;
-  onEditFocus: () => void;
-  onDelete: () => void;
 }
 
-export default function Message({ message, friend, onEditFocus, onDelete }: MessageProps) {
-  const { auth } = usePage<SharedData>().props;
-  const isOwnMessage = auth.user.id !== message.receiver_id;
+export function Message({ message }: MessageProps) {
   const messageIsWork = Boolean(message.work?.id ?? false);
   const isMobile = useIsMobile();
+  const friend = message.sender.id === '2' ? message.sender : null;
 
   const EditMessageDesktop = (
     <Popover>
@@ -47,7 +41,6 @@ export default function Message({ message, friend, onEditFocus, onDelete }: Mess
         {!messageIsWork && (
           <Button
             variant="secondary"
-            onClick={onEditFocus}
             className="flex-1"
           >
             Edit
@@ -55,7 +48,6 @@ export default function Message({ message, friend, onEditFocus, onDelete }: Mess
         )}
         <Button
           variant="destructive"
-          onClick={onDelete}
           className="flex-1 hover:opacity-80"
         >
           Delete
@@ -78,7 +70,6 @@ export default function Message({ message, friend, onEditFocus, onDelete }: Mess
         {!messageIsWork && (
           <Button
             variant="secondary"
-            onClick={onEditFocus}
             className="flex-1"
           >
             Edit
@@ -86,7 +77,6 @@ export default function Message({ message, friend, onEditFocus, onDelete }: Mess
         )}
         <Button
           variant="destructive"
-          onClick={onDelete}
           className="flex-1 hover:opacity-80"
         >
           Delete
@@ -95,27 +85,13 @@ export default function Message({ message, friend, onEditFocus, onDelete }: Mess
     </Popover>
   );
 
-  if (message.is_deleted) {
-    return (
-      <li
-        key={`${message.id}-${new Date(message.created_at).getTime()}`}
-        className={cn(
-          isOwnMessage ? 'bg-primary text-primary-foreground/60 ml-auto' : 'bg-card text-foreground/60 mr-auto',
-          'border-border text flex max-w-50 flex-col justify-center rounded border p-2 font-mono text-xs md:w-96 md:max-w-96 md:text-base',
-        )}
-      >
-        <p className="text-center">(deleted {getRelativeTime(message.updated_at)}...)</p>
-      </li>
-    );
-  }
-
   return (
     <li className="flex flex-col">
       <div className="flex">
-        {isOwnMessage && EditMessageMobile}
+        {!friend && EditMessageMobile}
         <div
           className={cn(
-            isOwnMessage ? 'bg-primary text-primary-foreground ml-auto' : 'bg-card text-foreground mr-auto',
+            !friend ? 'bg-primary text-primary-foreground ml-auto' : 'bg-card text-foreground mr-auto',
             'border-border text flex w-50 max-w-50 flex-col justify-center overflow-hidden rounded border p-2 md:w-96 md:max-w-96',
           )}
         >
@@ -127,16 +103,13 @@ export default function Message({ message, friend, onEditFocus, onDelete }: Mess
                   {shortenString(message.work.title)}
                   {'>'}
                 </DrawerTrigger>
-                <DrawerContent>
+                <DrawerContent className="mb-3">
                   <DrawerHeader>
                     <DrawerTitle className="sr-only">View work</DrawerTitle>
                     <DrawerDescription className="text-muted-foreground">(Click on the cover to view work)</DrawerDescription>
                   </DrawerHeader>
                   <div className="px-4">
-                    <Link
-                      href={route('work', { work: message.work.id, chat: friend.id })}
-                      className="hover:opacity-90"
-                    >
+                    <div className="hover:opacity-90">
                       {message?.work?.image || message?.work?.image_self ? (
                         <img
                           src={message.work.image || message.work.image_self || undefined}
@@ -147,7 +120,7 @@ export default function Message({ message, friend, onEditFocus, onDelete }: Mess
                           <p className="text-muted-foreground text-center font-mono text-sm">No cover provided...</p>
                         </div>
                       )}
-                    </Link>
+                    </div>
                     <h3 className="font-secondary text-foreground mb-1 text-xl">{shortenString(message?.work?.title ?? null, 110)}</h3>
 
                     {message?.work?.description ? (
@@ -159,22 +132,14 @@ export default function Message({ message, friend, onEditFocus, onDelete }: Mess
 
                   <DrawerFooter>
                     <DrawerClose>
-                      <Button
-                        variant="outline"
-                        className="pb-3"
-                      >
-                        Exit work view
-                      </Button>
+                      <Button variant="outline">Exit work view</Button>
                     </DrawerClose>
                   </DrawerFooter>
                 </DrawerContent>
               </Drawer>
             ) : (
               <div>
-                <Link
-                  href={route('work', { work: message.work.id, chat: friend.id })}
-                  className="hover:opacity-80"
-                >
+                <div className="hover:opacity-80">
                   {message?.work?.image || message?.work?.image_self ? (
                     <img
                       src={message.work.image || message.work.image_self || undefined}
@@ -185,7 +150,7 @@ export default function Message({ message, friend, onEditFocus, onDelete }: Mess
                       <p className="text-muted-foreground text-center font-mono text-sm">No cover provided...</p>
                     </div>
                   )}
-                </Link>
+                </div>
 
                 <h3 className="font-secondary text-foreground mb-1 text-xl">{shortenString(message?.work?.title ?? null, 110)}</h3>
 
@@ -197,26 +162,24 @@ export default function Message({ message, friend, onEditFocus, onDelete }: Mess
               </div>
             )
           ) : (
-            <div className={cn('mx-1 max-h-60 overflow-x-hidden overflow-y-scroll p-0.5', isOwnMessage ? 'text-right' : 'text-left')}>
+            <div className={cn('mx-1 max-h-60 overflow-x-hidden overflow-y-scroll p-0.5', !friend ? 'text-right' : 'text-left')}>
               {!messageIsWork && (
                 <AvatarPicture
-                  avatar={isOwnMessage ? auth.user.avatar : friend.avatar}
-                  is_friend={isOwnMessage ? 0 : 1}
-                  name={isOwnMessage ? auth.user.name : friend.name}
-                  className={cn('h-6 w-6 border-1', isOwnMessage ? 'float-right ml-2' : 'float-left mr-2')}
+                  avatar={!friend ? 'https://res.cloudinary.com/djpz0iokm/image/upload/v1750423572/mybiqnoytyb6rlbps7xk.png' : friend.avatar}
+                  is_friend={!friend ? 0 : 1}
+                  name={!friend ? 'vempr' : friend.name}
+                  className={cn('h-6 w-6 border-1', !friend ? 'float-right ml-2' : 'float-left mr-2')}
                 />
               )}
-              <p>{message.text}</p>
+              <p className="text-sm md:text-base">{message.text}</p>
             </div>
           )}
 
-          {isOwnMessage && EditMessageDesktop}
+          {!friend && EditMessageDesktop}
         </div>
       </div>
 
-      <p className={cn('text-muted-foreground mt-1 font-mono text-xs', isOwnMessage ? 'text-right' : '')}>
-        {getRelativeTime(message.created_at)} {message.created_at !== message.updated_at && `(updated ${getRelativeTime(message.updated_at)})`}
-      </p>
+      <p className={cn('text-muted-foreground mt-1 font-mono text-xs', !friend ? 'text-right' : '')}>{message.created_at}</p>
     </li>
   );
 }

@@ -32,7 +32,6 @@ export default function AddWorksToCollection({ works, collection }: AddWorksToCo
   const { rd, open, setOpen } = useResponsiveDialog();
 
   function onSubmit(values: WorksForm) {
-    console.log(values);
     put(
       route('collection.entry.update.multiple', {
         work_ids: values.selectedWorks,
