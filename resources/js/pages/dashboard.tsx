@@ -216,6 +216,33 @@ export default function Dashboard() {
   const { appearance } = useAppearance();
   const isMobile = useIsMobile();
 
+  if (!dashboardData) {
+    return (
+      <AppLayout breadcrumbs={breadcrumbs}>
+        <Head title="Dashboard" />
+        <h2 className="font-secondary mb-2 opacity-80 lg:w-max">
+          Howdy{' '}
+          <Link
+            href={route('u.index')}
+            className="text-secondary hover:underline"
+          >
+            {'<'}
+            {auth.user.name}
+            {'>'}
+          </Link>
+          ! You have been using libsim for {getRelativeTime(auth.user.created_at, true)}. Create some{' '}
+          <Link
+            href={route('work.create')}
+            className="text-secondary hover:underline"
+          >
+            {'<work entries>'}
+          </Link>{' '}
+          to view your dashboard data!
+        </h2>
+      </AppLayout>
+    );
+  }
+
   const sortedTags = dashboardData ? Object.entries(dashboardData.tags).sort((a, b) => b[1] - a[1]) : null;
 
   const readingChartData = [
@@ -546,7 +573,10 @@ export default function Dashboard() {
                       </TableHeader>
                       <TableBody>
                         {sortedTags?.map(([name, count]) => (
-                          <TableRow className="text-foreground text-xs">
+                          <TableRow
+                            className="text-foreground text-xs"
+                            key={`${name}${count}`}
+                          >
                             <TableCell className="font-medium">{name}</TableCell>
                             <TableCell className="text-right">{count}</TableCell>
                           </TableRow>
@@ -575,7 +605,10 @@ export default function Dashboard() {
                     </TableHeader>
                     <TableBody>
                       {sortedTags?.map(([name, count]) => (
-                        <TableRow className="text-foreground text-xs">
+                        <TableRow
+                          className="text-foreground text-xs"
+                          key={`${name}${count}`}
+                        >
                           <TableCell className="font-medium">{name}</TableCell>
                           <TableCell className="text-right">{count}</TableCell>
                         </TableRow>
@@ -597,7 +630,7 @@ export default function Dashboard() {
             </TableHeader>
             <TableBody>
               {sortedTags?.slice(0, 5).map(([name, count]) => (
-                <TableRow>
+                <TableRow key={`${name}${count}`}>
                   <TableCell className="font-medium">{name}</TableCell>
                   <TableCell className="text-right">{count}</TableCell>
                 </TableRow>
@@ -640,7 +673,10 @@ export default function Dashboard() {
                             ...data,
                           }))
                           .map((collection) => (
-                            <TableRow className="text-foreground text-xs">
+                            <TableRow
+                              className="text-foreground text-xs"
+                              key={collection.id}
+                            >
                               <Link href={route('collection.view', { collection: collection.id })}>
                                 <TableCell className="font-medium hover:underline">{collection.name}</TableCell>
                               </Link>
@@ -676,7 +712,10 @@ export default function Dashboard() {
                           ...data,
                         }))
                         .map((collection) => (
-                          <TableRow className="text-foreground text-xs">
+                          <TableRow
+                            className="text-foreground text-xs"
+                            key={collection.id}
+                          >
                             <Link href={route('collection.view', { collection: collection.id })}>
                               <TableCell className="font-medium hover:underline">{collection.name}</TableCell>
                             </Link>
@@ -706,7 +745,10 @@ export default function Dashboard() {
                   ...data,
                 }))
                 .map((collection) => (
-                  <TableRow className="text-foreground">
+                  <TableRow
+                    className="text-foreground"
+                    key={collection.id}
+                  >
                     <Link href={route('collection.view', { collection: collection.id })}>
                       <TableCell className="font-medium hover:underline">{collection.name}</TableCell>
                     </Link>
