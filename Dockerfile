@@ -1,25 +1,46 @@
-FROM richarvey/nginx-php-fpm:3.1.6
+# Base image with PHP and required extensions
+FROM php:8.2-fpm
 
-# Copy project files
-COPY . /var/www/html
+# Install system dependencies and PHP extensions
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    libsqlite3-dev \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    zip \
+    unzip \
+    nginx \
+    supervisor
 
-# Set working directory
+RUN docker-php-ext-install pdo_sqlite mbstring exif pcntl bcmath gd
+
+# Install Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
 WORKDIR /var/www/html
 
-# Environment variables (optional, can be set on Render dashboard)
-ENV APP_ENV=production
-ENV APP_DEBUG=false
+# Copy existing application code
+COPY . .
 
-# Install composer dependencies without dev packages, optimize autoloader
+# Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Generate app key, cache config and routes (migrations NOT here)
-RUN php artisan key:generate && \
-    php artisan config:cache && \
-    php artisan route:cache
+# Build Tailwind assets (assuming you use npm scripts)
+RUN apt-get install -y nodejs npm && \
+    npm install && \
+    npm run prod
 
-# Copy entrypoint script
-COPY scripts/entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+# Set permissions for Laravel
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-ENTRYPOINT ["/entrypoint.sh"]
+# Copy Nginx config
+COPY ./nginx.conf /etc/nginx/sites-available/default
+
+# Supervisord config to run PHP-FPM and Nginx
+COPY ./supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+EXPOSE 80
+
+CMD ["/usr/bin/supervisord", "-n"]
