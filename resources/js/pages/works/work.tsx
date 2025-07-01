@@ -382,7 +382,7 @@ export default function Work() {
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle>Delete "{work.title}"?</DialogTitle>
+                <DialogTitle className="text-lg/6">Delete "{work.title}"?</DialogTitle>
                 <DialogDescription>Once your work entry is deleted, all of its data will also be permanently deleted.</DialogDescription>
               </DialogHeader>
 

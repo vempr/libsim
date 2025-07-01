@@ -21,7 +21,6 @@ import AppLayout from '@/layouts/app-layout';
 import { getRelativeTime } from '@/lib/date';
 import { InertiaProps, SharedData, type BreadcrumbItem } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { useMemo } from 'react';
 import { Pie, PieChart } from 'recharts';
 
 const readingChartConfig = {
@@ -293,18 +292,10 @@ export default function Dashboard() {
     { code: 'tr', count: dashboardData.translatedLanguages.tr ?? 0, fill: 'var(--chart-tr)' },
   ];
 
-  const readingTotalCount = useMemo(() => {
-    return readingChartData.reduce((acc, curr) => acc + curr.count, 0);
-  }, []);
-  const publicationTotalCount = useMemo(() => {
-    return publicationChartData.reduce((acc, curr) => acc + curr.count, 0);
-  }, []);
-  const originalLanguagesTotalCount = useMemo(() => {
-    return originalLanguagesChartData.reduce((acc, curr) => acc + curr.count, 0);
-  }, []);
-  const translatedLanguagesTotalCount = useMemo(() => {
-    return translatedLanguagesChartData.reduce((acc, curr) => acc + curr.count, 0);
-  }, []);
+  const readingTotalCount = readingChartData.reduce((acc, curr) => acc + curr.count, 0);
+  const publicationTotalCount = publicationChartData.reduce((acc, curr) => acc + curr.count, 0);
+  const originalLanguagesTotalCount = originalLanguagesChartData.reduce((acc, curr) => acc + curr.count, 0);
+  const translatedLanguagesTotalCount = translatedLanguagesChartData.reduce((acc, curr) => acc + curr.count, 0);
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
