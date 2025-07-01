@@ -12,7 +12,8 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     nginx \
-    supervisor
+    supervisor \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN docker-php-ext-install pdo_sqlite mbstring exif pcntl bcmath gd
 
@@ -27,10 +28,12 @@ COPY . .
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Build Tailwind assets (assuming you use npm scripts)
-RUN apt-get install -y nodejs npm && \
+# Install Node.js 18.x from NodeSource and build frontend assets
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs && \
     npm install && \
-    npm run prod
+    npm run build && \
+    apt-get purge -y --auto-remove curl
 
 # Set permissions for Laravel
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
