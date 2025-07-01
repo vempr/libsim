@@ -29,6 +29,13 @@ RUN npm ci && \
     npm run build && \
     npm cache clean --force
 
+# Database setup
+RUN mkdir -p database && \
+    touch database/database.sqlite && \
+    chown -R www-data:www-data database && \
+    chmod 775 database && \
+    chmod 664 database/database.sqlite
+
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
@@ -43,5 +50,5 @@ COPY docker/nginx.conf /etc/nginx/sites-available/default
 # Expose port 10000 (Render's default)
 EXPOSE 10000
 
-# Start script
-CMD bash -c "php-fpm & nginx -g 'daemon off;'"
+# Start script with safe migration
+CMD bash -c "php artisan migrate --force && php-fpm & nginx -g 'daemon off;'"
