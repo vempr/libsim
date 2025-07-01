@@ -1,4 +1,6 @@
+import { Button } from '@/components/ui/button';
 import AppLayoutTemplate from '@/layouts/app/app-sidebar-layout';
+import { shortenString } from '@/lib/shorten';
 import { InertiaProps, SharedData, type BreadcrumbItem } from '@/types';
 import { MessageEvent, NotificationEvent } from '@/types/event';
 import { Link, usePage } from '@inertiajs/react';
@@ -29,8 +31,9 @@ export default ({ children, breadcrumbs, excludeAppSidebarHeader, ...props }: Ap
       if (currentRoute !== 'chat.show') {
         toast('', {
           action: (
-            <Link href={route('chat.show', { friend: message.sender.id })}>
-              {message.sender.name}: {message.text} View messages {JSON.stringify(message)}
+            <Link href={route('chat.show', { friend: message.sender.id })} className="flex justify-between items-center w-full">
+							<p><span className="font-secondary">{message.sender.name}</span>: {message.text ? shortenString(message.text) : '<Work>'}</p>
+               <Button variant="outline" className="ml-auto" size="sm">View messages</Button> 
             </Link>
           ),
         });
