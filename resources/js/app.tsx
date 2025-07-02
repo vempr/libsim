@@ -7,6 +7,7 @@ import { createRoot } from 'react-dom/client';
 import '../css/app.css';
 import '../css/nprogress.css';
 import { initializeTheme } from './hooks/use-appearance';
+import './echo.js';
 
 let timeout: NodeJS.Timeout;
 
