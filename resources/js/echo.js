@@ -1,7 +1,4 @@
 import Echo from 'laravel-echo';
-import Pusher from 'pusher-js';
-
-window.Pusher = new Pusher(import.meta.env.VITE_APP_KEY, {cluster: import.meta.env.VITE_REVERB_APP_CLUSTER});
 
 window.Echo = new Echo({
   broadcaster: 'reverb',
