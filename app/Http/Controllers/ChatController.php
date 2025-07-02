@@ -18,6 +18,20 @@ class ChatController extends Controller {
 	public function index() {
 		$userId = Auth::id();
 
+		// Subquery to get the latest message time between the user and each friend
+		$latestMessageSubquery = ChatMessage::selectRaw('MAX(created_at)')
+			->where(function ($query) use ($userId) {
+				// Messages sent by the friend to the user
+				$query->whereColumn('sender_id', 'users.id')
+					->where('receiver_id', $userId);
+			})
+			->orWhere(function ($query) use ($userId) {
+				// Messages sent by the user to the friend
+				$query->where('sender_id', $userId)
+					->whereColumn('receiver_id', 'users.id');
+			});
+
+		// Query friends with the latest message time included and ordered by it desc
 		$friends = User::where(function ($query) use ($userId) {
 			$query->whereHas('friendsOf', function ($q) use ($userId) {
 				$q->where('user_id', $userId);
@@ -27,10 +41,14 @@ class ChatController extends Controller {
 				});
 		})
 			->select(['id', 'name', 'avatar', 'private_works'])
+			->selectSub($latestMessageSubquery, 'latest_message_time')
+			->orderByDesc('latest_message_time')
 			->paginate(30);
 
+		// Collect friend IDs for message fetching
 		$friendIds = $friends->pluck('id');
 
+		// Fetch relevant chat messages between the user and those friends, eager loading the 'work'
 		$messages = ChatMessage::where(function ($q) use ($userId, $friendIds) {
 			$q->where('sender_id', $userId)
 				->whereIn('receiver_id', $friendIds);
@@ -50,9 +68,11 @@ class ChatController extends Controller {
 				return $message->sender_id === $userId ? $message->receiver_id : $message->sender_id;
 			});
 
+		// Attach latest message to each friend
 		$friends->transform(function ($friend) use ($messages) {
 			$latestMessage = $messages->get($friend->id)?->first();
 
+			// If friend has private works, remove work relation from latest message
 			if ($latestMessage && $friend->private_works) {
 				$latestMessage->unsetRelation('work');
 			}
@@ -66,6 +86,7 @@ class ChatController extends Controller {
 			'friendsMessagesPaginatedResponse' => $friends,
 		]);
 	}
+
 
 	public function show(User $friend, Request $request) {
 		if (!Auth::user()->allFriends()->contains($friend)) {
