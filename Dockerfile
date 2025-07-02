@@ -51,9 +51,12 @@ RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 775 /var/www/html/storage \
     && chmod -R 775 /var/www/html/bootstrap/cache
 
-# Create supervisor directory
+# Create supervisor directory and set permissions
 RUN mkdir -p /var/log/supervisor \
-    && chown -R www-data:www-data /var/log/supervisor
+    && chown -R www-data:www-data /var/log/supervisor \
+    && mkdir -p /var/www/html/storage/supervisor \
+    && chown -R www-data:www-data /var/www/html/storage/supervisor \
+    && chmod -R 775 /var/www/html/storage/supervisor # Ensure www-data can write here
 
 # Expose ports
 EXPOSE 10000
