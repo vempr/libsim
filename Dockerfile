@@ -18,14 +18,22 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-# Copy application files
+# Copy application files (before installing npm dependencies, so .env can be used if needed)
 COPY . .
 
-# Install PHP dependencies
-RUN composer install --no-dev --optimize-autoloader
+# Set up build arguments for Vite (Crucial for production)
+ARG VITE_REVERB_APP_KEY
+ARG VITE_REVERB_HOST
+ARG VITE_REVERB_PORT
+ARG VITE_REVERB_SCHEME
 
-# Install Node dependencies and build assets
+# Pass build arguments as environment variables during npm run build
+# Using a subshell to ensure environment variables are set for the npm command
 RUN npm ci && \
+    VITE_REVERB_APP_KEY="${VITE_REVERB_APP_KEY}" \
+    VITE_REVERB_HOST="${VITE_REVERB_HOST}" \
+    VITE_REVERB_PORT="${VITE_REVERB_PORT}" \
+    VITE_REVERB_SCHEME="${VITE_REVERB_SCHEME}" \
     npm run build && \
     npm cache clean --force
 
@@ -46,17 +54,15 @@ COPY docker/nginx.conf /etc/nginx/sites-available/default
 COPY docker/laravel-worker.conf /etc/supervisor/conf.d/laravel-worker.conf
 COPY docker/supervisord.conf /etc/supervisor/supervisord.conf
 
-# Set proper permissions
+# Set proper permissions (including for supervisor socket)
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 775 /var/www/html/storage \
-    && chmod -R 775 /var/www/html/bootstrap/cache
-
-# Create supervisor directory and set permissions
-RUN mkdir -p /var/log/supervisor \
+    && chmod -R 775 /var/www/html/bootstrap/cache \
+    && mkdir -p /var/log/supervisor \
     && chown -R www-data:www-data /var/log/supervisor \
     && mkdir -p /var/www/html/storage/supervisor \
     && chown -R www-data:www-data /var/www/html/storage/supervisor \
-    && chmod -R 775 /var/www/html/storage/supervisor # Ensure www-data can write here
+    && chmod -R 775 /var/www/html/storage/supervisor
 
 # Expose ports
 EXPOSE 10000

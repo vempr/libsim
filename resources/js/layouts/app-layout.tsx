@@ -16,7 +16,6 @@ interface AppLayoutProps {
 export default ({ children, breadcrumbs, excludeAppSidebarHeader, ...props }: AppLayoutProps) => {
   const { flash, auth } = usePage<InertiaProps & SharedData>().props;
   const currentRoute = route().current();
-	console.log(import.meta.env.VITE_REVERB_APP_KEY)
 
   useEffect(() => {
     if (flash?.error?.includes('The collection')) return;
