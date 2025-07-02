@@ -36,9 +36,6 @@ RUN mkdir -p database && \
     chmod 775 database && \
     chmod 664 database/database.sqlite
 
-# Set permissions
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-
 # Configure PHP-FPM
 RUN mkdir -p /var/run/php && \
     echo "listen = 9000" >> /usr/local/etc/php-fpm.d/zz-docker.conf && \
@@ -49,8 +46,14 @@ COPY docker/nginx.conf /etc/nginx/sites-available/default
 COPY docker/laravel-worker.conf /etc/supervisor/conf.d/laravel-worker.conf
 COPY docker/supervisord.conf /etc/supervisor/supervisord.conf
 
-# Create log directory for Supervisor
-RUN mkdir -p /var/log/supervisor
+# Set proper permissions
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 775 /var/www/html/storage \
+    && chmod -R 775 /var/www/html/bootstrap/cache
+
+# Create supervisor directory
+RUN mkdir -p /var/log/supervisor \
+    && chown -R www-data:www-data /var/log/supervisor
 
 # Expose ports
 EXPOSE 10000
