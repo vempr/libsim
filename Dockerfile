@@ -3,7 +3,7 @@ FROM php:8.2-fpm
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     git curl libsqlite3-dev libpng-dev libonig-dev libxml2-dev \
-    zip unzip nginx && \
+    zip unzip nginx supervisor && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
