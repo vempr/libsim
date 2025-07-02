@@ -44,11 +44,17 @@ RUN mkdir -p /var/run/php && \
     echo "listen = 9000" >> /usr/local/etc/php-fpm.d/zz-docker.conf && \
     echo "pm.max_children = 5" >> /usr/local/etc/php-fpm.d/zz-docker.conf
 
-# Copy Nginx config
+# Copy Nginx and Supervisor configs
 COPY docker/nginx.conf /etc/nginx/sites-available/default
+COPY docker/laravel-worker.conf /etc/supervisor/conf.d/laravel-worker.conf
+COPY docker/supervisord.conf /etc/supervisor/supervisord.conf
 
-# Expose port 10000 (Render's default)
+# Create log directory for Supervisor
+RUN mkdir -p /var/log/supervisor
+
+# Expose ports
 EXPOSE 10000
+EXPOSE 8080
 
-# Start script with safe migration
-CMD bash -c "php artisan migrate --force && php-fpm & nginx -g 'daemon off;'"
+# Start services
+CMD bash -c "php artisan migrate --force && supervisord -c /etc/supervisor/supervisord.conf & php-fpm & nginx -g 'daemon off;'"
