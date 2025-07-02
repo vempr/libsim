@@ -21,6 +21,8 @@ WORKDIR /var/www/html
 # Copy application files (before installing npm dependencies, so .env can be used if needed)
 COPY . .
 
+RUN composer install --no-dev --optimize-autoloader && composer clear-cache
+
 # Set up build arguments for Vite (Crucial for production)
 ARG VITE_REVERB_APP_KEY
 ARG VITE_REVERB_HOST
