@@ -52,7 +52,7 @@ function FriendForm({
 
   if (friendRequestStatus === 'expecting')
     return (
-      <div>
+      <div className="flex gap-x-2">
         <form onSubmit={handleAcceptFriend}>
           <Button
             type="submit"
@@ -65,6 +65,7 @@ function FriendForm({
           <Button
             type="submit"
             disabled={processing}
+						variant="destructive"
           >
             Decline friend request
           </Button>
@@ -184,7 +185,7 @@ export default function Work() {
 
         const response: {
           data: { worksPaginatedResponse: PaginatedResponse<Work> };
-        } = await axios.get(`http://127.0.0.1:8000/users/${profile.id}`, { params: { only_works: true } });
+        } = await axios.get(route('users.create', { user: profile.id }), { params: { only_works: true } });
 
         setWorksPaginatedResponse(response.data.worksPaginatedResponse);
         if (response) setFetchingWorks(false);
@@ -235,7 +236,7 @@ export default function Work() {
 
         const response: {
           data: { worksPaginatedResponse: PaginatedResponse<Work> };
-        } = await axios.get(`http://127.0.0.1:8000/users/${profile.id}`, { params: { only_data: true } });
+        } = await axios.get(route('users.create', { user: profile.id }), { params: { only_data: true } });
 
         setWorksPaginatedResponse(response.data.worksPaginatedResponse);
         if (response) setFetchingWorks(false);

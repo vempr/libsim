@@ -1,3 +1,4 @@
+import AvatarPicture from '@/components/avatar-picture';
 import { Button } from '@/components/ui/button';
 import AppLayoutTemplate from '@/layouts/app/app-sidebar-layout';
 import { shortenString } from '@/lib/shorten';
@@ -32,8 +33,9 @@ export default ({ children, breadcrumbs, excludeAppSidebarHeader, ...props }: Ap
         toast('', {
           action: (
             <Link href={route('chat.show', { friend: message.sender.id })} className="flex justify-between items-center w-full">
-							<p><span className="font-secondary">{message.sender.name}</span>: {message.text ? shortenString(message.text) : '<Work>'}</p>
-               <Button variant="outline" className="ml-auto" size="sm">View messages</Button> 
+							<AvatarPicture is_friend={1} avatar={message.sender.avatar} name={message.sender.name} className="w-8 h-8 border-0 mr-1" />
+							<p><span className="font-secondary">{message.sender.name}</span>: {message.text ? `'${shortenString(message.text)}'` : `<${shortenString(message.work?.title ?? null)}>`}</p>
+               <Button className="ml-auto" size="sm">View messages</Button> 
             </Link>
           ),
         });
@@ -51,9 +53,19 @@ export default ({ children, breadcrumbs, excludeAppSidebarHeader, ...props }: Ap
       const notification = e.notification;
 
       if (currentRoute !== 'notification.index') {
-        toast('', {
-          action: <Link href={route('notification.index')}>{JSON.stringify(notification)}</Link>,
-        });
+				if (notification.mood === 'positive') {
+					toast.success('', {
+						action: <Link href={route('notification.index')} className="flex items-center w-full"><AvatarPicture is_friend={1} avatar={notification.image} name={'friend'} className="w-8 h-8 border-0 -translate-x-2" /><p>{notification.description}</p></Link>,
+					})
+ 				} else if (notification.mood === 'negative') {
+					toast.error('', {
+						action: <Link href={route('notification.index')} className="flex items-center w-full"><AvatarPicture is_friend={0} avatar={notification.image} name={'user'} className="w-8 h-8 border-0 -translate-x-2" /><p>{notification.description}</p></Link>,
+					})
+				} else {
+					toast('', {
+						action: <Link href={route('notification.index')} className="flex items-center w-full"><AvatarPicture is_friend={0} avatar={notification.image} name={'user'} className="w-8 h-8 border-0 -translate-x-2" /><p>{notification.description}</p></Link>,
+					});
+				}
       }
     });
 

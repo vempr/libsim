@@ -48,7 +48,7 @@ export default function NotificationItem({ notification }: { notification: Notif
         </div>
 
         {notification.type == 'friend_request' ? (
-          <div className="flex flex-1 gap-x-2">
+          <div className="flex flex-1 gap-2 flex-col md:flex-row">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
