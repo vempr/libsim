@@ -1,6 +1,6 @@
 # libsim
 
-is a web-based novel collection platform. Use libsim to save entries between friends and exchange your favorite novels through the built-in chat! Create custom collections and organize your works, as well as your friends' works.
+is a web-based novel collection platform. Use libsim to save entries between friends and exchange your favorite novels through the built-in chat! Create custom collections and organize your works, as well as your friends' works. You can view the app demo on [YouTube](https://youtu.be/WjaajDIBPUA).
 
 This application was built with Laravel, Inertia and React from Laravel's React Starter Kit. I used [Laravel Reverb](https://reverb.laravel.com/) for real-time chat/notifications and [Render](https://www.render.com) to deploy libsim.
 
