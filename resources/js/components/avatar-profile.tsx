@@ -2,7 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useInitials } from '@/hooks/use-initials';
 import { SharedData } from '@/types';
-import { useForm, usePage } from '@inertiajs/react';
+import { router, useForm, usePage } from '@inertiajs/react';
 import { useCallback, useRef, useState } from 'react';
 import AvatarEditor from 'react-avatar-editor';
 import { useDropzone } from 'react-dropzone';
@@ -25,7 +25,7 @@ function fileSizeValidator(file: File) {
 
 export default function AvatarProfile() {
   const { auth } = usePage<SharedData>().props;
-  const { put, delete: destroy } = useForm();
+  const { delete: destroy } = useForm();
   const getInitials = useInitials();
 
   const editor = useRef<AvatarEditor>(null);
@@ -125,11 +125,18 @@ export default function AvatarProfile() {
 						</form>
 
 						<form
-							onSubmit={(e) => {
+							onSubmit={async (e) => {
 								e.preventDefault();
 								if (editor.current) {
-									const canvasScaled = editor.current.getImageScaledToCanvas().toDataURL();
-									put(route('profile.avatar.update', { file: canvasScaled }));
+									const canvas = editor.current.getImageScaledToCanvas();
+									canvas.toBlob((blob) => {
+										if (blob) {
+											const formData = new FormData();
+											formData.append('avatar', blob, 'avatar.png');
+
+											router.post(route('profile.avatar.update'), formData);
+										}
+									});
 								}
 							}}
 						>
@@ -139,7 +146,7 @@ export default function AvatarProfile() {
 							>
 								Update avatar
 							</Button>
-						</form>  
+						</form>
         </DialogFooter>
       </DialogContent>
     </Dialog>

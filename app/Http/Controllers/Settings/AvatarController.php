@@ -28,13 +28,11 @@ class AvatarController extends Controller {
 	}
 
 	public function update(Request $request) {
-		$image = $request->validate([
-			'file' => 'required|string|max:16777216'
-		])['file'];
+		$request->validate([
+			'avatar' => 'required|file|mimetypes:image/png,image/webp,image/jpeg,image/avif|max:16384'
+		]);
 
-		if (!fileIsAllowed($image)) {
-			return back()->with('error', 'File data type not allowed.');
-		}
+		$uploadedFile = $request->file('avatar');
 
 		$user = Auth::user();
 
@@ -44,10 +42,12 @@ class AvatarController extends Controller {
 
 				$user->avatar = null;
 				$user->avatar_public_id = null;
-				$user->update();
+				$user->save();
 			}
 
-			$result = $this->cloudinary->uploadApi()->upload($image);
+			$result = $this->cloudinary->uploadApi()->upload($uploadedFile->getRealPath(), [
+				'folder' => 'avatars'
+			]);
 
 			$user->avatar = $result['secure_url'];
 			$user->avatar_public_id = $result['public_id'];

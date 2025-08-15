@@ -17,32 +17,32 @@ class DatabaseSeeder extends Seeder {
 		]);
 
 		// for testing
-		// $staticUser1 = User::factory()->create([
-		// 	'name' => '1',
-		// 	'email' => 'static@example.com',
-		// ]);
+		$staticUser1 = User::factory()->create([
+			'name' => '1',
+			'email' => 'static@example.com',
+		]);
 
-		// $staticUser2 = User::factory()->create([
-		// 	'name' => '2',
-		// 	'email' => 'static2@example.com',
-		// ]);
+		$staticUser2 = User::factory()->create([
+			'name' => '2',
+			'email' => 'static2@example.com',
+		]);
 
-		// $randomUsers = User::factory(18)->create();
-		// $friends = $randomUsers
-		// 	->whereNotIn('id', [$staticUser1->id])
-		// 	->random(10);
+		$randomUsers = User::factory(18)->create();
+		$friends = $randomUsers
+			->whereNotIn('id', [$staticUser1->id])
+			->random(10);
 
-		// $staticUser1->friends()->attach($friends->pluck('id'));
+		$staticUser1->friends()->attach($friends->pluck('id'));
 
-		// $allUsers = collect([$staticUser1, $staticUser2])->merge($randomUsers);
-		// $allUsers->each(function ($user) {
-		// 	$user->profile()->create(Profile::factory()->make()->toArray());
-		// });
+		$allUsers = collect([$staticUser1, $staticUser2])->merge($randomUsers);
+		$allUsers->each(function ($user) {
+			$user->profile()->create(Profile::factory()->make()->toArray());
+		});
 
-		// User::factory()->create(['name' => 'empty', 'email' => 'empty@example.com'])->profile()->create(Profile::factory()->make()->toArray());
+		User::factory()->create(['name' => 'empty', 'email' => 'empty@example.com'])->profile()->create(Profile::factory()->make()->toArray());
 
-		// Work::factory(500)
-		// 	->recycle($allUsers->all())
-		// 	->create();
+		Work::factory(500)
+			->recycle($allUsers->all())
+			->create();
 	}
 }

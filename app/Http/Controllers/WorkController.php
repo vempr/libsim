@@ -182,7 +182,9 @@ class WorkController extends Controller {
 
 		try {
 			if ($image) {
-				$result = $this->cloudinary->uploadApi()->upload($image->getRealPath());
+				$result = $this->cloudinary->uploadApi()->upload($image->getRealPath(), [
+					'folder' => 'works'
+				]);
 				$requestWork['image'] = $result['secure_url'];
 				$requestWork['image_public_id'] = $result['public_id'];
 			}

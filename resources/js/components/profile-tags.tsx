@@ -18,7 +18,7 @@ export default function ProfileTags({ title, tags, className }: ProfileTagsProps
       </h3>
 
       {tags ? (
-        <ul className="grid max-h-40 scroll-py-1 grid-cols-2 gap-1 overflow-x-hidden overflow-y-auto md:grid-cols-1">
+        <ul className="grid max-h-40 grid-cols-2 scroll-py-1 gap-1 overflow-x-hidden overflow-y-auto md:grid-cols-1">
           {tags.map((tag) => (
             <li
               className="w-full"

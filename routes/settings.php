@@ -9,7 +9,7 @@ use Inertia\Inertia;
 Route::middleware(['auth', 'verified', 'throttle:60,1'])->group(function () {
 	Route::redirect('settings', 'settings/profile');
 
-	Route::put('settings/profile/avatar', [AvatarController::class, 'update'])->name('profile.avatar.update');
+	Route::post('settings/profile/avatar', [AvatarController::class, 'update'])->name('profile.avatar.update');
 	Route::delete('settings/profile/avatar', [AvatarController::class, 'destroy'])->name('profile.avatar.destroy');
 
 	Route::get('settings/profile', [ProfileController::class, 'edit'])->name('profile.edit');

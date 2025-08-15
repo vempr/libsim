@@ -654,7 +654,7 @@ export default function Dashboard() {
                       <TableHeader>
                         <TableRow>
                           <TableHead className="font-secondary text-secondary w-[100px]">Name</TableHead>
-                          <TableHead className="font-secondary text-secondary text-right">Appearances</TableHead>
+                          <TableHead className="font-secondary text-secondary text-right">Works</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -693,7 +693,7 @@ export default function Dashboard() {
                     <TableHeader>
                       <TableRow>
                         <TableHead className="font-secondary text-secondary w-[100px]">Name</TableHead>
-                        <TableHead className="font-secondary text-secondary text-right">Appearances</TableHead>
+                        <TableHead className="font-secondary text-secondary text-right">Works</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -725,7 +725,7 @@ export default function Dashboard() {
             <TableHeader>
               <TableRow>
                 <TableHead className="font-secondary text-secondary w-[100px]">Name</TableHead>
-                <TableHead className="font-secondary text-secondary text-right">Appearances</TableHead>
+                <TableHead className="font-secondary text-secondary text-right">Works</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
