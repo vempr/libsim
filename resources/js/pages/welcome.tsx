@@ -49,7 +49,7 @@ const messages: MessageEager[] = [
       description:
         'Ragna, the heir to a frontier noble family, is a reincarnated former Japanese citizen who realizes that the world he now lives in is the setting of an otome game. Dreaming of a carefree life as an adventurer, his plans are derailed when a war takes his family, forcing him to take on the responsibilities of managing his family’s lands. Struggling with the unfamiliar duties of a lord, his already chaotic life takes another turn when an unexpected engagement to a noblewoman from a higher-ranking family is arranged. To his surprise, the bride-to-be is Alicia, the "villainess" of the otome game\'s story — a character destined for heartbreak, a demonic pact, and ultimate destruction. Now sharing his life with someone fated for tragedy, Ragna is swept up in the wheels of fate. Can he rewrite the predetermined outcomes of this world and secure a peaceful life for himself and Alicia?',
       image_self: null,
-      image: 'https://res.cloudinary.com/djpz0iokm/image/upload/v1751206155/ejv9gjofel4awxeby6lt.png',
+      image: '/example.jpg',
     },
     created_at: '1 day ago',
     updated_at: '',
