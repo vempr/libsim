@@ -125,7 +125,7 @@ class ChatController extends Controller {
 			return ['messagesPaginatedResponse' => $messages];
 		}
 
-		$works = Work::query()->where('user_id', Auth::id())->select('id', 'title', 'description', 'image_self', 'image')->get();
+		$works = Work::query()->where('user_id', Auth::id())->orderByDesc('updated_at')->select('id', 'title', 'description', 'image_self', 'image')->get();
 
 		return Inertia::render('chat/chat', [
 			'messagesPaginatedResponse' => $messages,
