@@ -2,6 +2,8 @@
 
 is a web-based novel collection platform. Use libsim to save entries between friends and exchange your favorite novels through the built-in chat! Create custom collections and organize your works, as well as your friends' works. You can view the app demo on [YouTube](https://youtu.be/WjaajDIBPUA).
 
+![public/demo.jpg](https://github.com/vempr/libsim/blob/6f4a484e49ba3a72b81c830c442c567328b92e77/public/demo.jpg)
+
 This application was built with Laravel, Inertia and React from Laravel's React Starter Kit. I used [Laravel Reverb](https://reverb.laravel.com/) for real-time chat/notifications and [Render](https://www.render.com) to deploy libsim.
 
 ## Features
