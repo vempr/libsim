@@ -71,4 +71,4 @@ EXPOSE 10000
 EXPOSE 8080
 
 # Start services
-CMD bash -c "php artisan migrate --force && supervisord -c /etc/supervisor/supervisord.conf & php-fpm & nginx -g 'daemon off;'"
+CMD bash -c "php artisan migrate --force --seed && supervisord -c /etc/supervisor/supervisord.conf & php-fpm & nginx -g 'daemon off;'"

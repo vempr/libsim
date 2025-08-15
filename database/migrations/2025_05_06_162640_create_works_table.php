@@ -11,8 +11,10 @@ return new class extends Migration {
 	public function up(): void {
 		Schema::create('works', function (Blueprint $table) {
 			$table->uuid('id')->primary();
-			$table->foreignUuid('user_id')
-				->constrained()
+			$table->uuid('user_id');
+			$table->foreign('user_id')
+				->references('id')
+				->on('users')
 				->onDelete('cascade');
 
 			$table->string("title");

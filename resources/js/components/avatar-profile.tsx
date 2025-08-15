@@ -110,36 +110,36 @@ export default function AvatarProfile() {
           </DialogClose>
 
             <form
-    onSubmit={(e) => {
-      e.preventDefault();
-      destroy(route('profile.avatar.update'));
-    }}
-  >
-    <Button
-      type="submit"
-      variant="destructive"
-      className="hover:cursor-pointer"
-    >
-      Delete current avatar
-    </Button>
-  </form>
+							onSubmit={(e) => {
+								e.preventDefault();
+								destroy(route('profile.avatar.update'));
+							}}
+						>
+							<Button
+								type="submit"
+								variant="destructive"
+								className="hover:cursor-pointer"
+							>
+								Delete current avatar
+							</Button>
+						</form>
 
-  <form
-    onSubmit={(e) => {
-      e.preventDefault();
-      if (editor.current) {
-        const canvasScaled = editor.current.getImageScaledToCanvas().toDataURL();
-        put(route('profile.avatar.update'), { file: canvasScaled });
-      }
-    }}
-  >
-    <Button
-      type="submit"
-      className="hover:cursor-pointer"
-    >
-      Update avatar
-    </Button>
-  </form>
+						<form
+							onSubmit={(e) => {
+								e.preventDefault();
+								if (editor.current) {
+									const canvasScaled = editor.current.getImageScaledToCanvas().toDataURL();
+									put(route('profile.avatar.update', { file: canvasScaled }));
+								}
+							}}
+						>
+							<Button
+								type="submit"
+								className="hover:cursor-pointer"
+							>
+								Update avatar
+							</Button>
+						</form>  
         </DialogFooter>
       </DialogContent>
     </Dialog>
