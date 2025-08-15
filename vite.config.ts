@@ -21,5 +21,8 @@ export default defineConfig({
       'ziggy-js': resolve(__dirname, 'vendor/tightenco/ziggy'),
     },
   },
-	base: './'
+	base: './',
+	build: {
+    assetsInlineLimit: 0
+  }
 });
