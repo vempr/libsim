@@ -71,6 +71,8 @@ export default function WorkCard({ work, favorite, collection, user }: { work: W
   const link = route('work', params);
   const canViewStatusReading = !favorite && !user;
 
+	console.log(work);
+
   if (isMobile) {
     return (
       <li>
@@ -95,40 +97,42 @@ export default function WorkCard({ work, favorite, collection, user }: { work: W
             </div>
 
             <div className="flex flex-1 flex-col justify-between gap-y-2">
-              {canViewStatusReading && (
-                <div className="-translate-y-0.5">
-                  <Badge
-                    variant={badgeVariant}
-                    className="w-full font-mono capitalize"
-                  >
-                    {work.status_reading ?? 'Unknown'}
-                  </Badge>
-                  <h2 className="font-secondary text-lg">
-                    {title} {work.publication_year && <span>({work.publication_year})</span>}
-                  </h2>
-                </div>
-              )}
+							<div className="flex flex-col">
+								<div className="-translate-y-0.5">
+								{canViewStatusReading && (
+									<Badge
+										variant={badgeVariant}
+										className="w-full font-mono capitalize"
+									>
+										{work.status_reading ?? 'Unknown'}
+									</Badge>
+								)}
+									<h2 className="font-secondary text-lg">
+										{title} {work.publication_year && <span>({work.publication_year})</span>}
+									</h2>
+								</div>
 
-              {(work.author || work.status_publication) && (
-                <div className="flex flex-1 flex-col justify-end font-light tracking-tight">
-                  {work.author && <p>{authors}</p>}
+								{(work.author || work.status_publication) && (
+									<div className="flex flex-1 flex-col justify-end font-light tracking-tight">
+										{work.author && <p>{authors}</p>}
 
-                  {work.status_publication && (
-                    <div className="-mt-1 -ml-1 flex items-center">
-                      <Dot className={PublicationStatusDotColor + ' -m-1'} />
-                      <p className="font-secondary text-muted-foreground capitalize">{work.status_publication}</p>
-                    </div>
-                  )}
-                </div>
-              )}
+										{work.status_publication && (
+											<div className="-mt-1 -ml-1 flex items-center">
+												<Dot className={PublicationStatusDotColor + ' -m-1'} />
+												<p className="font-secondary text-muted-foreground capitalize">{work.status_publication}</p>
+											</div>
+										)}
+									</div>
+								)}
+							</div>
+
+							<p className="max-h-30 overflow-y-auto bg-background p-2 rounded">
+								{work.description ?? <span className="text-muted-foreground font-mono tracking-normal">(No description provided...)</span>}
+							</p>
             </div>
           </div>
 
           <ReadOnlyInputTags value={work.tags ?? '<Tags not provided>'} />
-
-          <p className="max-h-52 overflow-y-auto">
-            {work.description ?? <span className="text-muted-foreground font-mono tracking-normal">(No description provided...)</span>}
-          </p>
         </Link>
       </li>
     );
